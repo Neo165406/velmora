@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — Velmora</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .pd-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  @media (max-width: 860px) {
+    .pd-wrap { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav-bar">
+    <a href="index.html" class="brand">VEL<span>MORA</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="shop.html#rings">Rings</a></li>
+      <li><a href="shop.html#necklaces">Necklaces</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <button class="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="nav-overlay"></div>
+</header>
+
+<section>
+  <div class="container">
+    <div class="pd-wrap" data-product-detail></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom">&copy; 2026 Velmora. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/nav.js"></script>
+<script src="js/products.js"></script>
+</body>
+</html>
