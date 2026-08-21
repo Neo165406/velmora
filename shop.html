@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — Velmora</title>
+<meta name="description" content="Shop Velmora's full jewellery collection — rings, necklaces, earrings and bracelets.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav-bar">
+    <a href="index.html" class="brand">VEL<span>MORA</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="shop.html#rings">Rings</a></li>
+      <li><a href="shop.html#necklaces">Necklaces</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <button class="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="nav-overlay"></div>
+</header>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>The Collection</h1>
+    <p>Rings, necklaces, earrings and bracelets — crafted for every occasion.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <div class="filter-row">
+      <button class="filter-chip active" data-filter="All">All</button>
+      <button class="filter-chip" data-filter="Rings">Rings</button>
+      <button class="filter-chip" data-filter="Necklaces">Necklaces</button>
+      <button class="filter-chip" data-filter="Earrings">Earrings</button>
+      <button class="filter-chip" data-filter="Bracelets">Bracelets</button>
+    </div>
+    <div class="product-grid" data-product-grid></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">VEL<span>MORA</span></div>
+        <p style="font-size:0.9rem; max-width:260px;">Fine jewellery for the stylish woman. Antique gold, hand-set stones, made in Dhaka.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Products</a></li>
+          <li><a href="shop.html">Rings</a></li>
+          <li><a href="shop.html">Necklaces</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Reach Us</h4>
+        <ul>
+          <li>Dhaka, Bangladesh</li>
+          <li>hello@velmora.shop</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Velmora. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/nav.js"></script>
+<script src="js/products.js"></script>
+</body>
+</html>
