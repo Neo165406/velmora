@@ -29,9 +29,15 @@
       <li><a href="shop.html#necklaces">Necklaces</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
-    <button class="hamburger" aria-label="Toggle menu">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="nav-right">
+      <a href="cart.html" class="cart-icon-wrap" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#6B0F1A" stroke-width="1.6"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="10" cy="20" r="1.2" fill="#6B0F1A"/><circle cx="17" cy="20" r="1.2" fill="#6B0F1A"/></svg>
+        <span data-cart-count>0</span>
+      </a>
+      <button class="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
   <div class="nav-overlay"></div>
 </header>
@@ -49,6 +55,7 @@
 </footer>
 
 <script src="js/nav.js"></script>
-<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script type="module" src="js/products.js"></script>
 </body>
 </html>
