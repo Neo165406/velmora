@@ -23,19 +23,48 @@
       <li><a href="shop.html#necklaces">Necklaces</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
-    <button class="hamburger" aria-label="Toggle menu">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="nav-right">
+      <a href="cart.html" class="cart-icon-wrap" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#6B0F1A" stroke-width="1.6"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="10" cy="20" r="1.2" fill="#6B0F1A"/><circle cx="17" cy="20" r="1.2" fill="#6B0F1A"/></svg>
+        <span data-cart-count>0</span>
+      </a>
+      <button class="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
   <div class="nav-overlay"></div>
 </header>
 
 <section class="hero">
-  <div class="hero-content">
-    <div class="hero-eyebrow">Velmora Fine Jewellery</div>
-    <h1>Glamour for the<br><em>Stylish Woman</em></h1>
-    <p>Antique gold detailing, hand-set stones, and pieces made to be worn — not kept away. Cash on delivery across Bangladesh.</p>
-    <a href="shop.html" class="btn btn-solid">Shop the Collection</a>
+  <div class="hero-slide slide-a is-active">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Velmora Fine Jewellery</div>
+      <h1>Glamour for the<br><em>Stylish Woman</em></h1>
+      <p>Antique gold detailing, hand-set stones, and pieces made to be worn — not kept away. Cash on delivery across Bangladesh.</p>
+      <a href="shop.html" class="btn btn-solid">Shop the Collection</a>
+    </div>
+  </div>
+  <div class="hero-slide slide-b">
+    <div class="hero-content">
+      <div class="hero-eyebrow">New This Season</div>
+      <h1>Antique Gold,<br><em>Reimagined</em></h1>
+      <p>Hand-finished necklaces and chokers inspired by heritage craftsmanship.</p>
+      <a href="shop.html" class="btn btn-solid">Explore Necklaces</a>
+    </div>
+  </div>
+  <div class="hero-slide slide-c">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Bridal Edit</div>
+      <h1>Pieces Made<br><em>For the Big Day</em></h1>
+      <p>Kundan, temple work, and statement sets for every ceremony.</p>
+      <a href="shop.html" class="btn btn-solid">View Bridal Edit</a>
+    </div>
+  </div>
+  <div class="hero-dots">
+    <button class="hero-dot is-active" aria-label="Slide 1"></button>
+    <button class="hero-dot" aria-label="Slide 2"></button>
+    <button class="hero-dot" aria-label="Slide 3"></button>
   </div>
 </section>
 
@@ -131,6 +160,8 @@
 </footer>
 
 <script src="js/nav.js"></script>
-<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/hero-slider.js"></script>
+<script type="module" src="js/products.js"></script>
 </body>
 </html>
