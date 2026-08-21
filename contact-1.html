@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Velmora</title>
+<meta name="description" content="Get in touch with Velmora for orders, custom pieces, and questions.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav-bar">
+    <a href="index.html" class="brand">VEL<span>MORA</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="shop.html#rings">Rings</a></li>
+      <li><a href="shop.html#necklaces">Necklaces</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+    </ul>
+    <button class="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="nav-overlay"></div>
+</header>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>Get in Touch</h1>
+    <p>Questions, custom orders, or bulk enquiries — we reply within a day.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container contact-wrap">
+    <div>
+      <h2 style="margin-bottom:20px;">Send a message</h2>
+      <form id="contact-form">
+        <div class="form-field">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-field">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+        <div class="form-field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-solid">Send Message</button>
+        <div class="form-status" id="form-status"></div>
+      </form>
+    </div>
+    <div>
+      <h2 style="margin-bottom:20px;">Visit or Reach Us</h2>
+      <p style="margin-bottom:14px; color:#6b4a4e;">Dhaka, Bangladesh</p>
+      <p style="margin-bottom:14px; color:#6b4a4e;">hello@velmora.shop</p>
+      <p style="margin-bottom:30px; color:#6b4a4e;">Available Saturday–Thursday, 10am–8pm</p>
+      <a class="btn" href="#" id="whatsapp-link">Order via WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom">&copy; 2026 Velmora. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/nav.js"></script>
+<script>
+  // Pre-fill WhatsApp link if arriving from a product page (?product=Name)
+  // Replace 8801XXXXXXXXX with your WhatsApp business number.
+  const params = new URLSearchParams(window.location.search);
+  const product = params.get('product');
+  const waNumber = '8801XXXXXXXXX';
+  const waText = product ? `Hi, I'm interested in: ${product}` : `Hi, I'd like to know more about Velmora.`;
+  document.getElementById('whatsapp-link').href = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
+
+  // Form submit placeholder — wire this to Firestore the same way
+  // StrDust's contact page writes to its `messages` collection.
+  document.getElementById('contact-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    document.getElementById('form-status').textContent = 'Thanks — connect this form to Firestore to start receiving messages.';
+    this.reset();
+  });
+</script>
+</body>
+</html>
