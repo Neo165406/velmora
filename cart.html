@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart — Velmora</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav-bar">
+    <a href="index.html" class="brand">VEL<span>MORA</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="shop.html#rings">Rings</a></li>
+      <li><a href="shop.html#necklaces">Necklaces</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="cart.html" class="cart-icon-wrap" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#6B0F1A" stroke-width="1.6"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="10" cy="20" r="1.2" fill="#6B0F1A"/><circle cx="17" cy="20" r="1.2" fill="#6B0F1A"/></svg>
+        <span data-cart-count>0</span>
+      </a>
+      <button class="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="nav-overlay"></div>
+</header>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>Your Cart</h1>
+    <p>Review your pieces before checkout.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <div id="cart-empty" class="empty-cart" style="display:none;">
+      <p style="margin-bottom:20px;">Your cart is empty.</p>
+      <a href="shop.html" class="btn btn-solid">Continue Shopping</a>
+    </div>
+
+    <div id="cart-full" class="cart-layout">
+      <div>
+        <div id="cart-items"></div>
+      </div>
+
+      <div class="cart-summary">
+        <h3>Order Summary</h3>
+        <div class="delivery-options">
+          <label class="delivery-option">
+            <input type="radio" name="delivery" value="dhaka" checked>
+            Inside Dhaka
+            <span class="fee">৳60</span>
+          </label>
+          <label class="delivery-option">
+            <input type="radio" name="delivery" value="outside">
+            Outside Dhaka
+            <span class="fee">৳130</span>
+          </label>
+        </div>
+        <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">৳0</span></div>
+        <div class="summary-row"><span>Delivery</span><span id="sum-delivery">৳60</span></div>
+        <div class="summary-row total"><span>Total</span><span id="sum-total">৳0</span></div>
+
+        <form id="checkout-form" style="margin-top:24px;">
+          <div class="form-field">
+            <label for="c-name">Full Name</label>
+            <input type="text" id="c-name" required>
+          </div>
+          <div class="form-field">
+            <label for="c-phone">Phone Number</label>
+            <input type="tel" id="c-phone" required>
+          </div>
+          <div class="form-field">
+            <label for="c-address">Delivery Address</label>
+            <textarea id="c-address" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-solid" style="width:100%; border:none;">Place Order — Cash on Delivery</button>
+          <div class="form-status" id="checkout-status"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom">&copy; 2026 Velmora. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/nav.js"></script>
+<script src="js/cart.js"></script>
+<script>
+  function gemIconSmall() {
+    return `<svg viewBox="0 0 64 64" fill="none"><path d="M8 22L32 6L56 22L32 58L8 22Z" stroke="#6B0F1A" stroke-width="2" stroke-linejoin="round"/></svg>`;
+  }
+
+  function renderCart() {
+    const cart = getCart();
+    const empty = document.getElementById('cart-empty');
+    const full = document.getElementById('cart-full');
+
+    if (!cart.length) {
+      empty.style.display = 'block';
+      full.style.display = 'none';
+      return;
+    }
+    empty.style.display = 'none';
+    full.style.display = 'grid';
+
+    document.getElementById('cart-items').innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="thumb">${gemIconSmall()}</div>
+        <div class="details">
+          <h4>${item.name}</h4>
+          <div class="qty-stepper">
+            <button type="button" data-minus="${item.id}">−</button>
+            <input type="text" value="${item.qty}" readonly>
+            <button type="button" data-plus="${item.id}">+</button>
+          </div>
+          <a href="#" class="remove-link" data-remove="${item.id}">Remove</a>
+        </div>
+        <div class="price">${formatTaka(item.price * item.qty)}</div>
+      </div>
+    `).join('');
+
+    document.querySelectorAll('[data-minus]').forEach(btn => {
+      const item = cart.find(i => i.id === btn.dataset.minus);
+      btn.addEventListener('click', () => { updateQty(item.id, item.qty - 1); renderCart(); });
+    });
+    document.querySelectorAll('[data-plus]').forEach(btn => {
+      const item = cart.find(i => i.id === btn.dataset.plus);
+      btn.addEventListener('click', () => { updateQty(item.id, item.qty + 1); renderCart(); });
+    });
+    document.querySelectorAll('[data-remove]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        removeFromCart(link.dataset.remove);
+        renderCart();
+      });
+    });
+
+    updateSummary();
+  }
+
+  function currentZone() {
+    return document.querySelector('input[name="delivery"]:checked').value;
+  }
+
+  function updateSummary() {
+    const subtotal = cartSubtotal();
+    const fee = getDeliveryFee(currentZone());
+    document.getElementById('sum-subtotal').textContent = formatTaka(subtotal);
+    document.getElementById('sum-delivery').textContent = formatTaka(fee);
+    document.getElementById('sum-total').textContent = formatTaka(subtotal + fee);
+  }
+
+  document.querySelectorAll('input[name="delivery"]').forEach(radio => {
+    radio.addEventListener('change', updateSummary);
+  });
+
+  document.getElementById('checkout-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    // Once Firestore is configured, write this order object into an
+    // `orders` collection here (same pattern as StrDust's dashboard.html).
+    const order = {
+      name: document.getElementById('c-name').value,
+      phone: document.getElementById('c-phone').value,
+      address: document.getElementById('c-address').value,
+      zone: currentZone(),
+      deliveryFee: getDeliveryFee(currentZone()),
+      items: getCart(),
+      subtotal: cartSubtotal(),
+      total: cartSubtotal() + getDeliveryFee(currentZone()),
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+    const orders = JSON.parse(localStorage.getItem('velmora_orders') || '[]');
+    orders.push(order);
+    localStorage.setItem('velmora_orders', JSON.stringify(orders));
+
+    localStorage.removeItem('velmora_cart');
+    document.getElementById('checkout-status').textContent = 'Order placed! We\'ll call to confirm delivery.';
+    this.reset();
+    setTimeout(renderCart, 1200);
+  });
+
+  renderCart();
+</script>
+</body>
+</html>
