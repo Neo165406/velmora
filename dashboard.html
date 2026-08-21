@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Velmora</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Shown until Firebase config is filled in (js/firebase-config.js) -->
+<div id="config-gate" class="login-screen">
+  <div class="login-box" style="width:420px;">
+    <h2>Connect Firebase</h2>
+    <p style="font-size:0.9rem; color:#6b4a4e; margin-bottom:16px;">
+      This dashboard needs your Velmora Firebase web config before it can log in or manage products/orders.
+    </p>
+    <div class="config-warning">
+      Open <code>js/firebase-config.js</code> and paste in your project's web config from
+      Firebase Console → Project Settings → General → "Your apps". Then reload this page.
+    </div>
+  </div>
+</div>
+
+<!-- Shown once configured, before login -->
+<div id="login-screen" class="login-screen" style="display:none;">
+  <div class="login-box">
+    <h2>Admin Login</h2>
+    <form id="login-form">
+      <div class="form-field">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" required>
+      </div>
+      <div class="form-field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" required>
+      </div>
+      <button type="submit" class="btn btn-solid" style="width:100%; border:none;">Log In</button>
+      <div class="form-status" id="login-status"></div>
+    </form>
+  </div>
+</div>
+
+<!-- Main dashboard, shown after successful login -->
+<div id="admin-shell" class="admin-shell" style="display:none;">
+  <div class="admin-topbar">
+    <div class="brand">VEL<span>MORA</span> Admin</div>
+    <button class="btn" id="logout-btn" style="padding:8px 20px; border-color:var(--gold-light); color:var(--gold-light);">Log Out</button>
+  </div>
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="products">Products</button>
+    <button class="admin-tab" data-tab="orders">Orders</button>
+  </div>
+
+  <div class="admin-body">
+    <div class="admin-panel active" id="panel-products">
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3 id="form-title">Add Product</h3>
+          <form id="product-form">
+            <input type="hidden" id="p-id">
+            <div class="form-field">
+              <label for="p-name">Name</label>
+              <input type="text" id="p-name" required>
+            </div>
+            <div class="form-field">
+              <label for="p-category">Category</label>
+              <select id="p-category" style="width:100%; padding:13px 15px; border:1px solid rgba(107,15,26,0.25);">
+                <option>Rings</option>
+                <option>Necklaces</option>
+                <option>Earrings</option>
+                <option>Bracelets</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="p-price">Price (৳)</label>
+              <input type="number" id="p-price" required>
+            </div>
+            <div class="form-field">
+              <label for="p-oldprice">Old Price (৳) — optional</label>
+              <input type="number" id="p-oldprice">
+            </div>
+            <div class="form-field">
+              <label for="p-tag">Tag — optional (e.g. New, Bestseller)</label>
+              <input type="text" id="p-tag">
+            </div>
+            <div class="form-field">
+              <label for="p-stock">Stock Quantity</label>
+              <input type="number" id="p-stock" value="10">
+            </div>
+            <button type="submit" class="btn btn-solid" style="width:100%; border:none;">Save Product</button>
+            <button type="button" id="p-cancel" class="btn" style="width:100%; margin-top:10px; display:none;">Cancel Edit</button>
+          </form>
+        </div>
+
+        <div class="admin-card">
+          <h3>All Products</h3>
+          <table class="admin-table">
+            <thead>
+              <tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th></th></tr>
+            </thead>
+            <tbody id="products-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="panel-orders">
+      <div class="admin-card">
+        <h3>All Orders</h3>
+        <table class="admin-table">
+          <thead>
+            <tr><th>Customer</th><th>Phone</th><th>Zone</th><th>Total</th><th>Status</th></tr>
+          </thead>
+          <tbody id="orders-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { firebaseConfig } from './js/firebase-config.js';
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import {
+    getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import {
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+  const isConfigured = Boolean(firebaseConfig.apiKey);
+  const configGate = document.getElementById('config-gate');
+  const loginScreen = document.getElementById('login-screen');
+  const adminShell = document.getElementById('admin-shell');
+
+  if (!isConfigured) {
+    configGate.style.display = 'flex';
+  } else {
+    configGate.style.display = 'none';
+    loginScreen.style.display = 'flex';
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginScreen.style.display = 'none';
+        adminShell.style.display = 'block';
+        loadProducts();
+        loadOrders();
+      } else {
+        loginScreen.style.display = 'flex';
+        adminShell.style.display = 'none';
+      }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (err) {
+        document.getElementById('login-status').textContent = 'Login failed — check email/password.';
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+
+    // ---- Tabs ----
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // ---- Products ----
+    async function loadProducts() {
+      const snapshot = await getDocs(collection(db, 'products'));
+      const tbody = document.getElementById('products-table-body');
+      tbody.innerHTML = '';
+      snapshot.forEach(docSnap => {
+        const p = docSnap.data();
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${p.name}</td>
+          <td>${p.category}</td>
+          <td>৳${p.price}</td>
+          <td>${p.stock ?? '-'}</td>
+          <td>
+            <button data-edit="${docSnap.id}">Edit</button>
+            <button data-delete="${docSnap.id}">Delete</button>
+          </td>`;
+        tbody.appendChild(row);
+
+        row.querySelector('[data-edit]').addEventListener('click', () => fillForm(docSnap.id, p));
+        row.querySelector('[data-delete]').addEventListener('click', async () => {
+          if (confirm('Delete ' + p.name + '?')) {
+            await deleteDoc(doc(db, 'products', docSnap.id));
+            loadProducts();
+          }
+        });
+      });
+    }
+
+    function fillForm(id, p) {
+      document.getElementById('form-title').textContent = 'Edit Product';
+      document.getElementById('p-id').value = id;
+      document.getElementById('p-name').value = p.name;
+      document.getElementById('p-category').value = p.category;
+      document.getElementById('p-price').value = p.price;
+      document.getElementById('p-oldprice').value = p.oldPrice || '';
+      document.getElementById('p-tag').value = p.tag || '';
+      document.getElementById('p-stock').value = p.stock ?? 10;
+      document.getElementById('p-cancel').style.display = 'block';
+    }
+
+    function resetForm() {
+      document.getElementById('form-title').textContent = 'Add Product';
+      document.getElementById('product-form').reset();
+      document.getElementById('p-id').value = '';
+      document.getElementById('p-cancel').style.display = 'none';
+    }
+    document.getElementById('p-cancel').addEventListener('click', resetForm);
+
+    document.getElementById('product-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('p-id').value;
+      const data = {
+        name: document.getElementById('p-name').value,
+        category: document.getElementById('p-category').value,
+        price: Number(document.getElementById('p-price').value),
+        oldPrice: document.getElementById('p-oldprice').value ? Number(document.getElementById('p-oldprice').value) : null,
+        tag: document.getElementById('p-tag').value || null,
+        stock: Number(document.getElementById('p-stock').value)
+      };
+      if (id) {
+        await updateDoc(doc(db, 'products', id), data);
+      } else {
+        await addDoc(collection(db, 'products'), data);
+      }
+      resetForm();
+      loadProducts();
+    });
+
+    // ---- Orders ----
+    async function loadOrders() {
+      const snapshot = await getDocs(collection(db, 'orders'));
+      const tbody = document.getElementById('orders-table-body');
+      tbody.innerHTML = '';
+      snapshot.forEach(docSnap => {
+        const o = docSnap.data();
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${o.name}</td>
+          <td>${o.phone}</td>
+          <td>${o.zone === 'dhaka' ? 'Inside Dhaka' : 'Outside Dhaka'}</td>
+          <td>৳${o.total}</td>
+          <td><span class="status-badge ${o.status}">${o.status}</span></td>`;
+        tbody.appendChild(row);
+      });
+    }
+  }
+</script>
+</body>
+</html>
