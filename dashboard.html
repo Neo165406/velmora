@@ -64,6 +64,16 @@
               <input type="text" id="p-name" required>
             </div>
             <div class="form-field">
+              <label for="p-image-file">Upload Photo</label>
+              <input type="file" id="p-image-file" accept="image/*">
+              <div id="upload-status" style="font-size:0.82rem; color:#6b4a4e; margin-top:6px;"></div>
+              <img id="p-image-preview" style="display:none; width:70px; height:70px; object-fit:cover; margin-top:10px; border-radius:4px;">
+            </div>
+            <div class="form-field">
+              <label for="p-image">Image URL (fills in automatically after upload — or paste one manually)</label>
+              <input type="url" id="p-image" placeholder="https://i.ibb.co/....jpg">
+            </div>
+            <div class="form-field">
               <label for="p-category">Category</label>
               <select id="p-category" style="width:100%; padding:13px 15px; border:1px solid rgba(107,15,26,0.25);">
                 <option>Rings</option>
@@ -105,7 +115,7 @@
           <h3>All Products</h3>
           <table class="admin-table">
             <thead>
-              <tr><th>Name</th><th>Category</th><th>Gender</th><th>Price</th><th>Stock</th><th></th></tr>
+              <tr><th>Image</th><th>Name</th><th>Category</th><th>Gender</th><th>Price</th><th>Stock</th><th></th></tr>
             </thead>
             <tbody id="products-table-body"></tbody>
           </table>
@@ -129,6 +139,7 @@
 
 <script type="module">
   import { firebaseConfig } from './js/firebase-config.js';
+  import { imgbbApiKey } from './js/imgbb-config.js';
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import {
     getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc
@@ -177,6 +188,40 @@
 
     document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
+    // ---- Image upload (imgbb) ----
+    document.getElementById('p-image-file').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      const status = document.getElementById('upload-status');
+      const preview = document.getElementById('p-image-preview');
+      if (!file) return;
+
+      if (!imgbbApiKey) {
+        status.textContent = 'No imgbb API key set yet — add one in js/imgbb-config.js, or paste an image URL below instead.';
+        return;
+      }
+
+      status.textContent = 'Uploading...';
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+          method: 'POST',
+          body: formData
+        });
+        const result = await res.json();
+        if (result.success) {
+          document.getElementById('p-image').value = result.data.url;
+          preview.src = result.data.url;
+          preview.style.display = 'block';
+          status.textContent = 'Uploaded ✓';
+        } else {
+          status.textContent = 'Upload failed — check your imgbb API key.';
+        }
+      } catch (err) {
+        status.textContent = 'Upload failed — check your connection or API key.';
+      }
+    });
+
     // ---- Tabs ----
     document.querySelectorAll('.admin-tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -196,6 +241,7 @@
         const p = docSnap.data();
         const row = document.createElement('tr');
         row.innerHTML = `
+          <td>${p.image ? `<img src="${p.image}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;">` : '—'}</td>
           <td>${p.name}</td>
           <td>${p.category}</td>
           <td>${p.gender || '-'}</td>
@@ -221,6 +267,7 @@
       document.getElementById('form-title').textContent = 'Edit Product';
       document.getElementById('p-id').value = id;
       document.getElementById('p-name').value = p.name;
+      document.getElementById('p-image').value = p.image || '';
       document.getElementById('p-category').value = p.category;
       document.getElementById('p-gender').value = p.gender || 'Women';
       document.getElementById('p-price').value = p.price;
@@ -228,6 +275,13 @@
       document.getElementById('p-tag').value = p.tag || '';
       document.getElementById('p-stock').value = p.stock ?? 10;
       document.getElementById('p-cancel').style.display = 'block';
+      const preview = document.getElementById('p-image-preview');
+      if (p.image) {
+        preview.src = p.image;
+        preview.style.display = 'block';
+      } else {
+        preview.style.display = 'none';
+      }
     }
 
     function resetForm() {
@@ -235,6 +289,8 @@
       document.getElementById('product-form').reset();
       document.getElementById('p-id').value = '';
       document.getElementById('p-cancel').style.display = 'none';
+      document.getElementById('p-image-preview').style.display = 'none';
+      document.getElementById('upload-status').textContent = '';
     }
     document.getElementById('p-cancel').addEventListener('click', resetForm);
 
@@ -243,6 +299,7 @@
       const id = document.getElementById('p-id').value;
       const data = {
         name: document.getElementById('p-name').value,
+        image: document.getElementById('p-image').value || null,
         category: document.getElementById('p-category').value,
         gender: document.getElementById('p-gender').value,
         price: Number(document.getElementById('p-price').value),
