@@ -53,15 +53,15 @@
     <div class="hero-content">
       <div class="hero-eyebrow">Velmora Fine Jewellery</div>
       <h1>Glamour for the<br><em>Stylish Woman</em></h1>
-      
+      <p>Antique gold detailing, hand-set stones, and pieces made to be worn — not kept away. Cash on delivery across Bangladesh.</p>
       <a href="shop.html" class="btn btn-solid">Shop the Collection</a>
     </div>
   </div>
   <div class="hero-slide slide-b">
     <div class="hero-content">
       <div class="hero-eyebrow">New This Season</div>
-      <h1>Antique Piece <br><em>Reimagined</em></h1>
-      
+      <h1>Antique Gold,<br><em>Reimagined</em></h1>
+      <p>Hand-finished necklaces and chokers inspired by heritage craftsmanship.</p>
       <a href="shop.html" class="btn btn-solid">Explore Necklaces</a>
     </div>
   </div>
@@ -69,7 +69,7 @@
     <div class="hero-content">
       <div class="hero-eyebrow">Bridal Edit</div>
       <h1>Pieces Made<br><em>For the Big Day</em></h1>
-      
+      <p>Kundan, temple work, and statement sets for every ceremony.</p>
       <a href="shop.html" class="btn btn-solid">View Bridal Edit</a>
     </div>
   </div>
@@ -216,5 +216,54 @@
 <script src="js/hero-slider.js"></script>
 <script src="js/promo-slider.js"></script>
 <script type="module" src="js/products.js"></script>
+<script type="module">
+  import { db, isFirebaseConfigured } from './js/firebase-init.js';
+  import { collection, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  async function loadTheme() {
+    if (!isFirebaseConfigured) return;
+    try {
+      const snap = await getDoc(doc(db, 'settings', 'site'));
+      if (!snap.exists()) return;
+      const t = snap.data();
+      if (t.accentColor) document.documentElement.style.setProperty('--gold', t.accentColor);
+      if (t.heroBadge) document.querySelectorAll('.hero-eyebrow').forEach(el => el.textContent = t.heroBadge);
+      if (t.heroSub) {
+        const firstSlideP = document.querySelector('.hero-slide.slide-a p');
+        if (firstSlideP) firstSlideP.textContent = t.heroSub;
+      }
+    } catch (err) {
+      console.error('Could not load theme settings:', err);
+    }
+  }
+
+  async function loadSlides() {
+    if (!isFirebaseConfigured) return;
+    try {
+      const snapshot = await getDocs(collection(db, 'slides'));
+      if (snapshot.empty) return;
+      const slides = snapshot.docs.map(d => d.data()).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+      const wrap = document.querySelector('.promo-slider');
+      if (!wrap) return;
+      const slideHtml = slides.map((s, i) => `
+        <div class="promo-slide p-${String.fromCharCode(97 + (i % 3))} ${i === 0 ? 'is-active' : ''}" ${s.image ? `style="background-image:url('${s.image}'); background-size:cover; background-position:center;"` : ''}>
+          <div>
+            <div class="eyebrow">${s.eyebrow || ''}</div>
+            <h3>${s.title || ''}</h3>
+          </div>
+        </div>`).join('');
+      const barsHtml = slides.map(() => `<div class="promo-progress-bar"><span class="fill"></span></div>`).join('');
+      wrap.innerHTML = slideHtml + `<div class="promo-progress-track">${barsHtml}</div>`;
+
+      if (window.initPromoSlider) window.initPromoSlider();
+    } catch (err) {
+      console.error('Could not load slides:', err);
+    }
+  }
+
+  loadTheme();
+  loadSlides();
+</script>
 </body>
 </html>
