@@ -73,6 +73,14 @@
               </select>
             </div>
             <div class="form-field">
+              <label for="p-gender">Gender</label>
+              <select id="p-gender" style="width:100%; padding:13px 15px; border:1px solid rgba(107,15,26,0.25);">
+                <option>Women</option>
+                <option>Men</option>
+                <option>Unisex</option>
+              </select>
+            </div>
+            <div class="form-field">
               <label for="p-price">Price (৳)</label>
               <input type="number" id="p-price" required>
             </div>
@@ -97,7 +105,7 @@
           <h3>All Products</h3>
           <table class="admin-table">
             <thead>
-              <tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th></th></tr>
+              <tr><th>Name</th><th>Category</th><th>Gender</th><th>Price</th><th>Stock</th><th></th></tr>
             </thead>
             <tbody id="products-table-body"></tbody>
           </table>
@@ -190,6 +198,7 @@
         row.innerHTML = `
           <td>${p.name}</td>
           <td>${p.category}</td>
+          <td>${p.gender || '-'}</td>
           <td>৳${p.price}</td>
           <td>${p.stock ?? '-'}</td>
           <td>
@@ -213,6 +222,7 @@
       document.getElementById('p-id').value = id;
       document.getElementById('p-name').value = p.name;
       document.getElementById('p-category').value = p.category;
+      document.getElementById('p-gender').value = p.gender || 'Women';
       document.getElementById('p-price').value = p.price;
       document.getElementById('p-oldprice').value = p.oldPrice || '';
       document.getElementById('p-tag').value = p.tag || '';
@@ -234,6 +244,7 @@
       const data = {
         name: document.getElementById('p-name').value,
         category: document.getElementById('p-category').value,
+        gender: document.getElementById('p-gender').value,
         price: Number(document.getElementById('p-price').value),
         oldPrice: document.getElementById('p-oldprice').value ? Number(document.getElementById('p-oldprice').value) : null,
         tag: document.getElementById('p-tag').value || null,
