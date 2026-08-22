@@ -119,8 +119,17 @@ button { font-family: inherit; cursor: pointer; }
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 18px;
 }
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.icon-btn svg { width: 21px; height: 21px; }
 .cart-icon-wrap {
   position: relative;
   display: flex;
@@ -164,6 +173,7 @@ button { font-family: inherit; cursor: pointer; }
 .hamburger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 @media (max-width: 860px) {
+  .nav-right { gap: 14px; }
   .hamburger { display: flex; }
   .nav-links {
     position: fixed;
@@ -337,6 +347,44 @@ button { font-family: inherit; cursor: pointer; }
 }
 .promo-progress-bar.done .fill { width: 100%; transition: none; }
 .promo-progress-bar.active .fill { width: 100%; transition: width 4.5s linear; }
+.search-bar {
+  max-height: 0;
+  overflow: hidden;
+  background: var(--blush);
+  transition: max-height 0.25s ease;
+}
+.search-bar.is-open { max-height: 80px; }
+.search-bar .container { padding-top: 14px; padding-bottom: 14px; }
+.search-bar input {
+  width: 100%;
+  border: 1px solid rgba(107,15,26,0.25);
+  background: var(--white);
+  padding: 12px 16px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.95rem;
+  color: var(--plum);
+}
+.search-bar input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+/* ---------- Footer social icons ---------- */
+.social-icons {
+  display: flex;
+  gap: 14px;
+  margin-top: 18px;
+}
+.social-icons a {
+  width: 36px; height: 36px;
+  border: 1px solid rgba(250,246,239,0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.social-icons a:hover { background: var(--gold); border-color: var(--gold); }
+.social-icons a svg { width: 16px; height: 16px; stroke: var(--ivory); }
+.social-icons a:hover svg { stroke: var(--maroon-dark); }
+
 section { padding: 90px 0; }
 .section-head { text-align: center; margin-bottom: 54px; }
 .section-eyebrow {
