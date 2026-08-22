@@ -142,13 +142,26 @@ async function loadProducts() {
   }
 }
 
+function primaryImage(p) {
+  if (Array.isArray(p.images) && p.images.length) return p.images[0];
+  if (p.image) return p.image;
+  return null;
+}
+
+function productMedia(p) {
+  const img = primaryImage(p);
+  return img
+    ? `<img src="${img}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">`
+    : velmoraGemIcon();
+}
+
 function renderProductCard(p) {
   return `
     <div class="product-card">
       <a href="product.html?id=${p.id}">
         <div class="product-media">
           ${p.tag ? `<span class="product-tag">${p.tag}</span>` : ''}
-          ${velmoraGemIcon()}
+          ${productMedia(p)}
         </div>
         <div class="product-info">
           <div class="cat">${p.category}</div>
@@ -259,7 +272,9 @@ window.applyVelmoraSearch = function (value) {
 function renderFeatured() {
   const grid = document.querySelector('[data-featured-grid]');
   if (!grid) return;
-  grid.innerHTML = VELMORA_PRODUCTS.slice(0, 4).map(renderProductCard).join('');
+  const featured = VELMORA_PRODUCTS.filter(p => p.featured);
+  const items = (featured.length ? featured : VELMORA_PRODUCTS).slice(0, 4);
+  grid.innerHTML = items.map(renderProductCard).join('');
   wireAddToCartButtons(grid);
 }
 
@@ -272,7 +287,7 @@ function renderProductDetail() {
 
   mount.innerHTML = `
     <div class="pd-media product-media" style="aspect-ratio:1/1;">
-      ${velmoraGemIcon()}
+      ${productMedia(p)}
     </div>
     <div class="pd-info">
       <div class="cat">${p.category}</div>
@@ -283,6 +298,13 @@ function renderProductDetail() {
       <p style="color:#6b4a4e; margin-bottom:28px; max-width:440px;">
         Handcrafted detailing with a polished antique finish. Cash on delivery available across Bangladesh — ৳60 inside Dhaka, ৳130 outside Dhaka.
       </p>
+      ${Array.isArray(p.sizes) && p.sizes.length ? `
+        <div style="margin-bottom:24px;">
+          <div style="font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--maroon); margin-bottom:10px;">Available Sizes</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            ${p.sizes.map(s => `<span style="padding:6px 14px; border:1px solid rgba(107,15,26,0.3); font-size:0.85rem;">${s}</span>`).join('')}
+          </div>
+        </div>` : ''}
       <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
         <div class="qty-stepper">
           <button type="button" data-qty-minus>−</button>
