@@ -3,10 +3,11 @@
 // Do NOT put a service-account / private key here — that's a different, sensitive credential.
 
 export const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyAclDfzJ8BB0zJpE56rjHDUgjHXFcpMP8w",
+  authDomain: "velmora-84a4a.firebaseapp.com",
+  projectId: "velmora-84a4a",
+  storageBucket: "velmora-84a4a.firebasestorage.app",
+  messagingSenderId: "42615139718",
+  appId: "1:42615139718:web:86cf3dd1de593679de5007"
 };
+
