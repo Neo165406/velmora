@@ -1,11 +1,13 @@
-// Promo slider ("explore our new products" banner) — progress-bar autoplay
-document.addEventListener('DOMContentLoaded', function () {
+// Promo slider ("explore our new products" banner) — progress-bar autoplay.
+// Exposed as window.initPromoSlider() so it can be called again after
+// slides are dynamically loaded from Firestore (see index.html).
+function initPromoSlider() {
   const slides = document.querySelectorAll('.promo-slide');
   const bars = document.querySelectorAll('.promo-progress-bar');
   if (!slides.length) return;
+  if (window.__promoSliderTimer) clearInterval(window.__promoSliderTimer);
 
   let current = 0;
-  let timer;
 
   function setBars(index) {
     bars.forEach((bar, i) => {
@@ -15,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
       fill.style.width = '0%';
       if (i < index) bar.classList.add('done');
     });
-    // Force reflow so the "active" transition restarts cleanly
     void bars[index].offsetWidth;
     bars[index].classList.add('active');
   }
@@ -29,11 +30,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function next() { goTo(current + 1); }
 
-  function start() {
-    setBars(current);
-    clearInterval(timer);
-    timer = setInterval(next, 4500);
-  }
+  setBars(current);
+  window.__promoSliderTimer = setInterval(next, 4500);
+}
 
-  start();
-});
+window.initPromoSlider = initPromoSlider;
+document.addEventListener('DOMContentLoaded', initPromoSlider);
