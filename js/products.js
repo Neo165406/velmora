@@ -13,6 +13,7 @@ let VELMORA_PRODUCTS = [
     id: 'rng-001',
     name: 'Antique Gold Kundan Ring',
     category: 'Rings',
+    gender: 'Women',
     price: 4200,
     oldPrice: 5200,
     tag: 'New',
@@ -21,6 +22,7 @@ let VELMORA_PRODUCTS = [
     id: 'nck-001',
     name: 'Maroon Stone Bridal Necklace',
     category: 'Necklaces',
+    gender: 'Women',
     price: 12500,
     oldPrice: null,
     tag: 'Bestseller',
@@ -29,6 +31,7 @@ let VELMORA_PRODUCTS = [
     id: 'ear-001',
     name: 'Pearl Drop Chandbali Earrings',
     category: 'Earrings',
+    gender: 'Women',
     price: 3100,
     oldPrice: 3800,
     tag: null,
@@ -37,6 +40,7 @@ let VELMORA_PRODUCTS = [
     id: 'brc-001',
     name: 'Layered Gold Cuff Bracelet',
     category: 'Bracelets',
+    gender: 'Women',
     price: 5400,
     oldPrice: null,
     tag: null,
@@ -45,6 +49,7 @@ let VELMORA_PRODUCTS = [
     id: 'nck-002',
     name: 'Antique Temple Choker',
     category: 'Necklaces',
+    gender: 'Women',
     price: 9800,
     oldPrice: 11000,
     tag: 'New',
@@ -53,6 +58,7 @@ let VELMORA_PRODUCTS = [
     id: 'rng-002',
     name: 'Rose Gold Solitaire Ring',
     category: 'Rings',
+    gender: 'Women',
     price: 6600,
     oldPrice: null,
     tag: null,
@@ -61,6 +67,7 @@ let VELMORA_PRODUCTS = [
     id: 'ear-002',
     name: 'Kundan Jhumka Earrings',
     category: 'Earrings',
+    gender: 'Women',
     price: 2800,
     oldPrice: null,
     tag: 'Bestseller',
@@ -69,9 +76,46 @@ let VELMORA_PRODUCTS = [
     id: 'brc-002',
     name: 'Ruby Studded Bangle Set',
     category: 'Bracelets',
+    gender: 'Women',
     price: 8200,
     oldPrice: 9500,
     tag: null,
+  },
+  {
+    id: 'rng-003',
+    name: "Men's Gold Signet Ring",
+    category: 'Rings',
+    gender: 'Men',
+    price: 5800,
+    oldPrice: null,
+    tag: 'New',
+  },
+  {
+    id: 'brc-003',
+    name: "Men's Silver Chain Bracelet",
+    category: 'Bracelets',
+    gender: 'Men',
+    price: 3400,
+    oldPrice: null,
+    tag: null,
+  },
+  {
+    id: 'brc-004',
+    name: 'Minimal Gold Bangle',
+    category: 'Bracelets',
+    gender: 'Unisex',
+    price: 4600,
+    oldPrice: null,
+    tag: null,
+  },
+  {
+    id: 'rng-004',
+    name: 'Plain Band Couple Ring',
+    category: 'Rings',
+    gender: 'Unisex',
+    price: 3200,
+    oldPrice: null,
+    tag: 'Bestseller',
   },
 ];
 
@@ -134,28 +178,83 @@ function wireAddToCartButtons(scope) {
   });
 }
 
-// Renders into any element with [data-product-grid], optionally filtered
-function renderProductGrid(category) {
+// Renders into any element with [data-product-grid], applying the
+// current category, gender, and search filters together.
+const filterState = { category: 'All', gender: 'All', search: '' };
+
+function applyFilters() {
+  return VELMORA_PRODUCTS.filter(p => {
+    const matchCategory = filterState.category === 'All' || p.category === filterState.category;
+    const matchGender = filterState.gender === 'All' || p.gender === filterState.gender;
+    const matchSearch = !filterState.search || p.name.toLowerCase().includes(filterState.search.toLowerCase());
+    return matchCategory && matchGender && matchSearch;
+  });
+}
+
+function renderProductGrid() {
   const grid = document.querySelector('[data-product-grid]');
   if (!grid) return;
-  const items = category && category !== 'All'
-    ? VELMORA_PRODUCTS.filter(p => p.category === category)
-    : VELMORA_PRODUCTS;
-  grid.innerHTML = items.map(renderProductCard).join('');
+  const items = applyFilters();
+  grid.innerHTML = items.length
+    ? items.map(renderProductCard).join('')
+    : `<p style="grid-column:1/-1; text-align:center; color:#6b4a4e; padding:40px 0;">No products found.</p>`;
   wireAddToCartButtons(grid);
 }
 
 function setupFilters() {
-  const chips = document.querySelectorAll('.filter-chip');
-  if (!chips.length) return;
-  chips.forEach(chip => {
+  const catChips = document.querySelectorAll('[data-filter]');
+  catChips.forEach(chip => {
     chip.addEventListener('click', () => {
-      chips.forEach(c => c.classList.remove('active'));
+      catChips.forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
-      renderProductGrid(chip.dataset.filter);
+      filterState.category = chip.dataset.filter;
+      renderProductGrid();
+    });
+  });
+
+  const genderChips = document.querySelectorAll('[data-gender-filter]');
+  genderChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      genderChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      filterState.gender = chip.dataset.genderFilter;
+      renderProductGrid();
     });
   });
 }
+
+// Reads ?category=, ?gender=, ?search= from the URL (used by nav links
+// like Men/Women/Unisex, and by the nav search bar) and pre-applies them.
+function applyUrlFilters() {
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get('category');
+  const gender = params.get('gender');
+  const search = params.get('search');
+
+  if (category) {
+    filterState.category = category;
+    document.querySelectorAll('[data-filter]').forEach(c => {
+      c.classList.toggle('active', c.dataset.filter === category);
+    });
+  }
+  if (gender) {
+    filterState.gender = gender;
+    document.querySelectorAll('[data-gender-filter]').forEach(c => {
+      c.classList.toggle('active', c.dataset.genderFilter === gender);
+    });
+  }
+  if (search) {
+    filterState.search = search;
+    const input = document.getElementById('search-input');
+    if (input) input.value = search;
+  }
+}
+
+// Exposed so the nav search bar can filter in place when already on shop.html
+window.applyVelmoraSearch = function (value) {
+  filterState.search = value;
+  renderProductGrid();
+};
 
 function renderFeatured() {
   const grid = document.querySelector('[data-featured-grid]');
@@ -215,7 +314,8 @@ function renderProductDetail() {
 
 document.addEventListener('DOMContentLoaded', async function () {
   await loadProducts();
-  renderProductGrid('All');
+  applyUrlFilters();
+  renderProductGrid();
   renderFeatured();
   setupFilters();
   renderProductDetail();
