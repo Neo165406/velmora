@@ -23,6 +23,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   hamburger.addEventListener('click', toggleNav);
   if (overlay) overlay.addEventListener('click', closeNav);
+
+  // "Shop" submenu toggle (mobile accordion) — separate from regular links
+  navLinks.querySelectorAll('.sub-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const submenu = btn.parentElement.querySelector('.sub-menu');
+      if (submenu) submenu.classList.toggle('is-open');
+    });
+  });
+
   navLinks.querySelectorAll('a').forEach(function (link) {
     link.addEventListener('click', closeNav);
   });
