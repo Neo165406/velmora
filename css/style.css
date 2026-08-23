@@ -186,12 +186,27 @@ button { font-family: inherit; cursor: pointer; }
     padding: 100px 36px 40px;
     transform: translateX(100%);
     transition: transform 0.32s ease;
+    z-index: 95;
+    overflow-y: auto;
   }
   .nav-links.is-open { transform: translateX(0); }
   .nav-links li { border-bottom: 1px solid rgba(255,255,255,0.12); }
   .nav-links a { color: var(--ivory); display: block; padding: 16px 0; }
   .nav-links a.active { color: var(--gold-light); }
   .nav-links a::after { display: none; }
+  .nav-links .sub-toggle {
+    background: none; border: none; color: var(--ivory);
+    font-size: 0.75rem; padding: 8px; margin-left: auto;
+  }
+  .nav-links li.has-sub { display: flex; flex-wrap: wrap; align-items: center; }
+  .nav-links li.has-sub > a { flex: 1; }
+  .nav-links .sub-menu {
+    list-style: none; width: 100%; max-height: 0; overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+  .nav-links .sub-menu.is-open { max-height: 260px; }
+  .nav-links .sub-menu li { border-bottom: none; padding-left: 14px; }
+  .nav-links .sub-menu a { padding: 10px 0; font-size: 0.85rem; color: rgba(250,246,239,0.8); }
   .nav-overlay {
     position: fixed; inset: 0;
     background: rgba(42,16,21,0.45);
@@ -200,6 +215,34 @@ button { font-family: inherit; cursor: pointer; }
     z-index: 90;
   }
   .nav-overlay.is-open { opacity: 1; pointer-events: auto; }
+}
+
+/* ---------- Desktop "Shop" dropdown submenu ---------- */
+@media (min-width: 861px) {
+  .nav-links li.has-sub { position: relative; }
+  .nav-links .sub-toggle { display: none; }
+  .nav-links .sub-menu {
+    list-style: none;
+    position: absolute; top: 100%; left: 0;
+    background: var(--maroon-dark);
+    min-width: 170px;
+    box-shadow: var(--shadow);
+    opacity: 0; pointer-events: none; visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    padding: 8px 0;
+    z-index: 50;
+  }
+  .nav-links li.has-sub:hover .sub-menu {
+    opacity: 1; pointer-events: auto; visibility: visible;
+    transform: translateY(0);
+  }
+  .nav-links .sub-menu a {
+    display: block; padding: 10px 18px; color: var(--ivory);
+    text-transform: none; font-size: 0.86rem; letter-spacing: 0.02em;
+  }
+  .nav-links .sub-menu a:hover { background: rgba(250,246,239,0.08); }
+  .nav-links .sub-menu a::after { display: none; }
 }
 
 /* ---------- Hero slider ---------- */
