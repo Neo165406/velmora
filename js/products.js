@@ -121,8 +121,8 @@ let VELMORA_PRODUCTS = [
 
 function velmoraGemIcon() {
   return `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M8 22L32 6L56 22L32 58L8 22Z" stroke="#6B0F1A" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M8 22H56M20 22L32 6M44 22L32 6M20 22L32 58M44 22L32 58" stroke="#6B0F1A" stroke-width="1" opacity="0.6"/>
+    <path d="M8 22L32 6L56 22L32 58L8 22Z" stroke="#161616" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M8 22H56M20 22L32 6M44 22L32 6M20 22L32 58M44 22L32 58" stroke="#161616" stroke-width="1" opacity="0.6"/>
   </svg>`;
 }
 
@@ -278,6 +278,16 @@ function renderFeatured() {
   wireAddToCartButtons(grid);
 }
 
+function renderRelated(current) {
+  const grid = document.querySelector('[data-related-grid]');
+  if (!grid) return;
+  const related = VELMORA_PRODUCTS.filter(p => p.category === current.category && p.id !== current.id).slice(0, 4);
+  grid.innerHTML = related.length
+    ? related.map(renderProductCard).join('')
+    : `<p style="grid-column:1/-1; text-align:center; color:#6b4a4e;">No other pieces in this category yet.</p>`;
+  wireAddToCartButtons(grid);
+}
+
 function renderProductDetail() {
   const mount = document.querySelector('[data-product-detail]');
   if (!mount) return;
@@ -315,6 +325,7 @@ function renderProductDetail() {
       </div>
     </div>`;
   document.title = p.name + ' — Velmora';
+  renderRelated(p);
 
   const qtyInput = mount.querySelector('[data-qty-input]');
   mount.querySelector('[data-qty-minus]').addEventListener('click', () => {
