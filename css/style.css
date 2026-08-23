@@ -1,818 +1,863 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — Velmora</title>
-<link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@300;400;500;600&display=swap');
 
-<!-- Shown until Firebase config is filled in (js/firebase-config.js) -->
-<div id="config-gate" class="login-screen">
-  <div class="login-box" style="width:420px;">
-    <h2>Connect Firebase</h2>
-    <p style="font-size:0.9rem; color:#6b4a4e; margin-bottom:16px;">
-      This dashboard needs your Velmora Firebase web config before it can log in or manage products/orders.
-    </p>
-    <div class="config-warning">
-      Open <code>js/firebase-config.js</code> and paste in your project's web config from
-      Firebase Console → Project Settings → General → "Your apps". Then reload this page.
-    </div>
-  </div>
-</div>
+:root {
+  --maroon: #6B0F1A;
+  --maroon-dark: #4A0A12;
+  --gold: #C9A227;
+  --gold-light: #E4C766;
+  --ivory: #FAF6EF;
+  --plum: #2A1015;
+  --blush: #F1E4DE;
+  --white: #FFFFFF;
+  --shadow: 0 12px 30px rgba(42, 16, 21, 0.12);
+  --radius: 2px;
+}
 
-<!-- Shown once configured, before login -->
-<div id="login-screen" class="login-screen" style="display:none;">
-  <div class="login-box">
-    <h2>Admin Login</h2>
-    <form id="login-form">
-      <div class="field">
-        <label for="login-email">Email</label>
-        <input type="email" id="login-email" required>
-      </div>
-      <div class="field">
-        <label for="login-password">Password</label>
-        <input type="password" id="login-password" required>
-      </div>
-      <button type="submit" class="btn btn-aqua btn-block">Log In</button>
-      <div class="form-status" id="login-status" style="margin-top:10px; font-size:0.85rem; color:#a15a5a;"></div>
-    </form>
-  </div>
-</div>
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-<!-- Main dashboard -->
-<div class="admin-shell hidden" id="adminShell">
-  <aside class="admin-side">
-    <div class="logo">VEL<span>MORA</span></div>
-    <a href="#" data-tab="overview" class="tab-link active">Overview</a>
-    <a href="#" data-tab="products" class="tab-link">Products</a>
-    <a href="#" data-tab="orders" class="tab-link">Orders</a>
-    <a href="#" data-tab="slides" class="tab-link">Slides</a>
-    <a href="#" data-tab="theme" class="tab-link">Theme</a>
-    <a href="index.html" target="_blank">View Store ↗</a>
-    <a href="#" id="logoutBtn">Log Out</a>
-  </aside>
+html { scroll-behavior: smooth; }
 
-  <main class="admin-main">
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--ivory);
+  color: var(--plum);
+  font-weight: 300;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
 
-    <!-- OVERVIEW -->
-    <section id="tab-overview">
-      <div class="admin-topbar"><h1>Overview</h1></div>
-      <div class="stat-grid">
-        <div class="stat-card"><div class="num" id="statProducts">—</div><div class="label">Total Products</div></div>
-        <div class="stat-card"><div class="num" id="statOrders">—</div><div class="label">Total Orders</div></div>
-        <div class="stat-card"><div class="num" id="statPending">—</div><div class="label">Pending Orders</div></div>
-        <div class="stat-card"><div class="num" id="statRevenue">—</div><div class="label">Revenue (Delivered)</div></div>
-      </div>
-      <div class="table-card" style="padding:20px;" id="emptyStateCard">
-        <p style="margin-bottom:12px;">No products yet? Add a few demo pieces to see how the store looks with a full grid.</p>
-        <button class="btn btn-outline" id="seedBtn">🌱 Add Demo Products</button>
-      </div>
-    </section>
+h1, h2, h3, .display {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--plum);
+}
 
-    <!-- PRODUCTS -->
-    <section id="tab-products" class="hidden">
-      <div class="admin-topbar">
-        <h1>Products</h1>
-        <button class="btn btn-aqua" id="newProductBtn">+ New Product</button>
-      </div>
-      <div class="filter-bar">
-        <button class="chip active" data-pcat="">All</button>
-        <button class="chip" data-pcat="Rings">Rings</button>
-        <button class="chip" data-pcat="Necklaces">Necklaces</button>
-        <button class="chip" data-pcat="Earrings">Earrings</button>
-        <button class="chip" data-pcat="Bracelets">Bracelets</button>
-      </div>
-      <div class="table-card">
-        <table>
-          <thead><tr><th>Product</th><th>Category</th><th>Gender</th><th>Price</th><th>Stock</th><th>Featured</th><th></th></tr></thead>
-          <tbody id="productsTableBody"></tbody>
-        </table>
-      </div>
-    </section>
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+button { font-family: inherit; cursor: pointer; }
 
-    <!-- ORDERS -->
-    <section id="tab-orders" class="hidden">
-      <div class="admin-topbar"><h1>Orders</h1></div>
-      <div class="table-card">
-        <table>
-          <thead><tr><th>Customer</th><th>Phone</th><th>Zone</th><th>Total</th><th>Status</th><th>Date</th><th></th></tr></thead>
-          <tbody id="ordersTableBody"></tbody>
-        </table>
-      </div>
-    </section>
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
 
-    <!-- SLIDES (homepage promo banner) -->
-    <section id="tab-slides" class="hidden">
-      <div class="admin-topbar">
-        <h1>Slides</h1>
-        <button class="btn btn-aqua" id="newSlideBtn">+ New Slide</button>
-      </div>
-      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Controls the promo banner on the homepage — add photos and text here instead of editing code.</p>
-      <div class="table-card">
-        <table>
-          <thead><tr><th>Slide</th><th>Title</th><th>Order</th><th></th></tr></thead>
-          <tbody id="slidesTableBody"></tbody>
-        </table>
-      </div>
-    </section>
+/* ---------- Gold divider signature element ---------- */
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 0 auto;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  height: 1px;
+  width: 46px;
+  background: var(--gold);
+  opacity: 0.7;
+}
+.divider .gem {
+  width: 7px;
+  height: 7px;
+  background: var(--gold);
+  transform: rotate(45deg);
+}
 
-    <!-- THEME -->
-    <section id="tab-theme" class="hidden">
-      <div class="admin-topbar"><h1>Theme</h1></div>
-      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Change the homepage hero text and accent gold shade — saves instantly to the live site.</p>
-      <div class="table-card" style="padding:24px; max-width:480px;">
-        <div class="field">
-          <label>Accent Gold</label>
-          <input type="color" id="tAccentColor" value="#C9A227" style="height:44px; padding:4px;">
-        </div>
-        <div class="field">
-          <label>Hero Eyebrow</label>
-          <input type="text" id="tHeroBadge" placeholder="Velmora Fine Jewellery">
-        </div>
-        <div class="field">
-          <label>Hero Subtext</label>
-          <textarea id="tHeroSub" rows="3" placeholder="Antique gold detailing, hand-set stones..."></textarea>
-        </div>
-        <button class="btn btn-aqua btn-block" id="saveThemeBtn">Save Theme</button>
-      </div>
-    </section>
-  </main>
-</div>
+/* ---------- Header / Hamburger nav (shared across all pages) ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--maroon);
+  border-bottom: 1px solid rgba(250,246,239,0.12);
+}
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ivory);
+}
+.brand span { color: var(--gold-light); }
 
-<!-- Product modal -->
-<div class="modal-overlay" id="productModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h3 id="productModalTitle">New Product</h3>
-      <button class="modal-close" id="closeProductModal">✕</button>
-    </div>
-    <div class="field">
-      <label>Product Name *</label>
-      <input type="text" id="pName" placeholder="e.g. Antique Gold Kundan Ring">
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>Category *</label>
-        <select id="pCategory">
-          <option>Rings</option>
-          <option>Necklaces</option>
-          <option>Earrings</option>
-          <option>Bracelets</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Gender</label>
-        <select id="pGender">
-          <option>Women</option>
-          <option>Men</option>
-          <option>Unisex</option>
-        </select>
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>Price (৳) *</label>
-        <input type="number" id="pPrice" placeholder="4200">
-      </div>
-      <div class="field">
-        <label>Old Price (৳) — optional</label>
-        <input type="number" id="pOldPrice" placeholder="Show a sale price">
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>Stock Quantity</label>
-        <input type="number" id="pStock" value="10" min="0">
-      </div>
-      <div class="field">
-        <label>Tag — optional</label>
-        <input type="text" id="pTag" placeholder="New, Bestseller...">
-      </div>
-    </div>
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 0.92rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ivory);
+  position: relative;
+  padding-bottom: 4px;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 0; height: 1px;
+  background: var(--gold-light);
+  transition: width 0.25s ease;
+}
+.nav-links a:hover::after,
+.nav-links a.active::after { width: 100%; }
+.nav-links a.active { color: var(--gold-light); }
 
-    <!-- Ring size chips — only shown for Rings -->
-    <div class="field" id="sizeChartField" style="display:none;">
-      <label>Available Ring Sizes</label>
-      <div class="size-chip-row" id="sizeChipRow" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
-    </div>
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.icon-btn svg { width: 21px; height: 21px; }
+.cart-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.cart-icon-wrap svg { width: 22px; height: 22px; }
+.cart-icon-wrap [data-cart-count] {
+  position: absolute;
+  top: -9px; right: -11px;
+  background: var(--gold);
+  color: var(--maroon-dark);
+  font-size: 0.65rem;
+  font-family: 'Jost', sans-serif;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
 
-    <div class="field">
-      <label>Description</label>
-      <textarea id="pDescription" rows="3" placeholder="Short description of the piece"></textarea>
-    </div>
-    <div class="field">
-      <label style="display:flex; align-items:center; gap:8px; font-weight:600; text-transform:none;">
-        <input type="checkbox" id="pFeatured" style="width:auto;"> Show in homepage Featured section
-      </label>
-    </div>
-    <div class="field">
-      <label style="display:flex; align-items:center; gap:8px; font-weight:600; text-transform:none;">
-        <input type="checkbox" id="pBestSeller" style="width:auto;"> Mark as Bestseller
-      </label>
-    </div>
-    <div class="field">
-      <label>Photos</label>
-      <div class="img-upload" id="imgUploadZone">
-        <input type="file" id="imgInput" accept="image/*" multiple style="display:none;">
-        <span id="uploadLabel">📷 Select photos (multiple allowed)</span>
-      </div>
-      <div class="img-preview-row" id="imgPreviewRow"></div>
-    </div>
-    <button class="btn btn-aqua btn-block" id="saveProductBtn" style="margin-top:8px;">Save Product</button>
-  </div>
-</div>
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  width: 28px;
+  background: none;
+  border: none;
+  padding: 6px 0;
+  z-index: 110;
+}
+.hamburger span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: var(--ivory);
+  transition: transform 0.25s ease, opacity 0.2s ease;
+}
+.hamburger.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.is-open span:nth-child(2) { opacity: 0; }
+.hamburger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-<!-- Slide modal -->
-<div class="modal-overlay" id="slideModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h3 id="slideModalTitle">New Slide</h3>
-      <button class="modal-close" id="closeSlideModal">✕</button>
-    </div>
-    <div class="field">
-      <label>Eyebrow</label>
-      <input type="text" id="sEyebrow" placeholder="New Arrivals">
-    </div>
-    <div class="field">
-      <label>Title</label>
-      <input type="text" id="sTitle" placeholder="Explore Our New Pieces">
-    </div>
-    <div class="field">
-      <label>Order (lower shows first)</label>
-      <input type="number" id="sOrder" value="1" min="0">
-    </div>
-    <div class="field">
-      <label>Image</label>
-      <div class="img-upload" id="slideImgUploadZone">
-        <input type="file" id="slideImgInput" accept="image/*" style="display:none;">
-        <span id="slideUploadLabel">📷 Select photo</span>
-      </div>
-      <div class="img-preview-row" id="slideImgPreviewRow"></div>
-    </div>
-    <button class="btn btn-aqua btn-block" id="saveSlideBtn" style="margin-top:8px;">Save Slide</button>
-  </div>
-</div>
-
-<!-- Order modal -->
-<div class="modal-overlay" id="orderModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h3>Order Details</h3>
-      <button class="modal-close" id="closeOrderModal">✕</button>
-    </div>
-    <div id="orderModalBody"></div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script type="module">
-  import { firebaseConfig } from './js/firebase-config.js';
-  import { imgbbApiKey } from './js/imgbb-config.js';
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import {
-    getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc,
-    getDoc, setDoc, deleteField, serverTimestamp
-  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-  import {
-    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
-  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-
-  const isConfigured = Boolean(firebaseConfig.apiKey);
-  const configGate = document.getElementById('config-gate');
-  const loginScreen = document.getElementById('login-screen');
-  const adminShell = document.getElementById('adminShell');
-
-  if (!isConfigured) {
-    configGate.style.display = 'flex';
-  } else {
-    configGate.style.display = 'none';
-    loginScreen.style.display = 'flex';
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    function formatTaka(n) { return '৳' + Number(n || 0).toLocaleString('en-IN'); }
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2400);
-    }
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        loginScreen.style.display = 'none';
-        adminShell.classList.remove('hidden');
-        init();
-      } else {
-        loginScreen.style.display = 'flex';
-        adminShell.classList.add('hidden');
-      }
-    });
-
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (err) {
-        document.getElementById('login-status').textContent = 'Login failed — check email/password.';
-      }
-    });
-    document.getElementById('logoutBtn').addEventListener('click', (e) => { e.preventDefault(); signOut(auth); });
-
-    /* ---------- Tabs ---------- */
-    document.querySelectorAll('.tab-link').forEach(link => {
-      link.addEventListener('click', (e) => {
-        if (!link.dataset.tab) return;
-        e.preventDefault();
-        document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        ['overview', 'products', 'orders', 'slides', 'theme'].forEach(t =>
-          document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== link.dataset.tab));
-      });
-    });
-
-    /* ---------- State ---------- */
-    let allProducts = [];
-    let allOrders = [];
-    let editingProductId = null;
-    let currentImages = [];
-    let productCategoryFilter = '';
-    const RING_SIZES = ['5', '6', '7', '8', '9', '10', '11'];
-    let selectedSizes = [];
-
-    function init() {
-      loadProducts();
-      loadOrders();
-      loadSlides();
-      loadTheme();
-    }
-
-    /* ---------- imgbb upload ---------- */
-    async function uploadToImgbb(file) {
-      if (!imgbbApiKey) throw new Error('No imgbb API key set in js/imgbb-config.js');
-      const formData = new FormData();
-      formData.append('image', file);
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.success) return data.data.url;
-      throw new Error(data.error?.message || 'Upload failed');
-    }
-
-    /* ---------- Products ---------- */
-    async function loadProducts() {
-      const snap = await getDocs(collection(db, 'products'));
-      allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      document.getElementById('statProducts').textContent = allProducts.length;
-      document.getElementById('emptyStateCard').style.display = allProducts.length ? 'none' : 'block';
-      renderProductsTable();
-    }
-
-    function renderProductsTable() {
-      const body = document.getElementById('productsTableBody');
-      const items = productCategoryFilter ? allProducts.filter(p => p.category === productCategoryFilter) : allProducts;
-      if (!items.length) {
-        body.innerHTML = `<tr><td colspan="7" class="text-center" style="color:#7a5a5d; padding:30px;">No products yet</td></tr>`;
-        return;
-      }
-      body.innerHTML = items.map(p => {
-        const thumb = (p.images && p.images[0]) || p.image || '';
-        return `
-        <tr>
-          <td><div class="row-thumb">${thumb ? `<img src="${thumb}">` : ''}<span>${p.name}</span></div></td>
-          <td>${p.category}</td>
-          <td>${p.gender || '-'}</td>
-          <td>${formatTaka(p.price)}</td>
-          <td>${p.stock ?? '-'}</td>
-          <td>${p.featured ? '⭐' : '—'}</td>
-          <td>
-            <button class="btn btn-outline btn-sm" data-edit="${p.id}">Edit</button>
-            <button class="btn btn-danger btn-sm" data-del="${p.id}">Delete</button>
-          </td>
-        </tr>`;
-      }).join('');
-    }
-
-    document.querySelector('#tab-products .filter-bar').addEventListener('click', (e) => {
-      const chip = e.target.closest('[data-pcat]');
-      if (!chip) return;
-      productCategoryFilter = chip.dataset.pcat;
-      document.querySelectorAll('[data-pcat]').forEach(c => c.classList.toggle('active', c === chip));
-      renderProductsTable();
-    });
-
-    document.getElementById('productsTableBody').addEventListener('click', (e) => {
-      const edit = e.target.closest('[data-edit]');
-      const del = e.target.closest('[data-del]');
-      if (edit) openProductModal(edit.dataset.edit);
-      if (del) deleteProduct(del.dataset.del);
-    });
-
-    function toggleSizeField(category) {
-      const field = document.getElementById('sizeChartField');
-      if (category === 'Rings') {
-        field.style.display = 'block';
-        renderSizeChips();
-      } else {
-        field.style.display = 'none';
-      }
-    }
-    function renderSizeChips() {
-      document.getElementById('sizeChipRow').innerHTML = RING_SIZES.map(s => `
-        <button type="button" class="chip ${selectedSizes.includes(s) ? 'active' : ''}" data-size="${s}">${s}</button>
-      `).join('');
-    }
-    document.getElementById('sizeChipRow').addEventListener('click', (e) => {
-      const chip = e.target.closest('[data-size]');
-      if (!chip) return;
-      const s = chip.dataset.size;
-      selectedSizes = selectedSizes.includes(s) ? selectedSizes.filter(x => x !== s) : [...selectedSizes, s];
-      chip.classList.toggle('active');
-    });
-    document.getElementById('pCategory').addEventListener('change', (e) => toggleSizeField(e.target.value));
-
-    function openProductModal(id = null) {
-      editingProductId = id;
-      currentImages = [];
-      selectedSizes = [];
-      document.getElementById('imgPreviewRow').innerHTML = '';
-      if (id) {
-        const p = allProducts.find(x => x.id === id);
-        document.getElementById('productModalTitle').textContent = 'Edit Product';
-        document.getElementById('pName').value = p.name || '';
-        document.getElementById('pCategory').value = p.category || 'Rings';
-        document.getElementById('pGender').value = p.gender || 'Women';
-        document.getElementById('pPrice').value = p.price || '';
-        document.getElementById('pOldPrice').value = p.oldPrice || '';
-        document.getElementById('pStock').value = p.stock ?? 10;
-        document.getElementById('pTag').value = p.tag || '';
-        document.getElementById('pDescription').value = p.description || '';
-        document.getElementById('pFeatured').checked = !!p.featured;
-        document.getElementById('pBestSeller').checked = !!p.bestSeller;
-        currentImages = [...(p.images || (p.image ? [p.image] : []))];
-        selectedSizes = [...(p.sizes || [])];
-        renderImagePreviews();
-      } else {
-        document.getElementById('productModalTitle').textContent = 'New Product';
-        ['pName', 'pOldPrice', 'pTag', 'pDescription'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('pPrice').value = '';
-        document.getElementById('pStock').value = 10;
-        document.getElementById('pFeatured').checked = false;
-        document.getElementById('pBestSeller').checked = false;
-        document.getElementById('pCategory').value = 'Rings';
-        document.getElementById('pGender').value = 'Women';
-      }
-      toggleSizeField(document.getElementById('pCategory').value);
-      document.getElementById('productModal').classList.add('open');
-    }
-    document.getElementById('newProductBtn').addEventListener('click', () => openProductModal());
-    document.getElementById('closeProductModal').addEventListener('click', () => document.getElementById('productModal').classList.remove('open'));
-
-    function renderImagePreviews() {
-      document.getElementById('imgPreviewRow').innerHTML = currentImages.map((url, i) =>
-        `<div style="position:relative;"><img src="${url}"><span data-rmimg="${i}" style="position:absolute;top:-6px;right:-6px;background:var(--maroon-dark);color:#fff;width:18px;height:18px;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</span></div>`
-      ).join('');
-    }
-    document.getElementById('imgPreviewRow').addEventListener('click', (e) => {
-      const rm = e.target.closest('[data-rmimg]');
-      if (rm) { currentImages.splice(Number(rm.dataset.rmimg), 1); renderImagePreviews(); }
-    });
-
-    document.getElementById('imgUploadZone').addEventListener('click', () => document.getElementById('imgInput').click());
-    document.getElementById('imgInput').addEventListener('change', async (e) => {
-      const files = [...e.target.files];
-      if (!files.length) return;
-      const label = document.getElementById('uploadLabel');
-      label.innerHTML = `<span class="spinner" style="border-top-color:var(--maroon-dark); border-color:rgba(107,15,26,0.2);"></span> Uploading...`;
-      for (const file of files) {
-        try {
-          const url = await uploadToImgbb(file);
-          currentImages.push(url);
-          renderImagePreviews();
-        } catch (err) {
-          console.error(err);
-          showToast('Photo upload failed — check imgbb key');
-        }
-      }
-      label.textContent = '📷 Select photos (multiple allowed)';
-      e.target.value = '';
-    });
-
-    async function saveProduct() {
-      const name = document.getElementById('pName').value.trim();
-      const category = document.getElementById('pCategory').value;
-      const price = Number(document.getElementById('pPrice').value);
-      if (!name || !price || !category) { showToast('Name, price, and category are required'); return; }
-
-      const btn = document.getElementById('saveProductBtn');
-      btn.disabled = true;
-      btn.innerHTML = `<span class="spinner"></span> Saving...`;
-
-      const data = {
-        name, category,
-        gender: document.getElementById('pGender').value,
-        price,
-        oldPrice: document.getElementById('pOldPrice').value ? Number(document.getElementById('pOldPrice').value) : null,
-        stock: Number(document.getElementById('pStock').value),
-        tag: document.getElementById('pTag').value.trim() || null,
-        description: document.getElementById('pDescription').value.trim(),
-        featured: document.getElementById('pFeatured').checked,
-        bestSeller: document.getElementById('pBestSeller').checked,
-        images: currentImages
-      };
-
-      if (category === 'Rings') {
-        data.sizes = selectedSizes;
-      } else {
-        data.sizes = deleteField();
-      }
-
-      try {
-        if (editingProductId) {
-          await updateDoc(doc(db, 'products', editingProductId), data);
-        } else {
-          if (category !== 'Rings') delete data.sizes;
-          data.createdAt = serverTimestamp();
-          await addDoc(collection(db, 'products'), data);
-        }
-        document.getElementById('productModal').classList.remove('open');
-        showToast('Product saved ✓');
-        loadProducts();
-      } catch (err) {
-        console.error(err);
-        showToast('Could not save — try again');
-      }
-      btn.disabled = false;
-      btn.textContent = 'Save Product';
-    }
-    document.getElementById('saveProductBtn').addEventListener('click', saveProduct);
-
-    async function deleteProduct(id) {
-      if (!confirm('Delete this product?')) return;
-      await deleteDoc(doc(db, 'products', id));
-      showToast('Product deleted');
-      loadProducts();
-    }
-
-    /* ---------- Slides ---------- */
-    let allSlides = [];
-    let editingSlideId = null;
-    let currentSlideImage = '';
-
-    async function loadSlides() {
-      const snap = await getDocs(collection(db, 'slides'));
-      allSlides = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-      renderSlidesTable();
-    }
-
-    function renderSlidesTable() {
-      const body = document.getElementById('slidesTableBody');
-      if (!allSlides.length) {
-        body.innerHTML = `<tr><td colspan="4" class="text-center" style="color:#7a5a5d; padding:30px;">No slides yet — homepage shows its default banner</td></tr>`;
-        return;
-      }
-      body.innerHTML = allSlides.map(s => `
-        <tr>
-          <td><div class="row-thumb">${s.image ? `<img src="${s.image}">` : ''}<span>${s.eyebrow || ''}</span></div></td>
-          <td>${s.title || ''}</td>
-          <td>${s.order ?? '—'}</td>
-          <td>
-            <button class="btn btn-outline btn-sm" data-sedit="${s.id}">Edit</button>
-            <button class="btn btn-danger btn-sm" data-sdel="${s.id}">Delete</button>
-          </td>
-        </tr>`).join('');
-    }
-
-    document.getElementById('slidesTableBody').addEventListener('click', (e) => {
-      const edit = e.target.closest('[data-sedit]');
-      const del = e.target.closest('[data-sdel]');
-      if (edit) openSlideModal(edit.dataset.sedit);
-      if (del) deleteSlide(del.dataset.sdel);
-    });
-
-    function openSlideModal(id = null) {
-      editingSlideId = id;
-      currentSlideImage = '';
-      document.getElementById('slideImgPreviewRow').innerHTML = '';
-      if (id) {
-        const s = allSlides.find(x => x.id === id);
-        document.getElementById('slideModalTitle').textContent = 'Edit Slide';
-        document.getElementById('sEyebrow').value = s.eyebrow || '';
-        document.getElementById('sTitle').value = s.title || '';
-        document.getElementById('sOrder').value = s.order ?? 1;
-        currentSlideImage = s.image || '';
-        renderSlideImagePreview();
-      } else {
-        document.getElementById('slideModalTitle').textContent = 'New Slide';
-        document.getElementById('sEyebrow').value = '';
-        document.getElementById('sTitle').value = '';
-        document.getElementById('sOrder').value = allSlides.length + 1;
-      }
-      document.getElementById('slideModal').classList.add('open');
-    }
-    document.getElementById('newSlideBtn').addEventListener('click', () => openSlideModal());
-    document.getElementById('closeSlideModal').addEventListener('click', () => document.getElementById('slideModal').classList.remove('open'));
-
-    function renderSlideImagePreview() {
-      document.getElementById('slideImgPreviewRow').innerHTML = currentSlideImage
-        ? `<div style="position:relative;"><img src="${currentSlideImage}"><span id="rmSlideImg" style="position:absolute;top:-6px;right:-6px;background:var(--maroon-dark);color:#fff;width:18px;height:18px;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</span></div>`
-        : '';
-      const rm = document.getElementById('rmSlideImg');
-      if (rm) rm.addEventListener('click', () => { currentSlideImage = ''; renderSlideImagePreview(); });
-    }
-
-    document.getElementById('slideImgUploadZone').addEventListener('click', () => document.getElementById('slideImgInput').click());
-    document.getElementById('slideImgInput').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const label = document.getElementById('slideUploadLabel');
-      label.innerHTML = `<span class="spinner" style="border-top-color:var(--maroon-dark); border-color:rgba(107,15,26,0.2);"></span> Uploading...`;
-      try {
-        currentSlideImage = await uploadToImgbb(file);
-        renderSlideImagePreview();
-      } catch (err) {
-        showToast('Photo upload failed — check imgbb key');
-      }
-      label.textContent = '📷 Select photo';
-      e.target.value = '';
-    });
-
-    async function saveSlide() {
-      const eyebrow = document.getElementById('sEyebrow').value.trim();
-      const title = document.getElementById('sTitle').value.trim();
-      const order = Number(document.getElementById('sOrder').value) || 0;
-      if (!title) { showToast('Title is required'); return; }
-
-      const btn = document.getElementById('saveSlideBtn');
-      btn.disabled = true;
-      btn.innerHTML = `<span class="spinner"></span> Saving...`;
-
-      const data = { eyebrow, title, order, image: currentSlideImage };
-      try {
-        if (editingSlideId) {
-          await updateDoc(doc(db, 'slides', editingSlideId), data);
-        } else {
-          await addDoc(collection(db, 'slides'), data);
-        }
-        document.getElementById('slideModal').classList.remove('open');
-        showToast('Slide saved ✓');
-        loadSlides();
-      } catch (err) {
-        console.error('Slide save failed:', err);
-        showToast('Could not save — try again');
-      }
-      btn.disabled = false;
-      btn.textContent = 'Save Slide';
-    }
-    document.getElementById('saveSlideBtn').addEventListener('click', saveSlide);
-
-    async function deleteSlide(id) {
-      if (!confirm('Delete this slide?')) return;
-      await deleteDoc(doc(db, 'slides', id));
-      showToast('Slide deleted');
-      loadSlides();
-    }
-
-    /* ---------- Theme ---------- */
-    async function loadTheme() {
-      try {
-        const snap = await getDoc(doc(db, 'settings', 'site'));
-        if (snap.exists()) {
-          const t = snap.data();
-          if (t.accentColor) document.getElementById('tAccentColor').value = t.accentColor;
-          if (t.heroSub) document.getElementById('tHeroSub').value = t.heroSub;
-          if (t.heroBadge) document.getElementById('tHeroBadge').value = t.heroBadge;
-        }
-      } catch (e) { /* no settings yet */ }
-    }
-    async function saveTheme() {
-      const accentColor = document.getElementById('tAccentColor').value;
-      const heroSub = document.getElementById('tHeroSub').value.trim();
-      const heroBadge = document.getElementById('tHeroBadge').value.trim();
-      const btn = document.getElementById('saveThemeBtn');
-      btn.disabled = true;
-      btn.innerHTML = `<span class="spinner"></span> Saving...`;
-      try {
-        await setDoc(doc(db, 'settings', 'site'), { accentColor, heroSub, heroBadge }, { merge: true });
-        showToast('Theme saved ✓ — refresh the store to see it');
-      } catch (err) {
-        console.error('Theme save failed:', err);
-        showToast('Could not save — try again');
-      }
-      btn.disabled = false;
-      btn.textContent = 'Save Theme';
-    }
-    document.getElementById('saveThemeBtn').addEventListener('click', saveTheme);
-
-    /* ---------- Orders ---------- */
-    async function loadOrders() {
-      const snap = await getDocs(collection(db, 'orders'));
-      allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-        .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-      document.getElementById('statOrders').textContent = allOrders.length;
-      document.getElementById('statPending').textContent = allOrders.filter(o => o.status === 'pending').length;
-      const revenue = allOrders.filter(o => o.status === 'delivered').reduce((s, o) => s + (o.total || 0), 0);
-      document.getElementById('statRevenue').textContent = formatTaka(revenue);
-      renderOrdersTable();
-    }
-
-    function renderOrdersTable() {
-      const body = document.getElementById('ordersTableBody');
-      if (!allOrders.length) {
-        body.innerHTML = `<tr><td colspan="7" class="text-center" style="color:#7a5a5d; padding:30px;">No orders yet</td></tr>`;
-        return;
-      }
-      body.innerHTML = allOrders.map(o => `
-        <tr>
-          <td>${o.name}</td>
-          <td>${o.phone}</td>
-          <td>${o.zone === 'dhaka' ? 'Inside Dhaka' : 'Outside Dhaka'}</td>
-          <td>${formatTaka(o.total)}</td>
-          <td><span class="pill pill-${o.status}">${o.status}</span></td>
-          <td>${o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleDateString() : '—'}</td>
-          <td><button class="btn btn-outline btn-sm" data-vieworder="${o.id}">View</button></td>
-        </tr>`).join('');
-    }
-
-    document.getElementById('ordersTableBody').addEventListener('click', (e) => {
-      const view = e.target.closest('[data-vieworder]');
-      if (view) openOrderModal(view.dataset.vieworder);
-    });
-
-    function openOrderModal(id) {
-      const o = allOrders.find(x => x.id === id);
-      document.getElementById('orderModalBody').innerHTML = `
-        <div class="field">
-          <label>Status</label>
-          <select id="statusSelect">
-            ${['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'].map(s =>
-              `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
-          </select>
-        </div>
-        <div style="margin-bottom:16px;">
-          ${(o.items || []).map(item => `
-            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(107,15,26,0.1); font-size:0.9rem;">
-              <span>${item.name} × ${item.qty}</span>
-              <span>${formatTaka(item.qty * item.price)}</span>
-            </div>`).join('')}
-          <div style="display:flex; justify-content:space-between; padding:12px 0 0; font-weight:600; color:var(--maroon);">
-            <span>Total</span><span>${formatTaka(o.total)}</span>
-          </div>
-        </div>
-        <div style="font-size:0.88rem; color:#6b4a4e; padding:14px; background:var(--blush);">
-          📍 ${o.name} · ${o.phone}<br>${o.address}
-        </div>
-        <button class="btn btn-aqua btn-block" style="margin-top:16px;" id="updateStatusBtn">Update Status</button>
-      `;
-      document.getElementById('orderModal').classList.add('open');
-      document.getElementById('updateStatusBtn').addEventListener('click', async () => {
-        const newStatus = document.getElementById('statusSelect').value;
-        await updateDoc(doc(db, 'orders', id), { status: newStatus });
-        document.getElementById('orderModal').classList.remove('open');
-        showToast('Order status updated');
-        loadOrders();
-      });
-    }
-    document.getElementById('closeOrderModal').addEventListener('click', () => document.getElementById('orderModal').classList.remove('open'));
-
-    /* ---------- Seed demo products ---------- */
-    async function seedDemoProducts() {
-      const demo = [
-        ['Rings', 'Antique Gold Kundan Ring', 4200, 5200, 'Women'],
-        ['Rings', "Men's Gold Signet Ring", 5800, null, 'Men'],
-        ['Necklaces', 'Maroon Stone Bridal Necklace', 12500, null, 'Women'],
-        ['Necklaces', 'Antique Temple Choker', 9800, 11000, 'Women'],
-        ['Earrings', 'Pearl Drop Chandbali Earrings', 3100, 3800, 'Women'],
-        ['Earrings', 'Kundan Jhumka Earrings', 2800, null, 'Women'],
-        ['Bracelets', 'Layered Gold Cuff Bracelet', 5400, null, 'Women'],
-        ['Bracelets', "Men's Silver Chain Bracelet", 3400, null, 'Men']
-      ];
-      const btn = document.getElementById('seedBtn');
-      btn.disabled = true;
-      btn.innerHTML = `<span class="spinner" style="border-top-color:var(--maroon); border-color:rgba(107,15,26,0.2);"></span> Adding...`;
-      for (const [category, name, price, oldPrice, gender] of demo) {
-        await addDoc(collection(db, 'products'), {
-          name, category, price, oldPrice, gender,
-          description: 'Demo product — edit with real photos and details.',
-          stock: 10,
-          featured: Math.random() > 0.5,
-          images: [],
-          createdAt: serverTimestamp()
-        });
-      }
-      showToast('8 demo products added ✓');
-      loadProducts();
-      btn.disabled = false;
-      btn.textContent = '🌱 Add Demo Products';
-    }
-    document.getElementById('seedBtn').addEventListener('click', seedDemoProducts);
+@media (max-width: 860px) {
+  .nav-right { gap: 14px; }
+  .hamburger { display: flex; }
+  .nav-links {
+    position: fixed;
+    top: 0; right: 0;
+    height: 100vh;
+    width: min(78vw, 320px);
+    background: var(--maroon);
+    flex-direction: column;
+    gap: 0;
+    padding: 100px 36px 40px;
+    transform: translateX(100%);
+    transition: transform 0.32s ease;
+    z-index: 95;
+    overflow-y: auto;
   }
-</script>
-</body>
-</html>
+  .nav-links.is-open { transform: translateX(0); }
+  .nav-links li { border-bottom: 1px solid rgba(255,255,255,0.12); }
+  .nav-links a { color: var(--ivory); display: block; padding: 16px 0; }
+  .nav-links a.active { color: var(--gold-light); }
+  .nav-links a::after { display: none; }
+  .nav-links .sub-toggle {
+    background: none; border: none; color: var(--ivory);
+    font-size: 0.75rem; padding: 8px; margin-left: auto;
+  }
+  .nav-links li.has-sub { display: flex; flex-wrap: wrap; align-items: center; }
+  .nav-links li.has-sub > a { flex: 1; }
+  .nav-links .sub-menu {
+    list-style: none; width: 100%; max-height: 0; overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+  .nav-links .sub-menu.is-open { max-height: 260px; }
+  .nav-links .sub-menu li { border-bottom: none; padding-left: 14px; }
+  .nav-links .sub-menu a { padding: 10px 0; font-size: 0.85rem; color: rgba(250,246,239,0.8); }
+  .nav-overlay {
+    position: fixed; inset: 0;
+    background: rgba(42,16,21,0.45);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 90;
+  }
+  .nav-overlay.is-open { opacity: 1; pointer-events: auto; }
+}
+
+/* ---------- Desktop "Shop" dropdown submenu ---------- */
+@media (min-width: 861px) {
+  .nav-links li.has-sub { position: relative; }
+  .nav-links .sub-toggle { display: none; }
+  .nav-links .sub-menu {
+    list-style: none;
+    position: absolute; top: 100%; left: 0;
+    background: var(--maroon-dark);
+    min-width: 170px;
+    box-shadow: var(--shadow);
+    opacity: 0; pointer-events: none; visibility: hidden;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    padding: 8px 0;
+    z-index: 50;
+  }
+  .nav-links li.has-sub:hover .sub-menu {
+    opacity: 1; pointer-events: auto; visibility: visible;
+    transform: translateY(0);
+  }
+  .nav-links .sub-menu a {
+    display: block; padding: 10px 18px; color: var(--ivory);
+    text-transform: none; font-size: 0.86rem; letter-spacing: 0.02em;
+  }
+  .nav-links .sub-menu a:hover { background: rgba(250,246,239,0.08); }
+  .nav-links .sub-menu a::after { display: none; }
+}
+
+/* ---------- Hero slider ---------- */
+.hero {
+  position: relative;
+  min-height: clamp(360px, 48vh, 520px);
+  overflow: hidden;
+  color: var(--ivory);
+}
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1s ease;
+  z-index: 1;
+}
+.hero-slide.is-active { opacity: 1; z-index: 2; }
+.hero-slide.slide-a { background: radial-gradient(circle at 30% 20%, rgba(201,162,39,0.20), transparent 55%), linear-gradient(160deg, var(--maroon) 0%, var(--maroon-dark) 62%, #300810 100%); }
+.hero-slide.slide-b { background: radial-gradient(circle at 70% 25%, rgba(201,162,39,0.24), transparent 55%), linear-gradient(200deg, #7a1f16 0%, var(--maroon-dark) 65%, #2A1015 100%); }
+.hero-slide.slide-c { background: radial-gradient(circle at 50% 15%, rgba(228,199,102,0.22), transparent 55%), linear-gradient(150deg, var(--maroon-dark) 0%, #3a0d15 60%, #1e0a0d 100%); }
+.hero-slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(115deg, rgba(201,162,39,0.06) 0px, rgba(201,162,39,0.06) 1px, transparent 1px, transparent 90px);
+  opacity: 0.6;
+}
+.hero-content { position: relative; z-index: 2; padding: 0 24px; }
+.hero-dots {
+  position: absolute;
+  bottom: 30px; left: 0; right: 0;
+  z-index: 5;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.hero-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: rgba(250,246,239,0.35);
+  border: 1px solid rgba(250,246,239,0.5);
+  padding: 0;
+}
+.hero-dot.is-active { background: var(--gold); border-color: var(--gold); }
+.hero-eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 22px;
+}
+.hero h1 {
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  line-height: 1.08;
+  margin-bottom: 20px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--gold-light);
+}
+.hero p {
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: rgba(250,246,239,0.82);
+  max-width: 480px;
+  margin: 0 auto 34px;
+}
+.btn {
+  display: inline-block;
+  padding: 15px 40px;
+  border: 1px solid var(--gold);
+  color: var(--gold-light);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+.btn:hover { background: var(--gold); color: var(--maroon-dark); }
+.btn-solid {
+  background: var(--gold);
+  color: var(--maroon-dark);
+  border-color: var(--gold);
+  font-weight: 500;
+}
+.btn-solid:hover { background: var(--gold-light); }
+
+/* ---------- Promo slider ("explore our new products" style) ---------- */
+.promo-slider {
+  position: relative;
+  aspect-ratio: 16/9;
+  max-height: 380px;
+  overflow: hidden;
+  border-radius: 16px;
+  margin: 60px 0 0;
+}
+.promo-slide {
+  position: absolute; inset: 0;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  padding: 32px;
+  color: var(--ivory);
+}
+.promo-slide.is-active { opacity: 1; z-index: 2; }
+.promo-slide.p-a { background: linear-gradient(15deg, rgba(42,16,21,0.92) 0%, rgba(107,15,26,0.55) 55%, rgba(201,162,39,0.35) 100%), linear-gradient(120deg, var(--maroon-dark), var(--maroon)); }
+.promo-slide.p-b { background: linear-gradient(15deg, rgba(42,16,21,0.92) 0%, rgba(138,36,50,0.55) 55%, rgba(228,199,102,0.3) 100%), linear-gradient(120deg, #2A1015, #7a1f16); }
+.promo-slide.p-c { background: linear-gradient(15deg, rgba(30,10,13,0.92) 0%, rgba(107,15,26,0.5) 55%, rgba(201,162,39,0.32) 100%), linear-gradient(120deg, #1e0a0d, var(--maroon-dark)); }
+.promo-slide .eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 10px;
+}
+.promo-slide h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  color: var(--ivory);
+  margin-bottom: 4px;
+}
+.promo-progress-track {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 5;
+  display: flex;
+  gap: 6px;
+  padding: 0 32px 16px;
+}
+.promo-progress-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(250,246,239,0.28);
+  overflow: hidden;
+}
+.promo-progress-bar .fill {
+  height: 100%;
+  width: 0%;
+  background: var(--gold);
+}
+.promo-progress-bar.done .fill { width: 100%; transition: none; }
+.promo-progress-bar.active .fill { width: 100%; transition: width 4.5s linear; }
+.search-bar {
+  max-height: 0;
+  overflow: hidden;
+  background: var(--blush);
+  transition: max-height 0.25s ease;
+}
+.search-bar.is-open { max-height: 80px; }
+.search-bar .container { padding-top: 14px; padding-bottom: 14px; }
+.search-bar input {
+  width: 100%;
+  border: 1px solid rgba(107,15,26,0.25);
+  background: var(--white);
+  padding: 12px 16px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.95rem;
+  color: var(--plum);
+}
+.search-bar input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+/* ---------- Footer social icons ---------- */
+.social-icons {
+  display: flex;
+  gap: 14px;
+  margin-top: 18px;
+}
+.social-icons a {
+  width: 36px; height: 36px;
+  border: 1px solid rgba(250,246,239,0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.social-icons a:hover { background: var(--gold); border-color: var(--gold); }
+.social-icons a svg { width: 16px; height: 16px; stroke: var(--ivory); }
+.social-icons a:hover svg { stroke: var(--maroon-dark); }
+
+section { padding: 90px 0; }
+.section-head { text-align: center; margin-bottom: 54px; }
+.section-eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--maroon);
+  margin-bottom: 14px;
+}
+.section-head h2 { font-size: clamp(1.9rem, 3.4vw, 2.6rem); margin-bottom: 18px; }
+.section-head p { max-width: 520px; margin: 0 auto; color: #6b4a4e; }
+
+/* ---------- Category grid ---------- */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+.category-card {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: flex-end;
+  padding: 22px;
+  color: var(--ivory);
+  isolation: isolate;
+}
+.category-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(200deg, var(--gold) 0%, var(--maroon) 70%);
+  opacity: 0.94;
+  z-index: -1;
+  transition: transform 0.5s ease;
+}
+.category-card:nth-child(2)::before { background: linear-gradient(200deg, #8A2432 0%, var(--maroon-dark) 75%); }
+.category-card:nth-child(3)::before { background: linear-gradient(200deg, var(--gold-light) 0%, #8A2432 75%); }
+.category-card:nth-child(4)::before { background: linear-gradient(200deg, var(--maroon) 0%, #7a1f16 75%); }
+.category-card:hover::before { transform: scale(1.06); }
+.category-card h3 { color: var(--ivory); font-size: 1.25rem; }
+.category-card .count { font-size: 0.78rem; opacity: 0.85; letter-spacing: 0.05em; }
+
+/* ---------- Product grid ---------- */
+.filter-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 46px;
+}
+.filter-chip {
+  padding: 9px 22px;
+  border: 1px solid rgba(107,15,26,0.3);
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--maroon);
+  border-radius: 999px;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+.filter-chip.active, .filter-chip:hover {
+  background: var(--maroon);
+  color: var(--ivory);
+  border-color: var(--maroon);
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+.product-card {
+  background: var(--white);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(42,16,21,0.18); }
+.product-media {
+  aspect-ratio: 1/1;
+  background: linear-gradient(150deg, var(--blush) 0%, var(--gold-light) 130%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.product-media svg { width: 46%; opacity: 0.85; }
+.product-tag {
+  position: absolute;
+  top: 12px; left: 12px;
+  background: var(--maroon);
+  color: var(--gold-light);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+}
+.product-info { padding: 20px 20px 24px; }
+.product-info .cat {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.product-info h3 { font-size: 1.08rem; font-weight: 600; margin-bottom: 8px; }
+.product-info .price { color: var(--maroon); font-weight: 500; font-family: 'Jost', sans-serif; }
+.product-info .price .old { color: #a98d90; text-decoration: line-through; font-size: 0.88rem; margin-left: 8px; font-weight: 300; }
+.add-cart-btn {
+  margin-top: 14px;
+  width: 100%;
+  padding: 11px;
+  background: var(--maroon);
+  color: var(--ivory);
+  border: none;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.2s ease;
+}
+.add-cart-btn:hover { background: var(--maroon-dark); }
+.add-cart-btn.is-added { background: var(--gold); color: var(--maroon-dark); }
+
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(107,15,26,0.25);
+}
+.qty-stepper button {
+  width: 38px; height: 38px;
+  background: none; border: none;
+  font-size: 1.1rem; color: var(--maroon);
+}
+.qty-stepper input {
+  width: 44px; text-align: center;
+  border: none; border-left: 1px solid rgba(107,15,26,0.25); border-right: 1px solid rgba(107,15,26,0.25);
+  height: 38px; font-family: 'Jost', sans-serif;
+}
+
+/* ---------- Cart page ---------- */
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 50px;
+  align-items: start;
+}
+.cart-item {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(107,15,26,0.12);
+}
+.cart-item .thumb {
+  width: 74px; height: 74px;
+  background: linear-gradient(150deg, var(--blush) 0%, var(--gold-light) 130%);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.cart-item .thumb svg { width: 60%; }
+.cart-item .details { flex: 1; }
+.cart-item .details h4 { font-size: 1rem; font-weight: 500; margin-bottom: 4px; }
+.cart-item .remove-link {
+  font-size: 0.78rem;
+  color: #a15a5a;
+  text-decoration: underline;
+  margin-top: 6px;
+  display: inline-block;
+}
+.cart-summary {
+  background: var(--blush);
+  padding: 30px;
+}
+.cart-summary h3 { margin-bottom: 20px; }
+.delivery-options { margin-bottom: 22px; }
+.delivery-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(107,15,26,0.2);
+  margin-bottom: 10px;
+  background: var(--white);
+  cursor: pointer;
+}
+.delivery-option input { accent-color: var(--maroon); }
+.delivery-option .fee { margin-left: auto; color: var(--maroon); font-weight: 500; }
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.95rem;
+}
+.summary-row.total {
+  border-top: 1px solid rgba(107,15,26,0.2);
+  margin-top: 10px;
+  padding-top: 16px;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--maroon);
+}
+.empty-cart { text-align: center; padding: 60px 0; color: #6b4a4e; }
+
+/* ---------- Admin dashboard ---------- */
+.admin-shell { min-height: 100vh; background: var(--ivory); display: flex; }
+.admin-side {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--maroon-dark);
+  color: var(--ivory);
+  padding: 28px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.admin-side .logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--ivory);
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+.admin-side .logo span { color: var(--gold-light); }
+.admin-side a {
+  display: block;
+  padding: 11px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: rgba(250,246,239,0.8);
+}
+.admin-side a:hover { background: rgba(250,246,239,0.08); color: var(--ivory); }
+.admin-side a.active { background: var(--gold); color: var(--maroon-dark); font-weight: 600; }
+.admin-side a:last-child { margin-top: auto; }
+.admin-main { flex: 1; min-width: 0; padding: 30px 32px; }
+.admin-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.admin-topbar h1 { font-size: 1.5rem; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
+.stat-card { background: var(--white); box-shadow: var(--shadow); padding: 22px; }
+.stat-card .num { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--maroon); }
+.stat-card .label { font-size: 0.8rem; color: #7a5a5d; margin-top: 4px; }
+
+.filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.chip {
+  padding: 8px 18px; border-radius: 999px; border: 1px solid rgba(107,15,26,0.25);
+  background: var(--white); font-size: 0.82rem; color: var(--maroon);
+}
+.chip.active { background: var(--maroon); color: var(--ivory); border-color: var(--maroon); }
+
+.table-card { background: var(--white); box-shadow: var(--shadow); padding: 20px; overflow-x: auto; }
+.table-card table { width: 100%; border-collapse: collapse; min-width: 560px; }
+.table-card th, .table-card td { text-align: left; padding: 12px 10px; border-bottom: 1px solid rgba(107,15,26,0.1); font-size: 0.86rem; }
+.table-card th { color: var(--maroon); font-weight: 500; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.06em; }
+.row-thumb { display: flex; align-items: center; gap: 10px; }
+.row-thumb img { width: 34px; height: 34px; object-fit: cover; border-radius: 4px; background: var(--blush); }
+
+.btn-outline { background: none; border: 1px solid rgba(107,15,26,0.3); color: var(--maroon); }
+.btn-danger { background: none; border: 1px solid #a15a5a; color: #a15a5a; }
+.btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+.btn-block { width: 100%; border: none; }
+.btn-aqua { background: var(--maroon); color: var(--ivory); border: none; }
+.btn-aqua:hover { background: var(--maroon-dark); }
+.text-center { text-align: center; }
+.hidden { display: none !important; }
+
+/* Modals (product / slide / order) */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(42,16,21,0.55);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 40px 16px; overflow-y: auto; z-index: 200;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal { background: var(--ivory); width: 480px; max-width: 100%; padding: 28px; }
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.modal-close { background: none; border: none; font-size: 1.2rem; color: var(--maroon); }
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--maroon); margin-bottom: 8px; }
+.field input, .field select, .field textarea {
+  width: 100%; border: 1px solid rgba(107,15,26,0.25); background: var(--white);
+  padding: 12px 14px; font-family: 'Jost', sans-serif; font-size: 0.92rem; color: var(--plum);
+}
+.field-row { display: flex; gap: 14px; }
+.field-row .field { flex: 1; }
+
+/* Image upload zone */
+.img-upload {
+  border: 1.5px dashed rgba(107,15,26,0.3); padding: 20px; text-align: center;
+  font-size: 0.85rem; color: var(--maroon); cursor: pointer; background: var(--white);
+}
+.img-upload:hover { background: var(--blush); }
+.img-preview-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.img-preview-row img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+
+.spinner {
+  display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid rgba(250,246,239,0.4); border-top-color: var(--ivory);
+  animation: spin 0.7s linear infinite; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--maroon-dark); color: var(--ivory); padding: 12px 22px;
+  font-size: 0.88rem; opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 300;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.login-screen {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, var(--maroon) 0%, var(--maroon-dark) 100%);
+}
+.login-box { background: var(--ivory); padding: 44px; width: 340px; max-width: 90vw; }
+.login-box h2 { text-align: center; margin-bottom: 26px; }
+.config-warning {
+  background: #fff3cd; border: 1px solid #e0c25c; color: #6b4a04;
+  padding: 16px 18px; font-size: 0.88rem; margin: 20px 0; max-width: 480px;
+}
+.status-badge, .pill {
+  padding: 3px 10px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.status-badge.pending, .pill-pending { background: #fff3cd; color: #6b4a04; }
+.status-badge.confirmed, .pill-confirmed { background: #d4edda; color: #155724; }
+.pill-shipped { background: #d6e4f0; color: #1a4a7a; }
+.pill-delivered { background: #d4edda; color: #155724; }
+.pill-cancelled { background: #f4d4d4; color: #7a1a1a; }
+
+@media (max-width: 860px) {
+  .admin-shell { flex-direction: column; }
+  .admin-side { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; padding: 14px 16px; }
+  .admin-side .logo { display: none; }
+  .admin-side a { white-space: nowrap; }
+  .admin-side a:last-child { margin-top: 0; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .field-row { flex-direction: column; gap: 0; }
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  background: var(--plum);
+  color: rgba(250,246,239,0.75);
+  padding: 64px 0 28px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+  gap: 40px;
+  margin-bottom: 46px;
+}
+.footer-grid h4 {
+  color: var(--gold-light);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+.footer-grid ul { list-style: none; }
+.footer-grid li { margin-bottom: 10px; font-size: 0.92rem; }
+.footer-brand { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--ivory); margin-bottom: 12px; }
+.footer-brand span { color: var(--gold); }
+.footer-bottom {
+  border-top: 1px solid rgba(250,246,239,0.12);
+  padding-top: 24px;
+  text-align: center;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+/* ---------- Contact form ---------- */
+.contact-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+.form-field { margin-bottom: 20px; }
+.form-field label {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--maroon);
+  margin-bottom: 8px;
+}
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  border: 1px solid rgba(107,15,26,0.25);
+  background: var(--white);
+  padding: 13px 15px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.95rem;
+  color: var(--plum);
+}
+.form-field input:focus,
+.form-field textarea:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+.form-status { margin-top: 14px; font-size: 0.9rem; }
+
+/* ---------- Utility ---------- */
+.page-hero {
+  padding: 64px 0 40px;
+  text-align: center;
+  background: var(--blush);
+}
+.page-hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 12px; }
+.page-hero p { color: #6b4a4e; }
+
+@media (max-width: 980px) {
+  .category-grid { grid-template-columns: repeat(2, 1fr); }
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .contact-wrap { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .category-grid { grid-template-columns: 1fr; }
+  .product-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+  section { padding: 60px 0; }
+}
+@media (max-width: 860px) {
+  .cart-layout { grid-template-columns: 1fr; }
+}
