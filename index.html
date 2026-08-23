@@ -124,31 +124,42 @@
       <h2>Find your piece</h2>
       <p>Four collections, one house of craftsmanship.</p>
     </div>
-    <div class="category-grid">
-      <a class="category-card" data-category="Rings" href="shop.html?category=Rings">
-        <div>
-          <h3>Rings</h3>
-          <div class="count">Explore collection</div>
-        </div>
-      </a>
-      <a class="category-card" data-category="Necklaces" href="shop.html?category=Necklaces">
-        <div>
-          <h3>Necklaces</h3>
-          <div class="count">Explore collection</div>
-        </div>
-      </a>
-      <a class="category-card" data-category="Earrings" href="shop.html?category=Earrings">
-        <div>
-          <h3>Earrings</h3>
-          <div class="count">Explore collection</div>
-        </div>
-      </a>
-      <a class="category-card" data-category="Bracelets" href="shop.html?category=Bracelets">
-        <div>
-          <h3>Bracelets</h3>
-          <div class="count">Explore collection</div>
-        </div>
-      </a>
+    <div class="category-strip">
+      <div class="category-track" id="category-track">
+        <a class="category-circle" data-category="Rings" href="shop.html?category=Rings">
+          <div class="ring"></div>
+          <span>Rings</span>
+        </a>
+        <a class="category-circle" data-category="Necklaces" href="shop.html?category=Necklaces">
+          <div class="ring"></div>
+          <span>Necklaces</span>
+        </a>
+        <a class="category-circle" data-category="Earrings" href="shop.html?category=Earrings">
+          <div class="ring"></div>
+          <span>Earrings</span>
+        </a>
+        <a class="category-circle" data-category="Bracelets" href="shop.html?category=Bracelets">
+          <div class="ring"></div>
+          <span>Bracelets</span>
+        </a>
+        <!-- duplicated set for a seamless infinite scroll loop -->
+        <a class="category-circle" data-category="Rings" href="shop.html?category=Rings" aria-hidden="true">
+          <div class="ring"></div>
+          <span>Rings</span>
+        </a>
+        <a class="category-circle" data-category="Necklaces" href="shop.html?category=Necklaces" aria-hidden="true">
+          <div class="ring"></div>
+          <span>Necklaces</span>
+        </a>
+        <a class="category-circle" data-category="Earrings" href="shop.html?category=Earrings" aria-hidden="true">
+          <div class="ring"></div>
+          <span>Earrings</span>
+        </a>
+        <a class="category-circle" data-category="Bracelets" href="shop.html?category=Bracelets" aria-hidden="true">
+          <div class="ring"></div>
+          <span>Bracelets</span>
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -284,7 +295,7 @@
         if (!slideEl || !product) return;
         const img = (product.images && product.images[0]) || product.image;
         if (!img) return;
-        slideEl.style.backgroundImage = `linear-gradient(160deg, rgba(74,10,18,0.78), rgba(30,8,13,0.88)), url('${img}')`;
+        slideEl.style.backgroundImage = `linear-gradient(160deg, rgba(10,10,10,0.78), rgba(5,5,5,0.88)), url('${img}')`;
         slideEl.style.backgroundSize = 'cover';
         slideEl.style.backgroundPosition = 'center';
         if (nameEl) nameEl.textContent = product.name;
@@ -304,7 +315,8 @@
       const products = snapshot.docs.map(d => d.data());
       document.querySelectorAll('[data-category]').forEach(card => {
         const cat = card.dataset.category;
-        const match = products.find(p => p.category === cat && ((p.images && p.images[0]) || p.image));
+        const inCategory = p => p.category === cat && ((p.images && p.images[0]) || p.image);
+        const match = products.find(p => inCategory(p) && p.featured) || products.find(inCategory);
         if (!match) return;
         const img = (match.images && match.images[0]) || match.image;
         card.style.setProperty('--card-bg', `url('${img}')`);
