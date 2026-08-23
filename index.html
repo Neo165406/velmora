@@ -125,25 +125,25 @@
       <p>Four collections, one house of craftsmanship.</p>
     </div>
     <div class="category-grid">
-      <a class="category-card" href="shop.html">
+      <a class="category-card" data-category="Rings" href="shop.html?category=Rings">
         <div>
           <h3>Rings</h3>
           <div class="count">Explore collection</div>
         </div>
       </a>
-      <a class="category-card" href="shop.html">
+      <a class="category-card" data-category="Necklaces" href="shop.html?category=Necklaces">
         <div>
           <h3>Necklaces</h3>
           <div class="count">Explore collection</div>
         </div>
       </a>
-      <a class="category-card" href="shop.html">
+      <a class="category-card" data-category="Earrings" href="shop.html?category=Earrings">
         <div>
           <h3>Earrings</h3>
           <div class="count">Explore collection</div>
         </div>
       </a>
-      <a class="category-card" href="shop.html">
+      <a class="category-card" data-category="Bracelets" href="shop.html?category=Bracelets">
         <div>
           <h3>Bracelets</h3>
           <div class="count">Explore collection</div>
@@ -297,9 +297,27 @@
     }
   }
 
+  async function loadCategoryPhotos() {
+    if (!isFirebaseConfigured) return;
+    try {
+      const snapshot = await getDocs(collection(db, 'products'));
+      const products = snapshot.docs.map(d => d.data());
+      document.querySelectorAll('[data-category]').forEach(card => {
+        const cat = card.dataset.category;
+        const match = products.find(p => p.category === cat && ((p.images && p.images[0]) || p.image));
+        if (!match) return;
+        const img = (match.images && match.images[0]) || match.image;
+        card.style.setProperty('--card-bg', `url('${img}')`);
+      });
+    } catch (err) {
+      console.error('Could not load category photos:', err);
+    }
+  }
+
   loadTheme();
   loadSlides();
   loadHeroPhotos();
+  loadCategoryPhotos();
 </script>
 </body>
 </html>
