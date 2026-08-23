@@ -18,7 +18,16 @@
     <a href="index.html" class="brand">VEL<span>MORA</span></a>
     <ul class="nav-links">
       <li><a href="index.html" class="active">Home</a></li>
-      <li><a href="shop.html">Shop</a></li>
+      <li class="has-sub">
+        <a href="shop.html">Shop</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Shop categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?category=Rings">Rings</a></li>
+          <li><a href="shop.html?category=Necklaces">Necklaces</a></li>
+          <li><a href="shop.html?category=Earrings">Earrings</a></li>
+          <li><a href="shop.html?category=Bracelets">Bracelets</a></li>
+        </ul>
+      </li>
       <li><a href="shop.html?gender=Men">Men</a></li>
       <li><a href="shop.html?gender=Women">Women</a></li>
       <li><a href="shop.html?gender=Unisex">Unisex</a></li>
