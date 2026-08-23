@@ -13,7 +13,16 @@
     <a href="index.html" class="brand">VEL<span>MORA</span></a>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
-      <li><a href="shop.html">Shop</a></li>
+      <li class="has-sub">
+        <a href="shop.html">Shop</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Shop categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?category=Rings">Rings</a></li>
+          <li><a href="shop.html?category=Necklaces">Necklaces</a></li>
+          <li><a href="shop.html?category=Earrings">Earrings</a></li>
+          <li><a href="shop.html?category=Bracelets">Bracelets</a></li>
+        </ul>
+      </li>
       <li><a href="shop.html?gender=Men">Men</a></li>
       <li><a href="shop.html?gender=Women">Women</a></li>
       <li><a href="shop.html?gender=Unisex">Unisex</a></li>
@@ -121,7 +130,10 @@
 <script src="js/nav.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/search.js"></script>
-<script>
+<script type="module">
+  import { db, isFirebaseConfigured } from './js/firebase-init.js';
+  import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
   function gemIconSmall() {
     return `<svg viewBox="0 0 64 64" fill="none"><path d="M8 22L32 6L56 22L32 58L8 22Z" stroke="#FAF6EF" stroke-width="2" stroke-linejoin="round"/></svg>`;
   }
@@ -190,10 +202,11 @@
     radio.addEventListener('change', updateSummary);
   });
 
-  document.getElementById('checkout-form').addEventListener('submit', function (e) {
+  document.getElementById('checkout-form').addEventListener('submit', async function (e) {
     e.preventDefault();
-    // Once Firestore is configured, write this order object into an
-    // `orders` collection here (same pattern as StrDust's dashboard.html).
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+
     const order = {
       name: document.getElementById('c-name').value,
       phone: document.getElementById('c-phone').value,
@@ -203,17 +216,26 @@
       items: getCart(),
       subtotal: cartSubtotal(),
       total: cartSubtotal() + getDeliveryFee(currentZone()),
-      status: 'pending',
-      createdAt: new Date().toISOString()
+      status: 'pending'
     };
-    const orders = JSON.parse(localStorage.getItem('velmora_orders') || '[]');
-    orders.push(order);
-    localStorage.setItem('velmora_orders', JSON.stringify(orders));
 
-    localStorage.removeItem('velmora_cart');
-    document.getElementById('checkout-status').textContent = 'Order placed! We\'ll call to confirm delivery.';
-    this.reset();
-    setTimeout(renderCart, 1200);
+    try {
+      if (isFirebaseConfigured) {
+        await addDoc(collection(db, 'orders'), { ...order, createdAt: serverTimestamp() });
+      } else {
+        const orders = JSON.parse(localStorage.getItem('velmora_orders') || '[]');
+        orders.push({ ...order, createdAt: new Date().toISOString() });
+        localStorage.setItem('velmora_orders', JSON.stringify(orders));
+      }
+      localStorage.removeItem('velmora_cart');
+      document.getElementById('checkout-status').textContent = 'Order placed! We\'ll call to confirm delivery.';
+      this.reset();
+      setTimeout(renderCart, 1200);
+    } catch (err) {
+      console.error('Order failed to save:', err);
+      document.getElementById('checkout-status').textContent = 'Something went wrong placing the order — please try again.';
+    }
+    submitBtn.disabled = false;
   });
 
   renderCart();
