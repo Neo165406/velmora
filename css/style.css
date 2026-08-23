@@ -248,7 +248,7 @@ button { font-family: inherit; cursor: pointer; }
 /* ---------- Hero slider ---------- */
 .hero {
   position: relative;
-  min-height: 78vh;
+  min-height: clamp(360px, 48vh, 520px);
   overflow: hidden;
   color: var(--ivory);
 }
