@@ -66,20 +66,20 @@
       <a href="shop.html" class="btn btn-solid">Shop the Collection</a>
     </div>
   </div>
-  <div class="hero-slide slide-b">
+  <div class="hero-slide slide-b" id="hero-slide-new">
     <div class="hero-content">
-      <div class="hero-eyebrow">New This Season</div>
-      <h1>Antique Gold,<br><em>Reimagined</em></h1>
-      <p>Hand-finished necklaces and chokers inspired by heritage craftsmanship.</p>
-      <a href="shop.html" class="btn btn-solid">Explore Necklaces</a>
+      <div class="hero-eyebrow">New Arrival</div>
+      <h1>Fresh In:<br><em id="hero-new-name">New This Season</em></h1>
+      <p>Hand-finished pieces, just added to the collection.</p>
+      <a href="shop.html?tag=New" class="btn btn-solid">Shop New Arrivals</a>
     </div>
   </div>
-  <div class="hero-slide slide-c">
+  <div class="hero-slide slide-c" id="hero-slide-bestseller">
     <div class="hero-content">
-      <div class="hero-eyebrow">Bridal Edit</div>
-      <h1>Pieces Made<br><em>For the Big Day</em></h1>
-      <p>Kundan, temple work, and statement sets for every ceremony.</p>
-      <a href="shop.html" class="btn btn-solid">View Bridal Edit</a>
+      <div class="hero-eyebrow">Bestseller</div>
+      <h1>Loved By Our<br><em id="hero-bestseller-name">Customers</em></h1>
+      <p>The pieces our customers keep coming back for.</p>
+      <a href="shop.html" class="btn btn-solid">Shop Bestsellers</a>
     </div>
   </div>
   <div class="hero-dots">
@@ -271,8 +271,35 @@
     }
   }
 
+  async function loadHeroPhotos() {
+    if (!isFirebaseConfigured) return;
+    try {
+      const snapshot = await getDocs(collection(db, 'products'));
+      const products = snapshot.docs.map(d => d.data());
+
+      const newProduct = products.find(p => p.tag === 'New') || products.find(p => p.featured);
+      const bestProduct = products.find(p => p.bestSeller) || products.find(p => p.tag === 'Bestseller');
+
+      function applyPhoto(slideEl, nameEl, product) {
+        if (!slideEl || !product) return;
+        const img = (product.images && product.images[0]) || product.image;
+        if (!img) return;
+        slideEl.style.backgroundImage = `linear-gradient(160deg, rgba(74,10,18,0.78), rgba(30,8,13,0.88)), url('${img}')`;
+        slideEl.style.backgroundSize = 'cover';
+        slideEl.style.backgroundPosition = 'center';
+        if (nameEl) nameEl.textContent = product.name;
+      }
+
+      applyPhoto(document.getElementById('hero-slide-new'), document.getElementById('hero-new-name'), newProduct);
+      applyPhoto(document.getElementById('hero-slide-bestseller'), document.getElementById('hero-bestseller-name'), bestProduct);
+    } catch (err) {
+      console.error('Could not load hero product photos:', err);
+    }
+  }
+
   loadTheme();
   loadSlides();
+  loadHeroPhotos();
 </script>
 </body>
 </html>
