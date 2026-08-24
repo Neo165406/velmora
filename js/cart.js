@@ -27,10 +27,12 @@ function addToCart(product, qty = 1) {
   if (existing) {
     existing.qty += qty;
   } else {
+    const image = (Array.isArray(product.images) && product.images[0]) || product.image || null;
     cart.push({
       id: product.id,
       name: product.name,
       price: product.price,
+      image: image,
       qty: qty
     });
   }
