@@ -370,8 +370,11 @@ function renderProductDetail() {
   });
 }
 
+const productsReadyPromise = loadProducts().then(() => VELMORA_PRODUCTS);
+window.velmoraProductsReady = productsReadyPromise;
+
 document.addEventListener('DOMContentLoaded', async function () {
-  await loadProducts();
+  await productsReadyPromise;
   applyUrlFilters();
   renderProductGrid();
   renderFeatured();
