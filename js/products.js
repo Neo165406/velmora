@@ -169,9 +169,9 @@ function renderProductCard(p) {
           <div class="price">${formatTaka(p.price)}${p.oldPrice ? `<span class="old">${formatTaka(p.oldPrice)}</span>` : ''}</div>
         </div>
       </a>
-      <div class="product-info" style="padding-top:0;">
-        <button class="add-cart-btn" data-add-to-cart="${p.id}">Add to Cart</button>
-      </div>
+      <button class="quick-add-btn" data-add-to-cart="${p.id}" aria-label="Add to cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+      </button>
     </div>`;
 }
 
@@ -181,10 +181,12 @@ function wireAddToCartButtons(scope) {
       const p = VELMORA_PRODUCTS.find(item => item.id === btn.dataset.addToCart);
       if (!p) return;
       addToCart(p, 1);
-      btn.textContent = 'Added ✓';
       btn.classList.add('is-added');
+      if (btn.classList.contains('add-cart-btn')) {
+        btn.textContent = 'Added ✓';
+      }
       setTimeout(() => {
-        btn.textContent = 'Add to Cart';
+        if (btn.classList.contains('add-cart-btn')) btn.textContent = 'Add to Cart';
         btn.classList.remove('is-added');
       }, 1200);
     });
