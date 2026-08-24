@@ -327,14 +327,26 @@ button { font-family: inherit; cursor: pointer; }
   transition: background 0.25s ease, color 0.25s ease;
 }
 .btn:hover { background: var(--gold); color: var(--maroon-dark); }
-.hero .btn { padding: 10px 26px; font-size: 0.74rem; }
-.btn-solid {
+.hero .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 28px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   background: var(--gold);
   color: var(--maroon-dark);
-  border-color: var(--gold);
-  font-weight: 500;
+  border: 1px solid var(--gold);
+  opacity: 1;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
-.btn-solid:hover { background: var(--gold-light); }
+
+.hero .btn:hover {
+  background: var(--gold-light);
+  color: var(--maroon-dark);
+  border-color: var(--gold-light);
+}
 
 /* ---------- Promo slider ("explore our new products" style) ---------- */
 .promo-slider {
