@@ -1,383 +1,333 @@
-// ---------------------------------------------------------------
-// Velmora product data.
-// Falls back to the static demo list below until Firebase is
-// configured (js/firebase-config.js) — then it loads live products
-// from your Firestore `products` collection instead, same as
-// StrDust's dashboard.html writes them.
-// ---------------------------------------------------------------
-import { db, isFirebaseConfigured } from './firebase-init.js';
-import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velmora — Glamour for Stylish Woman</title>
+<meta name="description" content="Velmora is a fine jewellery house for the stylish woman — rings, necklaces, earrings, and bracelets crafted with antique gold detailing.">
+<meta property="og:title" content="Velmora — Glamour for Stylish Woman">
+<meta property="og:description" content="Fine jewellery crafted for the stylish woman. Shop rings, necklaces, earrings and bracelets.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
-let VELMORA_PRODUCTS = [
-  {
-    id: 'rng-001',
-    name: 'Antique Gold Kundan Ring',
-    category: 'Rings',
-    gender: 'Women',
-    price: 4200,
-    oldPrice: 5200,
-    tag: 'New',
-  },
-  {
-    id: 'nck-001',
-    name: 'Maroon Stone Bridal Necklace',
-    category: 'Necklaces',
-    gender: 'Women',
-    price: 12500,
-    oldPrice: null,
-    tag: 'Bestseller',
-  },
-  {
-    id: 'ear-001',
-    name: 'Pearl Drop Chandbali Earrings',
-    category: 'Earrings',
-    gender: 'Women',
-    price: 3100,
-    oldPrice: 3800,
-    tag: null,
-  },
-  {
-    id: 'brc-001',
-    name: 'Layered Gold Cuff Bracelet',
-    category: 'Bracelets',
-    gender: 'Women',
-    price: 5400,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'nck-002',
-    name: 'Antique Temple Choker',
-    category: 'Necklaces',
-    gender: 'Women',
-    price: 9800,
-    oldPrice: 11000,
-    tag: 'New',
-  },
-  {
-    id: 'rng-002',
-    name: 'Rose Gold Solitaire Ring',
-    category: 'Rings',
-    gender: 'Women',
-    price: 6600,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'ear-002',
-    name: 'Kundan Jhumka Earrings',
-    category: 'Earrings',
-    gender: 'Women',
-    price: 2800,
-    oldPrice: null,
-    tag: 'Bestseller',
-  },
-  {
-    id: 'brc-002',
-    name: 'Ruby Studded Bangle Set',
-    category: 'Bracelets',
-    gender: 'Women',
-    price: 8200,
-    oldPrice: 9500,
-    tag: null,
-  },
-  {
-    id: 'rng-003',
-    name: "Men's Gold Signet Ring",
-    category: 'Rings',
-    gender: 'Men',
-    price: 5800,
-    oldPrice: null,
-    tag: 'New',
-  },
-  {
-    id: 'brc-003',
-    name: "Men's Silver Chain Bracelet",
-    category: 'Bracelets',
-    gender: 'Men',
-    price: 3400,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'brc-004',
-    name: 'Minimal Gold Bangle',
-    category: 'Bracelets',
-    gender: 'Unisex',
-    price: 4600,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'rng-004',
-    name: 'Plain Band Couple Ring',
-    category: 'Rings',
-    gender: 'Unisex',
-    price: 3200,
-    oldPrice: null,
-    tag: 'Bestseller',
-  },
-];
-
-function velmoraGemIcon() {
-  return `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M8 22L32 6L56 22L32 58L8 22Z" stroke="#161616" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M8 22H56M20 22L32 6M44 22L32 6M20 22L32 58M44 22L32 58" stroke="#161616" stroke-width="1" opacity="0.6"/>
-  </svg>`;
-}
-
-function formatTaka(amount) {
-  return '৳' + amount.toLocaleString('en-IN');
-}
-
-async function loadProducts() {
-  if (!isFirebaseConfigured) return; // keep static demo data
-  try {
-    const snapshot = await getDocs(collection(db, 'products'));
-    if (!snapshot.empty) {
-      VELMORA_PRODUCTS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
-  } catch (err) {
-    console.error('Could not load live products, showing demo data instead:', err);
-  }
-}
-
-function primaryImage(p) {
-  if (Array.isArray(p.images) && p.images.length) return p.images[0];
-  if (p.image) return p.image;
-  return null;
-}
-
-function productMedia(p) {
-  const img = primaryImage(p);
-  return img
-    ? `<img src="${img}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">`
-    : velmoraGemIcon();
-}
-
-function renderProductCard(p) {
-  return `
-    <div class="product-card">
-      <a href="product.html?id=${p.id}">
-        <div class="product-media">
-          ${p.tag ? `<span class="product-tag">${p.tag}</span>` : ''}
-          ${productMedia(p)}
-        </div>
-        <div class="product-info">
-          <div class="cat">${p.category}</div>
-          <h3>${p.name}</h3>
-          <div class="price">${formatTaka(p.price)}${p.oldPrice ? `<span class="old">${formatTaka(p.oldPrice)}</span>` : ''}</div>
-        </div>
-      </a>
-      <button class="quick-add-btn" data-add-to-cart="${p.id}" aria-label="Add to cart">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+<header class="site-header">
+  <nav class="nav-bar">
+    <a href="index.html" class="brand">VEL<span>MORA</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li class="has-sub">
+        <a href="shop.html">Shop</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Shop categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?category=Rings">Rings</a></li>
+          <li><a href="shop.html?category=Necklaces">Necklaces</a></li>
+          <li><a href="shop.html?category=Earrings">Earrings</a></li>
+          <li><a href="shop.html?category=Bracelets">Bracelets</a></li>
+        </ul>
+      </li>
+      <li><a href="shop.html?gender=Men">Men</a></li>
+      <li><a href="shop.html?gender=Women">Women</a></li>
+      <li><a href="shop.html?gender=Unisex">Unisex</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="icon-btn search-toggle" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
-    </div>`;
-}
-
-function wireAddToCartButtons(scope) {
-  scope.querySelectorAll('[data-add-to-cart]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const p = VELMORA_PRODUCTS.find(item => item.id === btn.dataset.addToCart);
-      if (!p) return;
-      addToCart(p, 1);
-      btn.classList.add('is-added');
-      if (btn.classList.contains('add-cart-btn')) {
-        btn.textContent = 'Added ✓';
-      }
-      setTimeout(() => {
-        if (btn.classList.contains('add-cart-btn')) btn.textContent = 'Add to Cart';
-        btn.classList.remove('is-added');
-      }, 1200);
-    });
-  });
-}
-
-// Renders into any element with [data-product-grid], applying the
-// current category, gender, and search filters together.
-const filterState = { category: 'All', gender: 'All', search: '' };
-
-function applyFilters() {
-  return VELMORA_PRODUCTS.filter(p => {
-    const matchCategory = filterState.category === 'All' || p.category === filterState.category;
-    const matchGender = filterState.gender === 'All' || p.gender === filterState.gender;
-    const matchSearch = !filterState.search || p.name.toLowerCase().includes(filterState.search.toLowerCase());
-    return matchCategory && matchGender && matchSearch;
-  });
-}
-
-function renderProductGrid() {
-  const grid = document.querySelector('[data-product-grid]');
-  if (!grid) return;
-  const items = applyFilters();
-  grid.innerHTML = items.length
-    ? items.map(renderProductCard).join('')
-    : `<p style="grid-column:1/-1; text-align:center; color:#6b4a4e; padding:40px 0;">No products found.</p>`;
-  wireAddToCartButtons(grid);
-}
-
-function setupFilters() {
-  const catChips = document.querySelectorAll('[data-filter]');
-  catChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      catChips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      filterState.category = chip.dataset.filter;
-      renderProductGrid();
-    });
-  });
-
-  const genderChips = document.querySelectorAll('[data-gender-filter]');
-  genderChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      genderChips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      filterState.gender = chip.dataset.genderFilter;
-      renderProductGrid();
-    });
-  });
-}
-
-// Reads ?category=, ?gender=, ?search= from the URL (used by nav links
-// like Men/Women/Unisex, and by the nav search bar) and pre-applies them.
-function applyUrlFilters() {
-  const params = new URLSearchParams(window.location.search);
-  const category = params.get('category');
-  const gender = params.get('gender');
-  const search = params.get('search');
-
-  if (category) {
-    filterState.category = category;
-    document.querySelectorAll('[data-filter]').forEach(c => {
-      c.classList.toggle('active', c.dataset.filter === category);
-    });
-  }
-  if (gender) {
-    filterState.gender = gender;
-    document.querySelectorAll('[data-gender-filter]').forEach(c => {
-      c.classList.toggle('active', c.dataset.genderFilter === gender);
-    });
-  }
-  if (search) {
-    filterState.search = search;
-    const input = document.getElementById('search-input');
-    if (input) input.value = search;
-  }
-}
-
-// Exposed so the nav search bar can filter in place when already on shop.html
-window.applyVelmoraSearch = function (value) {
-  filterState.search = value;
-  renderProductGrid();
-};
-
-function renderFeatured() {
-  const grid = document.querySelector('[data-featured-grid]');
-  if (!grid) return;
-  const featured = VELMORA_PRODUCTS.filter(p => p.featured);
-  const items = (featured.length ? featured : VELMORA_PRODUCTS).slice(0, 4);
-  grid.innerHTML = items.map(renderProductCard).join('');
-  wireAddToCartButtons(grid);
-}
-
-function renderRelated(current) {
-  const grid = document.querySelector('[data-related-grid]');
-  if (!grid) return;
-  const related = VELMORA_PRODUCTS.filter(p => p.category === current.category && p.id !== current.id).slice(0, 4);
-  grid.innerHTML = related.length
-    ? related.map(renderProductCard).join('')
-    : `<p style="grid-column:1/-1; text-align:center; color:#6b4a4e;">No other pieces in this category yet.</p>`;
-  wireAddToCartButtons(grid);
-}
-
-function renderProductDetail() {
-  const mount = document.querySelector('[data-product-detail]');
-  if (!mount) return;
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
-  const p = VELMORA_PRODUCTS.find(item => item.id === id) || VELMORA_PRODUCTS[0];
-  const images = (Array.isArray(p.images) && p.images.length) ? p.images : (p.image ? [p.image] : []);
-
-  mount.innerHTML = `
-    <div>
-      <div class="pd-media product-media" style="aspect-ratio:1/1;" id="pd-main-media">
-        ${images.length ? `<img src="${images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">` : velmoraGemIcon()}
-      </div>
-      ${images.length > 1 ? `
-        <div style="display:flex; gap:10px; margin-top:14px;">
-          ${images.map((img, i) => `
-            <button type="button" class="pd-thumb-btn" data-thumb="${i}"
-              style="width:64px; height:64px; padding:0; border:2px solid ${i === 0 ? 'var(--gold)' : 'transparent'}; overflow:hidden; cursor:pointer; background:none;">
-              <img src="${img}" style="width:100%; height:100%; object-fit:cover; display:block;">
-            </button>`).join('')}
-        </div>` : ''}
+      <a href="https://instagram.com/velmora" target="_blank" rel="noopener" class="icon-btn" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#FAF6EF" stroke="none"/></svg>
+      </a>
+      <a href="cart.html" class="cart-icon-wrap" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.6"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="10" cy="20" r="1.2" fill="#E4C766"/><circle cx="17" cy="20" r="1.2" fill="#E4C766"/></svg>
+        <span data-cart-count>0</span>
+      </a>
+      <button class="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-    <div class="pd-info">
-      <div class="cat">${p.category}</div>
-      <h1 class="display" style="font-size:2rem; margin-bottom:14px;">${p.name}</h1>
-      <div class="price" style="font-size:1.3rem; margin-bottom:24px;">
-        ${formatTaka(p.price)}${p.oldPrice ? `<span class="old">${formatTaka(p.oldPrice)}</span>` : ''}
-      </div>
-      <p style="color:#6b4a4e; margin-bottom:28px; max-width:440px;">
-        Handcrafted detailing with a polished antique finish. Cash on delivery available across Bangladesh — ৳60 inside Dhaka, ৳130 outside Dhaka.
-      </p>
-      ${Array.isArray(p.sizes) && p.sizes.length ? `
-        <div style="margin-bottom:24px;">
-          <div style="font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--maroon); margin-bottom:10px;">Available Sizes</div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            ${p.sizes.map(s => `<span style="padding:6px 14px; border:1px solid rgba(107,15,26,0.3); font-size:0.85rem;">${s}</span>`).join('')}
-          </div>
-        </div>` : ''}
-      <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
-        <div class="qty-stepper">
-          <button type="button" data-qty-minus>−</button>
-          <input type="text" value="1" data-qty-input readonly>
-          <button type="button" data-qty-plus>+</button>
-        </div>
-        <button class="add-cart-btn" style="width:auto; padding:13px 32px;" data-add-to-cart="${p.id}">Add to Cart</button>
-      </div>
-    </div>`;
-  document.title = p.name + ' — Velmora';
-  renderRelated(p);
+  </nav>
+  <div class="nav-overlay"></div>
+  <div class="search-bar" id="search-bar">
+    <div class="container">
+      <input type="text" id="search-input" placeholder="Search products...">
+    </div>
+  </div>
+</header>
 
-  if (images.length > 1) {
-    mount.querySelectorAll('[data-thumb]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = Number(btn.dataset.thumb);
-        document.getElementById('pd-main-media').innerHTML =
-          `<img src="${images[idx]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">`;
-        mount.querySelectorAll('[data-thumb]').forEach(b => { b.style.borderColor = 'transparent'; });
-        btn.style.borderColor = 'var(--gold)';
-      });
-    });
+<section class="hero">
+  <div class="hero-slide slide-a is-active">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Velmora Fine Jewellery</div>
+      <h1>Glamour for the<br><em>Stylish Woman</em></h1>
+      <p>Antique gold detailing, hand-set stones, and pieces made to be worn — not kept away. Cash on delivery across Bangladesh.</p>
+      <a href="shop.html" class="btn btn-solid">Shop the Collection</a>
+    </div>
+  </div>
+  <div class="hero-slide slide-b" id="hero-slide-new">
+    <div class="hero-content">
+      <div class="hero-eyebrow">New Arrival</div>
+      <h1>Fresh In:<br><em id="hero-new-name">New This Season</em></h1>
+      <p>Hand-finished pieces, just added to the collection.</p>
+      <a href="shop.html?tag=New" class="btn btn-solid">Shop New Arrivals</a>
+    </div>
+  </div>
+  <div class="hero-slide slide-c" id="hero-slide-bestseller">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Bestseller</div>
+      <h1>Loved By Our<br><em id="hero-bestseller-name">Customers</em></h1>
+      <p>The pieces our customers keep coming back for.</p>
+      <a href="shop.html" class="btn btn-solid">Shop Bestsellers</a>
+    </div>
+  </div>
+  <div class="hero-dots">
+    <button class="hero-dot is-active" aria-label="Slide 1"></button>
+    <button class="hero-dot" aria-label="Slide 2"></button>
+    <button class="hero-dot" aria-label="Slide 3"></button>
+  </div>
+</section>
+
+<div class="container">
+  <div class="promo-slider">
+    <div class="promo-slide p-a is-active">
+      <div>
+        <div class="eyebrow">New Arrivals</div>
+        <h3>Explore Our New Pieces</h3>
+      </div>
+    </div>
+    <div class="promo-slide p-b">
+      <div>
+        <div class="eyebrow">Festive Edit</div>
+        <h3>Antique Gold, Freshly In</h3>
+      </div>
+    </div>
+    <div class="promo-slide p-c">
+      <div>
+        <div class="eyebrow">Limited Stock</div>
+        <h3>Bridal Sets Selling Fast</h3>
+      </div>
+    </div>
+    <div class="promo-progress-track">
+      <div class="promo-progress-bar"><span class="fill"></span></div>
+      <div class="promo-progress-bar"><span class="fill"></span></div>
+      <div class="promo-progress-bar"><span class="fill"></span></div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Shop by Category</div>
+      <h2>Find your piece</h2>
+      <p>Four collections, one house of craftsmanship.</p>
+    </div>
+    <div class="category-strip">
+      <div class="category-track" id="category-track">
+        <a class="category-circle" data-category="Rings" href="shop.html?category=Rings">
+          <div class="ring"></div>
+          <span>Rings</span>
+        </a>
+        <a class="category-circle" data-category="Necklaces" href="shop.html?category=Necklaces">
+          <div class="ring"></div>
+          <span>Necklaces</span>
+        </a>
+        <a class="category-circle" data-category="Earrings" href="shop.html?category=Earrings">
+          <div class="ring"></div>
+          <span>Earrings</span>
+        </a>
+        <a class="category-circle" data-category="Bracelets" href="shop.html?category=Bracelets">
+          <div class="ring"></div>
+          <span>Bracelets</span>
+        </a>
+        <!-- duplicated set for a seamless infinite scroll loop -->
+        <a class="category-circle" data-category="Rings" href="shop.html?category=Rings" aria-hidden="true">
+          <div class="ring"></div>
+          <span>Rings</span>
+        </a>
+        <a class="category-circle" data-category="Necklaces" href="shop.html?category=Necklaces" aria-hidden="true">
+          <div class="ring"></div>
+          <span>Necklaces</span>
+        </a>
+        <a class="category-circle" data-category="Earrings" href="shop.html?category=Earrings" aria-hidden="true">
+          <div class="ring"></div>
+          <span>Earrings</span>
+        </a>
+        <a class="category-circle" data-category="Bracelets" href="shop.html?category=Bracelets" aria-hidden="true">
+          <div class="ring"></div>
+          <span>Bracelets</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background: var(--blush);">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Handpicked</div>
+      <h2>Featured pieces</h2>
+    </div>
+    <div class="product-grid" data-featured-grid></div>
+    <div style="text-align:center; margin-top:46px;">
+      <a href="shop.html" class="btn">View All Products</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container" style="text-align:center;">
+    <div class="divider" style="margin-bottom:26px;"><span class="gem"></span></div>
+    <h2 style="max-width:600px; margin:0 auto 16px;">Crafted for the woman who notices detail</h2>
+    <p style="max-width:560px; margin:0 auto; color:#6b4a4e;">Every Velmora piece is finished by hand — from the antique polish to the last stone setting — because glamour lives in the details you almost miss.</p>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">VEL<span>MORA</span></div>
+        <p style="font-size:0.9rem; max-width:260px;">Fine jewellery for the stylish woman. Antique gold, hand-set stones, made in Dhaka.</p>
+        <div class="social-icons">
+          <a href="https://instagram.com/velmora" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M15 8h2V4h-2a4 4 0 0 0-4 4v2H9v4h2v6h4v-6h2.5l.5-4H15V8a1 1 0 0 1 1-1z"/></svg>
+          </a>
+          <a href="https://wa.me/8801XXXXXXXXX" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M3 21l1.6-4.8A8 8 0 1 1 8.8 19.4L3 21z"/><path d="M8.5 9.5c0 3.5 3 6.5 6.5 6.5.6 0 1-.5.8-1l-1.3-1.9a.8.8 0 0 0-.9-.2l-1 .4a5 5 0 0 1-2.9-2.9l.4-1a.8.8 0 0 0-.2-.9L8.9 8.7c-.5-.2-1 .2-1 .8z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Products</a></li>
+          <li><a href="shop.html">Rings</a></li>
+          <li><a href="shop.html">Necklaces</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Reach Us</h4>
+        <ul>
+          <li>Dhaka, Bangladesh</li>
+          <li>hello@velmora.shop</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Velmora. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/nav.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/search.js"></script>
+<script src="js/hero-slider.js"></script>
+<script src="js/promo-slider.js"></script>
+<script type="module" src="js/products.js"></script>
+<script type="module">
+  import { db, isFirebaseConfigured } from './js/firebase-init.js';
+  import { collection, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  async function loadTheme() {
+    if (!isFirebaseConfigured) return;
+    try {
+      const snap = await getDoc(doc(db, 'settings', 'site'));
+      if (!snap.exists()) return;
+      const t = snap.data();
+      if (t.accentColor) document.documentElement.style.setProperty('--gold', t.accentColor);
+      if (t.heroBadge) document.querySelectorAll('.hero-eyebrow').forEach(el => el.textContent = t.heroBadge);
+      if (t.heroSub) {
+        const firstSlideP = document.querySelector('.hero-slide.slide-a p');
+        if (firstSlideP) firstSlideP.textContent = t.heroSub;
+      }
+    } catch (err) {
+      console.error('Could not load theme settings:', err);
+    }
   }
 
-  const qtyInput = mount.querySelector('[data-qty-input]');
-  mount.querySelector('[data-qty-minus]').addEventListener('click', () => {
-    qtyInput.value = Math.max(1, parseInt(qtyInput.value) - 1);
-  });
-  mount.querySelector('[data-qty-plus]').addEventListener('click', () => {
-    qtyInput.value = parseInt(qtyInput.value) + 1;
-  });
-  mount.querySelector('[data-add-to-cart]').addEventListener('click', function () {
-    addToCart(p, parseInt(qtyInput.value));
-    this.textContent = 'Added ✓';
-    this.classList.add('is-added');
-    setTimeout(() => {
-      this.textContent = 'Add to Cart';
-      this.classList.remove('is-added');
-    }, 1200);
-  });
-}
+  async function loadSlides() {
+    if (!isFirebaseConfigured) return;
+    try {
+      const snapshot = await getDocs(collection(db, 'slides'));
+      if (snapshot.empty) return;
+      const slides = snapshot.docs.map(d => d.data()).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-const productsReadyPromise = loadProducts().then(() => VELMORA_PRODUCTS);
-window.velmoraProductsReady = productsReadyPromise;
+      const wrap = document.querySelector('.promo-slider');
+      if (!wrap) return;
+      const slideHtml = slides.map((s, i) => `
+        <div class="promo-slide p-${String.fromCharCode(97 + (i % 3))} ${i === 0 ? 'is-active' : ''}" ${s.image ? `style="background-image:url('${s.image}'); background-size:cover; background-position:center;"` : ''}>
+          <div>
+            <div class="eyebrow">${s.eyebrow || ''}</div>
+            <h3>${s.title || ''}</h3>
+          </div>
+        </div>`).join('');
+      const barsHtml = slides.map(() => `<div class="promo-progress-bar"><span class="fill"></span></div>`).join('');
+      wrap.innerHTML = slideHtml + `<div class="promo-progress-track">${barsHtml}</div>`;
 
-document.addEventListener('DOMContentLoaded', async function () {
-  await productsReadyPromise;
-  applyUrlFilters();
-  renderProductGrid();
-  renderFeatured();
-  setupFilters();
-  renderProductDetail();
-});
+      if (window.initPromoSlider) window.initPromoSlider();
+    } catch (err) {
+      console.error('Could not load slides:', err);
+    }
+  }
+
+  async function loadHeroPhotos() {
+    try {
+      const products = window.velmoraProductsReady ? await window.velmoraProductsReady : [];
+      if (!products.length) return;
+
+      const newProduct = products.find(p => p.tag === 'New') || products.find(p => p.featured);
+      const bestProduct = products.find(p => p.bestSeller) || products.find(p => p.tag === 'Bestseller');
+
+      function applyPhoto(slideEl, nameEl, product) {
+        if (!slideEl || !product) return;
+        const img = (product.images && product.images[0]) || product.image;
+        if (!img) return;
+        slideEl.style.backgroundImage = `linear-gradient(160deg, rgba(10,10,10,0.78), rgba(5,5,5,0.88)), url('${img}')`;
+        slideEl.style.backgroundSize = 'cover';
+        slideEl.style.backgroundPosition = 'center';
+        if (nameEl) nameEl.textContent = product.name;
+      }
+
+      applyPhoto(document.getElementById('hero-slide-new'), document.getElementById('hero-new-name'), newProduct);
+      applyPhoto(document.getElementById('hero-slide-bestseller'), document.getElementById('hero-bestseller-name'), bestProduct);
+    } catch (err) {
+      console.error('Could not load hero product photos:', err);
+    }
+  }
+
+  async function loadCategoryPhotos() {
+    try {
+      const products = window.velmoraProductsReady ? await window.velmoraProductsReady : [];
+      if (!products.length) return;
+      document.querySelectorAll('[data-category]').forEach(card => {
+        const cat = card.dataset.category;
+        const inCategory = p => p.category === cat && ((p.images && p.images[0]) || p.image);
+        const match = products.find(p => inCategory(p) && p.featured) || products.find(inCategory);
+        if (!match) return;
+        const img = (match.images && match.images[0]) || match.image;
+        card.style.setProperty('--card-bg', `url('${img}')`);
+      });
+    } catch (err) {
+      console.error('Could not load category photos:', err);
+    }
+  }
+
+  loadTheme();
+  loadSlides();
+  loadHeroPhotos();
+  loadCategoryPhotos();
+</script>
+</body>
+</html>
