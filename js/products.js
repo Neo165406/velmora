@@ -378,5 +378,3 @@ document.addEventListener('DOMContentLoaded', async function () {
   setupFilters();
   renderProductDetail();
 });
-  renderProductDetail();
-});
