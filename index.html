@@ -283,10 +283,9 @@
   }
 
   async function loadHeroPhotos() {
-    if (!isFirebaseConfigured) return;
     try {
-      const snapshot = await getDocs(collection(db, 'products'));
-      const products = snapshot.docs.map(d => d.data());
+      const products = window.velmoraProductsReady ? await window.velmoraProductsReady : [];
+      if (!products.length) return;
 
       const newProduct = products.find(p => p.tag === 'New') || products.find(p => p.featured);
       const bestProduct = products.find(p => p.bestSeller) || products.find(p => p.tag === 'Bestseller');
@@ -309,10 +308,9 @@
   }
 
   async function loadCategoryPhotos() {
-    if (!isFirebaseConfigured) return;
     try {
-      const snapshot = await getDocs(collection(db, 'products'));
-      const products = snapshot.docs.map(d => d.data());
+      const products = window.velmoraProductsReady ? await window.velmoraProductsReady : [];
+      if (!products.length) return;
       document.querySelectorAll('[data-category]').forEach(card => {
         const cat = card.dataset.category;
         const inCategory = p => p.category === cat && ((p.images && p.images[0]) || p.image);
