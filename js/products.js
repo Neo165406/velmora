@@ -380,9 +380,3 @@ document.addEventListener('DOMContentLoaded', async function () {
   renderFeatured();
   setupFilters();
   renderProductDetail();
-});
-  loadHeroPhotos();
-  loadCategoryPhotos();
-</script>
-</body>
-</html>
