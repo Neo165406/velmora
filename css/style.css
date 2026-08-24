@@ -620,6 +620,7 @@ section { padding: 90px 0; }
   width: 74px; height: 74px;
   background: linear-gradient(150deg, var(--blush) 0%, var(--gold-light) 130%);
   flex-shrink: 0;
+  overflow: hidden;
   display: flex; align-items: center; justify-content: center;
 }
 .cart-item .thumb svg { width: 60%; }
