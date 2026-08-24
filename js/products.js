@@ -294,10 +294,21 @@ function renderProductDetail() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
   const p = VELMORA_PRODUCTS.find(item => item.id === id) || VELMORA_PRODUCTS[0];
+  const images = (Array.isArray(p.images) && p.images.length) ? p.images : (p.image ? [p.image] : []);
 
   mount.innerHTML = `
-    <div class="pd-media product-media" style="aspect-ratio:1/1;">
-      ${productMedia(p)}
+    <div>
+      <div class="pd-media product-media" style="aspect-ratio:1/1;" id="pd-main-media">
+        ${images.length ? `<img src="${images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">` : velmoraGemIcon()}
+      </div>
+      ${images.length > 1 ? `
+        <div style="display:flex; gap:10px; margin-top:14px;">
+          ${images.map((img, i) => `
+            <button type="button" class="pd-thumb-btn" data-thumb="${i}"
+              style="width:64px; height:64px; padding:0; border:2px solid ${i === 0 ? 'var(--gold)' : 'transparent'}; overflow:hidden; cursor:pointer; background:none;">
+              <img src="${img}" style="width:100%; height:100%; object-fit:cover; display:block;">
+            </button>`).join('')}
+        </div>` : ''}
     </div>
     <div class="pd-info">
       <div class="cat">${p.category}</div>
@@ -326,6 +337,18 @@ function renderProductDetail() {
     </div>`;
   document.title = p.name + ' — Velmora';
   renderRelated(p);
+
+  if (images.length > 1) {
+    mount.querySelectorAll('[data-thumb]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.thumb);
+        document.getElementById('pd-main-media').innerHTML =
+          `<img src="${images[idx]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">`;
+        mount.querySelectorAll('[data-thumb]').forEach(b => { b.style.borderColor = 'transparent'; });
+        btn.style.borderColor = 'var(--gold)';
+      });
+    });
+  }
 
   const qtyInput = mount.querySelector('[data-qty-input]');
   mount.querySelector('[data-qty-minus]').addEventListener('click', () => {
