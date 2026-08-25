@@ -1,4 +1,4 @@
-// ---------------------------------------------------------------
+// ----------------------------------------------------------------
 // Velmora product data.
 // Falls back to the static demo list below until Firebase is
 // configured (js/firebase-config.js) — then it loads live products
