@@ -9,6 +9,8 @@
 <meta property="og:description" content="Fine jewellery crafted for the stylish woman. Shop rings, necklaces, earrings and bracelets.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://firestore.googleapis.com">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -60,9 +62,9 @@
 <section class="hero">
   <div class="hero-slide slide-a is-active">
     <div class="hero-content">
-      <div class="hero-eyebrow"></div>
+      <div class="hero-eyebrow">Velmora Fine Jewellery</div>
       <h1>Glamour for the<br><em>Stylish Woman</em></h1>
-    
+      <p>Antique gold detailing, hand-set stones, and pieces made to be worn — not kept away. Cash on delivery across Bangladesh.</p>
       <a href="shop.html" class="btn btn-solid">Shop the Collection</a>
     </div>
   </div>
@@ -121,8 +123,8 @@
   <div class="container">
     <div class="section-head">
       <div class="section-eyebrow">Shop by Category</div>
-      
-      
+      <h2>Find your piece</h2>
+      <p>Four collections, one house of craftsmanship.</p>
     </div>
     <div class="category-strip">
       <div class="category-track" id="category-track">
@@ -237,7 +239,7 @@
 <script src="js/promo-slider.js"></script>
 <script type="module" src="js/products.js"></script>
 <script type="module">
-  import { db, isFirebaseConfigured } from './js/firebase-init.js';
+  import { db, isFirebaseConfigured } from './js/firebase-config.js';
   import { collection, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
   async function loadTheme() {
