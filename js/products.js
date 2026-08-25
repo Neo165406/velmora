@@ -1,11 +1,11 @@
-// ----------------------------------------------------------------
+// ---------------------------------------------------------------
 // Velmora product data.
 // Falls back to the static demo list below until Firebase is
 // configured (js/firebase-config.js) — then it loads live products
 // from your Firestore `products` collection instead, same as
 // StrDust's dashboard.html writes them.
 // ---------------------------------------------------------------
-import { db, isFirebaseConfigured } from './firebase-init.js';
+import { db, isFirebaseConfigured } from './firebase-config.js';
 import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 let VELMORA_PRODUCTS = [
@@ -130,12 +130,35 @@ function formatTaka(amount) {
   return '৳' + amount.toLocaleString('en-IN');
 }
 
+const PRODUCTS_CACHE_KEY = 'velmora_products_cache';
+
+function loadCachedProducts() {
+  try {
+    const cached = localStorage.getItem(PRODUCTS_CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length) {
+        VELMORA_PRODUCTS = parsed;
+        return true;
+      }
+    }
+  } catch (e) { /* corrupt or unavailable cache, ignore */ }
+  return false;
+}
+
+function saveCachedProducts() {
+  try {
+    localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(VELMORA_PRODUCTS));
+  } catch (e) { /* storage full or unavailable, ignore */ }
+}
+
 async function loadProducts() {
   if (!isFirebaseConfigured) return; // keep static demo data
   try {
     const snapshot = await getDocs(collection(db, 'products'));
     if (!snapshot.empty) {
       VELMORA_PRODUCTS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      saveCachedProducts();
     }
   } catch (err) {
     console.error('Could not load live products, showing demo data instead:', err);
@@ -151,7 +174,7 @@ function primaryImage(p) {
 function productMedia(p) {
   const img = primaryImage(p);
   return img
-    ? `<img src="${img}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">`
+    ? `<img src="${img}" alt="${p.name}" loading="lazy" style="width:100%; height:100%; object-fit:cover;">`
     : velmoraGemIcon();
 }
 
@@ -370,14 +393,22 @@ function renderProductDetail() {
   });
 }
 
+const hasCachedProducts = loadCachedProducts();
 const productsReadyPromise = loadProducts().then(() => VELMORA_PRODUCTS);
 window.velmoraProductsReady = productsReadyPromise;
 
-document.addEventListener('DOMContentLoaded', async function () {
-  await productsReadyPromise;
+function renderAll() {
   applyUrlFilters();
   renderProductGrid();
   renderFeatured();
-  setupFilters();
   renderProductDetail();
-  });
+}
+
+document.addEventListener('DOMContentLoaded', async function () {
+  setupFilters();
+  if (hasCachedProducts) {
+    renderAll(); // instant paint from last visit's cache
+  }
+  await productsReadyPromise;
+  renderAll(); // refresh with live data once it arrives
+});
