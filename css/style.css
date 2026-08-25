@@ -276,22 +276,6 @@ button { font-family: inherit; cursor: pointer; }
   opacity: 0.6;
 }
 .hero-content { position: relative; z-index: 2; padding: 0 24px; }
-.hero-dots {
-  position: absolute;
-  bottom: 30px; left: 0; right: 0;
-  z-index: 5;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-.hero-dot {
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: rgba(250,246,239,0.35);
-  border: 1px solid rgba(250,246,239,0.5);
-  padding: 0;
-}
-.hero-dot.is-active { background: var(--gold); border-color: var(--gold); }
 .hero-eyebrow {
   font-size: 0.62rem;
   letter-spacing: 0.25em;
