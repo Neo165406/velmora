@@ -271,6 +271,7 @@
           <div>
             <div class="eyebrow">${s.eyebrow || ''}</div>
             <h3>${s.title || ''}</h3>
+            ${s.price ? `<div class="price">৳${Number(s.price).toLocaleString('en-IN')}${s.oldPrice ? `<span class="old">৳${Number(s.oldPrice).toLocaleString('en-IN')}</span>` : ''}</div>` : ''}
           </div>
         </div>`).join('');
       const barsHtml = slides.map(() => `<div class="promo-progress-bar"><span class="fill"></span></div>`).join('');
