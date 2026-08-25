@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Cart — Velmora</title>
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://firestore.googleapis.com">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -131,7 +133,7 @@
 <script src="js/cart.js"></script>
 <script src="js/search.js"></script>
 <script type="module">
-  import { db, isFirebaseConfigured } from './js/firebase-init.js';
+  import { db, isFirebaseConfigured } from './js/firebase-config.js';
   import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
   function gemIconSmall() {
