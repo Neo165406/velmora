@@ -243,6 +243,16 @@
       <label>Order (lower shows first)</label>
       <input type="number" id="sOrder" value="1" min="0">
     </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Price (৳) — optional</label>
+        <input type="number" id="sPrice" placeholder="1200">
+      </div>
+      <div class="field">
+        <label>Old Price (৳) — optional</label>
+        <input type="number" id="sOldPrice" placeholder="Show a discount">
+      </div>
+    </div>
     <div class="field">
       <label>Image</label>
       <div class="img-upload" id="slideImgUploadZone">
@@ -606,12 +616,16 @@
         document.getElementById('sEyebrow').value = s.eyebrow || '';
         document.getElementById('sTitle').value = s.title || '';
         document.getElementById('sOrder').value = s.order ?? 1;
+        document.getElementById('sPrice').value = s.price || '';
+        document.getElementById('sOldPrice').value = s.oldPrice || '';
         currentSlideImage = s.image || '';
         renderSlideImagePreview();
       } else {
         document.getElementById('slideModalTitle').textContent = 'New Slide';
         document.getElementById('sEyebrow').value = '';
         document.getElementById('sTitle').value = '';
+        document.getElementById('sPrice').value = '';
+        document.getElementById('sOldPrice').value = '';
         document.getElementById('sOrder').value = allSlides.length + 1;
       }
       document.getElementById('slideModal').classList.add('open');
@@ -647,13 +661,15 @@
       const eyebrow = document.getElementById('sEyebrow').value.trim();
       const title = document.getElementById('sTitle').value.trim();
       const order = Number(document.getElementById('sOrder').value) || 0;
+      const price = document.getElementById('sPrice').value ? Number(document.getElementById('sPrice').value) : null;
+      const oldPrice = document.getElementById('sOldPrice').value ? Number(document.getElementById('sOldPrice').value) : null;
       if (!title) { showToast('Title is required'); return; }
 
       const btn = document.getElementById('saveSlideBtn');
       btn.disabled = true;
       btn.innerHTML = `<span class="spinner"></span> Saving...`;
 
-      const data = { eyebrow, title, order, image: currentSlideImage };
+      const data = { eyebrow, title, order, price, oldPrice, image: currentSlideImage };
       try {
         if (editingSlideId) {
           await updateDoc(doc(db, 'slides', editingSlideId), data);
@@ -664,6 +680,7 @@
         showToast('Slide saved ✓');
         loadSlides();
       } catch (err) {
+        console.error('Slide save failed:', err);
         showToast('Could not save — try again');
       }
       btn.disabled = false;
@@ -701,6 +718,7 @@
         await setDoc(doc(db, 'settings', 'site'), { accentColor, heroSub, heroBadge }, { merge: true });
         showToast('Theme saved ✓ — refresh the store to see it');
       } catch (err) {
+        console.error('Theme save failed:', err);
         showToast('Could not save — try again');
       }
       btn.disabled = false;
