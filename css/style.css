@@ -248,7 +248,7 @@ button { font-family: inherit; cursor: pointer; }
 /* ---------- Hero slider ---------- */
 .hero {
   position: relative;
-  min-height: clamp(200px, 26vh, 300px);
+  min-height: clamp(120px, 16vh, 180px);
   overflow: hidden;
   color: var(--ivory);
 }
@@ -261,7 +261,7 @@ button { font-family: inherit; cursor: pointer; }
   text-align: center;
   opacity: 0;
   transition: opacity 1s ease;
-  z-index: 0;
+  z-index: 1;
 }
 .hero-slide.is-active { opacity: 1; z-index: 2; }
 .hero-slide.slide-a { background: radial-gradient(circle at 30% 20%, rgba(201,162,39,0.20), transparent 55%), linear-gradient(160deg, var(--maroon) 0%, var(--maroon-dark) 62%, #050505 100%); }
@@ -275,7 +275,7 @@ button { font-family: inherit; cursor: pointer; }
     repeating-linear-gradient(115deg, rgba(201,162,39,0.06) 0px, rgba(201,162,39,0.06) 1px, transparent 1px, transparent 90px);
   opacity: 0.6;
 }
-.hero-content { position: relative; z-index: 10; padding: 0 24px; }
+.hero-content { position: relative; z-index: 2; padding: 0 24px; }
 .hero-dots {
   position: absolute;
   bottom: 30px; left: 0; right: 0;
@@ -293,16 +293,16 @@ button { font-family: inherit; cursor: pointer; }
 }
 .hero-dot.is-active { background: var(--gold); border-color: var(--gold); }
 .hero-eyebrow {
-  font-size: 0.7rem;
-  letter-spacing: 0.3em;
+  font-size: 0.62rem;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
   color: var(--gold-light);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 .hero h1 {
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  line-height: 1.1;
-  margin-bottom: 10px;
+  font-size: clamp(1.1rem, 3vw, 1.8rem);
+  line-height: 1.15;
+  margin-bottom: 6px;
   color: var(--ivory);
 }
 .hero h1 em {
@@ -310,11 +310,11 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--gold-light);
 }
 .hero p {
-  font-size: 0.92rem;
+  font-size: 0.8rem;
   font-weight: 300;
   color: rgba(250,246,239,0.82);
-  max-width: 420px;
-  margin: 0 auto 18px;
+  max-width: 400px;
+  margin: 0 auto 10px;
 }
 .btn {
   display: inline-block;
@@ -327,29 +327,14 @@ button { font-family: inherit; cursor: pointer; }
   transition: background 0.25s ease, color 0.25s ease;
 }
 .btn:hover { background: var(--gold); color: var(--maroon-dark); }
-.hero .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 11px 28px;
-  font-size: 0.74rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+.hero .btn { padding: 7px 20px; font-size: 0.68rem; }
+.btn-solid {
   background: var(--gold);
   color: var(--maroon-dark);
-  border: 1px solid var(--gold);
-  z-index: 20;
-  opacity: 1;
-  visibility: visible;
-
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  border-color: var(--gold);
+  font-weight: 500;
 }
-
-.hero .btn:hover {
-  background: var(--gold-light);
-  color: var(--maroon-dark);
-  border-color: var(--gold-light);
-}
+.btn-solid:hover { background: var(--gold-light); }
 
 /* ---------- Promo slider ("explore our new products" style) ---------- */
 .promo-slider {
@@ -445,8 +430,8 @@ button { font-family: inherit; cursor: pointer; }
 .social-icons a svg { width: 16px; height: 16px; stroke: var(--ivory); }
 .social-icons a:hover svg { stroke: var(--maroon-dark); }
 
-section { padding: 90px 0; }
-.section-head { text-align: center; margin-bottom: 54px; }
+section { padding: 56px 0; }
+.section-head { text-align: center; margin-bottom: 32px; }
 .section-eyebrow {
   font-size: 0.78rem;
   letter-spacing: 0.3em;
@@ -465,7 +450,7 @@ section { padding: 90px 0; }
 }
 .category-track {
   display: flex;
-  gap: 34px;
+  gap: 20px;
   width: max-content;
   animation: category-scroll 16s linear infinite;
 }
@@ -478,13 +463,13 @@ section { padding: 90px 0; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  width: 92px;
+  gap: 6px;
+  width: 76px;
   flex-shrink: 0;
 }
 .category-circle .ring {
-  width: 84px; height: 84px;
-  border-radius: 50%;
+  width: 68px; height: 68px;
+  border-radius: 8px;
   overflow: hidden;
   background: var(--card-bg, linear-gradient(200deg, var(--gold) 0%, var(--maroon) 70%));
   background-size: cover;
