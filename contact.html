@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact — Velmora</title>
 <meta name="description" content="Get in touch with Velmora for orders, custom pieces, and questions.">
+<meta property="og:title" content="Contact — Velmora">
+<meta property="og:description" content="Get in touch with Velmora for orders, custom pieces, and questions.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://velmora-alpha.vercel.app/contact.html">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -116,7 +121,7 @@
   // Replace 8801XXXXXXXXX with your WhatsApp business number.
   const params = new URLSearchParams(window.location.search);
   const product = params.get('product');
-  const waNumber = '8801707082002';
+  const waNumber = '8801XXXXXXXXX';
   const waText = product ? `Hi, I'm interested in: ${product}` : `Hi, I'd like to know more about Velmora.`;
   document.getElementById('whatsapp-link').href = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
 
