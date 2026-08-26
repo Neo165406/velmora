@@ -313,6 +313,50 @@ function renderRelated(current) {
   wireAddToCartButtons(grid);
 }
 
+function updateProductSEO(p) {
+  const desc = `${p.name} — ${p.category} at Velmora. ${p.description || 'Handcrafted detailing with a polished antique finish.'} ৳${p.price} — cash on delivery across Bangladesh.`.slice(0, 160);
+  const img = primaryImage(p) || '';
+
+  const setMeta = (selector, attr, value) => {
+    const el = document.querySelector(selector);
+    if (el) el.setAttribute(attr, value);
+  };
+  setMeta('meta[name="description"]', 'content', desc);
+  setMeta('meta[property="og:title"]', 'content', p.name + ' — Velmora');
+  setMeta('meta[property="og:description"]', 'content', desc);
+  if (img) {
+    let ogImg = document.querySelector('meta[property="og:image"]');
+    if (!ogImg) {
+      ogImg = document.createElement('meta');
+      ogImg.setAttribute('property', 'og:image');
+      document.head.appendChild(ogImg);
+    }
+    ogImg.setAttribute('content', img);
+  }
+
+  let ld = document.getElementById('product-jsonld');
+  if (!ld) {
+    ld = document.createElement('script');
+    ld.type = 'application/ld+json';
+    ld.id = 'product-jsonld';
+    document.head.appendChild(ld);
+  }
+  ld.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: p.name,
+    description: desc,
+    image: img || undefined,
+    category: p.category,
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'BDT',
+      price: p.price,
+      availability: (p.stock === undefined || p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
+    }
+  });
+}
+
 function renderProductDetail() {
   const mount = document.querySelector('[data-product-detail]');
   if (!mount) return;
@@ -361,6 +405,7 @@ function renderProductDetail() {
       </div>
     </div>`;
   document.title = p.name + ' — Velmora';
+  updateProductSEO(p);
   renderRelated(p);
 
   if (images.length > 1) {
