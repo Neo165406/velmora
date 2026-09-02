@@ -93,7 +93,7 @@ button { font-family: inherit; cursor: pointer; }
 
 .nav-links {
   display: flex;
-  gap: 36px;
+  gap: 30px;
   list-style: none;
 }
 .nav-links a {
@@ -204,7 +204,7 @@ button { font-family: inherit; cursor: pointer; }
     list-style: none; width: 100%; max-height: 0; overflow: hidden;
     transition: max-height 0.25s ease;
   }
-  .nav-links .sub-menu.is-open { max-height: 260px; }
+  .nav-links .sub-menu.is-open { max-height: 320px; overflow-y: auto; }
   .nav-links .sub-menu li { border-bottom: none; padding-left: 14px; }
   .nav-links .sub-menu a { padding: 10px 0; font-size: 0.85rem; color: rgba(250,246,239,0.8); }
   .nav-overlay {
@@ -217,7 +217,7 @@ button { font-family: inherit; cursor: pointer; }
   .nav-overlay.is-open { opacity: 1; pointer-events: auto; }
 }
 
-/* ---------- Desktop "Shop" dropdown submenu ---------- */
+/* ---------- Desktop "Man" / "Woman" dropdown submenus ---------- */
 @media (min-width: 861px) {
   .nav-links li.has-sub { position: relative; }
   .nav-links .sub-toggle { display: none; }
@@ -225,7 +225,7 @@ button { font-family: inherit; cursor: pointer; }
     list-style: none;
     position: absolute; top: 100%; left: 0;
     background: var(--maroon-dark);
-    min-width: 170px;
+    min-width: 190px;
     box-shadow: var(--shadow);
     opacity: 0; pointer-events: none; visibility: hidden;
     transform: translateY(6px);
@@ -245,89 +245,15 @@ button { font-family: inherit; cursor: pointer; }
   .nav-links .sub-menu a::after { display: none; }
 }
 
-/* ---------- Hero slider ---------- */
-.hero {
-  position: relative;
-  min-height: clamp(120px, 16vh, 180px);
-  overflow: hidden;
-  color: var(--ivory);
-}
-.hero-slide {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  opacity: 0;
-  transition: opacity 1s ease;
-  z-index: 1;
-}
-.hero-slide.is-active { opacity: 1; z-index: 2; }
-.hero-slide.slide-a { background: radial-gradient(circle at 30% 20%, rgba(201,162,39,0.20), transparent 55%), linear-gradient(160deg, var(--maroon) 0%, var(--maroon-dark) 62%, #050505 100%); }
-.hero-slide.slide-b { background: radial-gradient(circle at 70% 25%, rgba(201,162,39,0.24), transparent 55%), linear-gradient(200deg, #262626 0%, var(--maroon-dark) 65%, #1A1A1A 100%); }
-.hero-slide.slide-c { background: radial-gradient(circle at 50% 15%, rgba(228,199,102,0.22), transparent 55%), linear-gradient(150deg, var(--maroon-dark) 0%, #101010 60%, #020202 100%); }
-.hero-slide::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(115deg, rgba(201,162,39,0.06) 0px, rgba(201,162,39,0.06) 1px, transparent 1px, transparent 90px);
-  opacity: 0.6;
-}
-.hero-content { position: relative; z-index: 2; padding: 0 24px; }
-.hero-eyebrow {
-  font-size: 0.62rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--gold-light);
-  margin-bottom: 6px;
-}
-.hero h1 {
-  font-size: clamp(1.1rem, 3vw, 1.8rem);
-  line-height: 1.15;
-  margin-bottom: 6px;
-  color: var(--ivory);
-}
-.hero h1 em {
-  font-style: italic;
-  color: var(--gold-light);
-}
-.hero p {
-  font-size: 0.8rem;
-  font-weight: 300;
-  color: rgba(250,246,239,0.82);
-  max-width: 400px;
-  margin: 0 auto 10px;
-}
-.btn {
-  display: inline-block;
-  padding: 15px 40px;
-  border: 1px solid var(--gold);
-  color: var(--gold-light);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-size: 0.82rem;
-  transition: background 0.25s ease, color 0.25s ease;
-}
-.btn:hover { background: var(--gold); color: var(--maroon-dark); }
-.hero .btn { padding: 7px 20px; font-size: 0.68rem; }
-.btn-solid {
-  background: var(--gold);
-  color: var(--maroon-dark);
-  border-color: var(--gold);
-  font-weight: 500;
-}
-.btn-solid:hover { background: var(--gold-light); }
-
-/* ---------- Promo slider ("explore our new products" style) ---------- */
+/* ---------- Promo slider — doubles as the page hero (first section after header) ---------- */
 .promo-slider {
   position: relative;
-  aspect-ratio: 16/9;
-  max-height: 380px;
+  aspect-ratio: 16/7;
+  max-height: 460px;
+  min-height: 260px;
   overflow: hidden;
-  border-radius: 16px;
-  margin: 32px 0 0;
+  margin: 0;
+  border-radius: 0;
 }
 .promo-slide {
   position: absolute; inset: 0;
@@ -449,7 +375,7 @@ section { padding: 44px 0; }
   display: flex;
   gap: 20px;
   width: max-content;
-  animation: category-scroll 16s linear infinite;
+  animation: category-scroll 20s linear infinite;
 }
 .category-strip:hover .category-track { animation-play-state: paused; }
 @keyframes category-scroll {
@@ -479,6 +405,53 @@ section { padding: 44px 0; }
   color: var(--plum);
   text-align: center;
 }
+
+/* ---------- Gender category tile grid (homepage "For Him" / "For Her") ---------- */
+.gender-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+.gender-tile { display: block; }
+.gender-tile-img {
+  aspect-ratio: 4/3;
+  background: var(--card-bg, linear-gradient(200deg, var(--gold) 0%, var(--maroon) 70%));
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 10px;
+  transition: transform 0.3s ease;
+}
+.gender-tile:hover .gender-tile-img { transform: scale(1.02); }
+.gender-tile span {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  color: var(--maroon);
+}
+@media (max-width: 620px) {
+  .gender-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .gender-tile span { font-size: 0.92rem; }
+}
+
+/* ---------- Horizontal deal slider (Combo Deals / Gift Items) ---------- */
+.deal-slider {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+}
+.deal-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+}
+.deal-track .product-card {
+  width: 220px;
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+.deal-slider::-webkit-scrollbar { height: 6px; }
+.deal-slider::-webkit-scrollbar-thumb { background: rgba(20,20,20,0.2); border-radius: 999px; }
 
 /* ---------- Product grid ---------- */
 .filter-row {
@@ -721,6 +694,10 @@ section { padding: 44px 0; }
 .row-thumb { display: flex; align-items: center; gap: 10px; }
 .row-thumb img { width: 34px; height: 34px; object-fit: cover; border-radius: 4px; background: var(--blush); }
 
+.btn { display: inline-block; padding: 15px 40px; border: 1px solid var(--gold); color: var(--gold-light); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.82rem; transition: background 0.25s ease, color 0.25s ease; }
+.btn:hover { background: var(--gold); color: var(--maroon-dark); }
+.btn-solid { background: var(--gold); color: var(--maroon-dark); border-color: var(--gold); font-weight: 500; }
+.btn-solid:hover { background: var(--gold-light); }
 .btn-outline { background: none; border: 1px solid rgba(20,20,20,0.3); color: var(--maroon); }
 .btn-danger { background: none; border: 1px solid #a15a5a; color: #a15a5a; }
 .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
