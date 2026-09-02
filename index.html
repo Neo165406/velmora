@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-site-verification" content="qpPh9ovC9WDyz4GYHje5bpqpxvVpQ8ylJoPrxz3At0k" />
 <title>Velmora — Rings, Necklaces & Bracelets | Affordable Jewellery BD</title>
-<meta name="description" content="Shop rings, necklaces (including our Love Necklace and Butterfly Necklace), bracelets and earrings at Velmora — affordable gold jewellery at BD price, cash on delivery across Bangladesh.">
+<meta name="description" content="Shop rings, necklaces (including our Love Necklace and Butterfly Necklace), bracelets, earrings and gifts at Velmora — affordable gold jewellery at BD price, cash on delivery across Bangladesh.">
 <meta property="og:title" content="Velmora — Rings, Necklaces & Bracelets | Affordable Jewellery BD">
-<meta property="og:description" content="Affordable rings, necklaces, bracelets and earrings — including our Love Necklace and Butterfly Necklace. Cash on delivery across Bangladesh.">
+<meta property="og:description" content="Affordable rings, necklaces, bracelets, earrings and gifts. Cash on delivery across Bangladesh.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://velmora-alpha.vercel.app/">
@@ -37,28 +37,29 @@
     <ul class="nav-links">
       <li><a href="index.html" class="active">Home</a></li>
       <li class="has-sub">
-        <a href="shop.html">Shop</a>
-        <button type="button" class="sub-toggle" aria-label="Toggle Shop categories">▾</button>
+        <a href="shop.html?gender=Men">Man</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Man categories">▾</button>
         <ul class="sub-menu">
-          <li><a href="shop.html?category=Rings">Rings</a></li>
-          <li><a href="shop.html?category=Necklaces">Necklaces</a></li>
-          <li><a href="shop.html?category=Earrings">Earrings</a></li>
-          <li><a href="shop.html?category=Bracelets">Bracelets</a></li>
+          <li><a href="shop.html?gender=Men&category=Rings">Rings</a></li>
+          <li><a href="shop.html?gender=Men&category=Bracelets">Bracelets</a></li>
+          <li><a href="shop.html?gender=Men&category=Glasses">Glasses</a></li>
+          <li><a href="shop.html?gender=Men&category=Other%20Accessories">Other Accessories</a></li>
         </ul>
       </li>
       <li class="has-sub">
-        <a href="shop.html">Gifts</a>
-        <button type="button" class="sub-toggle" aria-label="Toggle Gifts categories">▾</button>
+        <a href="shop.html?gender=Women">Woman</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Woman categories">▾</button>
         <ul class="sub-menu">
-          <li><a href="shop.html?category=Gift%20Box">Gift Box</a></li>
-          <li><a href="shop.html?category=Flowers">Flowers</a></li>
-          <li><a href="shop.html?category=Chocolate">Chocolate</a></li>
-          <li><a href="shop.html?category=Combo">Combo</a></li>
+          <li><a href="shop.html?gender=Women&category=Rings">Rings</a></li>
+          <li><a href="shop.html?gender=Women&category=Necklaces">Necklaces</a></li>
+          <li><a href="shop.html?gender=Women&category=Pendant">Pendant</a></li>
+          <li><a href="shop.html?gender=Women&category=Bracelets">Bracelets</a></li>
+          <li><a href="shop.html?gender=Women&category=Earrings">Earrings</a></li>
+          <li><a href="shop.html?gender=Women&category=Others">Others</a></li>
         </ul>
       </li>
-      <li><a href="shop.html?gender=Men">Men</a></li>
-      <li><a href="shop.html?gender=Women">Women</a></li>
-      <li><a href="shop.html?gender=Unisex">Unisex</a></li>
+      <li><a href="shop.html?category=Gift%20Items">Gift Items</a></li>
+      <li><a href="shop.html?category=Combo%20Deals">Combo Deals</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
     <div class="nav-right">
@@ -85,59 +86,35 @@
   </div>
 </header>
 
-<section class="hero">
-  <div class="hero-slide slide-a is-active">
-    <div class="hero-content">
-      <div class="hero-eyebrow">Velmora Fine Jewellery</div>
-      <h1>Glamour for the<br><em>Stylish Woman</em></h1>
-      <a href="shop.html" class="btn btn-solid">Shop Now</a>
+<!-- Promo slider now doubles as the page hero -->
+<section class="promo-slider" aria-label="Promotions">
+  <div class="promo-slide p-a is-active">
+    <div>
+      <div class="eyebrow">Velmora Fine Jewellery</div>
+      <h3>Glamour for the Stylish Woman</h3>
+      <a href="shop.html" class="btn btn-solid" style="margin-top:14px; display:inline-block;">Shop Now</a>
     </div>
   </div>
-  <div class="hero-slide slide-b" id="hero-slide-new">
-    <div class="hero-content">
-      <div class="hero-eyebrow">New Arrival</div>
-      <h1>Fresh In:<br><em id="hero-new-name">New This Season</em></h1>
-      <p>Hand-finished pieces, just added to the collection.</p>
-      <a href="shop.html?tag=New" class="btn btn-solid">Shop New Arrivals</a>
+  <div class="promo-slide p-b">
+    <div>
+      <div class="eyebrow">New Arrivals</div>
+      <h3>Explore Our New Pieces</h3>
+      <a href="shop.html?tag=New" class="btn btn-solid" style="margin-top:14px; display:inline-block;">Shop New Arrivals</a>
     </div>
   </div>
-  <div class="hero-slide slide-c" id="hero-slide-bestseller">
-    <div class="hero-content">
-      <div class="hero-eyebrow">Bestseller</div>
-      <h1>Loved By Our<br><em id="hero-bestseller-name">Customers</em></h1>
-      <p>The pieces our customers keep coming back for.</p>
-      <a href="shop.html" class="btn btn-solid">Shop Bestsellers</a>
+  <div class="promo-slide p-c">
+    <div>
+      <div class="eyebrow">Festive Edit</div>
+      <h3>Antique Gold, Freshly In</h3>
+      <a href="shop.html" class="btn btn-solid" style="margin-top:14px; display:inline-block;">Shop Now</a>
     </div>
+  </div>
+  <div class="promo-progress-track">
+    <div class="promo-progress-bar"><span class="fill"></span></div>
+    <div class="promo-progress-bar"><span class="fill"></span></div>
+    <div class="promo-progress-bar"><span class="fill"></span></div>
   </div>
 </section>
-
-<div class="container">
-  <div class="promo-slider">
-    <div class="promo-slide p-a is-active">
-      <div>
-        <div class="eyebrow">New Arrivals</div>
-        <h3>Explore Our New Pieces</h3>
-      </div>
-    </div>
-    <div class="promo-slide p-b">
-      <div>
-        <div class="eyebrow">Festive Edit</div>
-        <h3>Antique Gold, Freshly In</h3>
-      </div>
-    </div>
-    <div class="promo-slide p-c">
-      <div>
-        <div class="eyebrow">Limited Stock</div>
-        <h3>Bridal Sets Selling Fast</h3>
-      </div>
-    </div>
-    <div class="promo-progress-track">
-      <div class="promo-progress-bar"><span class="fill"></span></div>
-      <div class="promo-progress-bar"><span class="fill"></span></div>
-      <div class="promo-progress-bar"><span class="fill"></span></div>
-    </div>
-  </div>
-</div>
 
 <section>
   <div class="container">
@@ -164,21 +141,21 @@
           <div class="ring"></div>
           <span>Bracelets</span>
         </a>
-        <a class="category-circle" data-category="Gift Box" href="shop.html?category=Gift%20Box">
+        <a class="category-circle" data-category="Pendant" href="shop.html?category=Pendant">
           <div class="ring"></div>
-          <span>Gift Box</span>
+          <span>Pendant</span>
         </a>
-        <a class="category-circle" data-category="Flowers" href="shop.html?category=Flowers">
+        <a class="category-circle" data-category="Glasses" href="shop.html?category=Glasses">
           <div class="ring"></div>
-          <span>Flowers</span>
+          <span>Glasses</span>
         </a>
-        <a class="category-circle" data-category="Chocolate" href="shop.html?category=Chocolate">
+        <a class="category-circle" data-category="Other Accessories" href="shop.html?category=Other%20Accessories">
           <div class="ring"></div>
-          <span>Chocolate</span>
+          <span>Accessories</span>
         </a>
-        <a class="category-circle" data-category="Combo" href="shop.html?category=Combo">
+        <a class="category-circle" data-category="Others" href="shop.html?category=Others">
           <div class="ring"></div>
-          <span>Combo</span>
+          <span>Others</span>
         </a>
         <!-- duplicated set for a seamless infinite scroll loop -->
         <a class="category-circle" data-category="Rings" href="shop.html?category=Rings" aria-hidden="true">
@@ -197,21 +174,21 @@
           <div class="ring"></div>
           <span>Bracelets</span>
         </a>
-        <a class="category-circle" data-category="Gift Box" href="shop.html?category=Gift%20Box" aria-hidden="true">
+        <a class="category-circle" data-category="Pendant" href="shop.html?category=Pendant" aria-hidden="true">
           <div class="ring"></div>
-          <span>Gift Box</span>
+          <span>Pendant</span>
         </a>
-        <a class="category-circle" data-category="Flowers" href="shop.html?category=Flowers" aria-hidden="true">
+        <a class="category-circle" data-category="Glasses" href="shop.html?category=Glasses" aria-hidden="true">
           <div class="ring"></div>
-          <span>Flowers</span>
+          <span>Glasses</span>
         </a>
-        <a class="category-circle" data-category="Chocolate" href="shop.html?category=Chocolate" aria-hidden="true">
+        <a class="category-circle" data-category="Other Accessories" href="shop.html?category=Other%20Accessories" aria-hidden="true">
           <div class="ring"></div>
-          <span>Chocolate</span>
+          <span>Accessories</span>
         </a>
-        <a class="category-circle" data-category="Combo" href="shop.html?category=Combo" aria-hidden="true">
+        <a class="category-circle" data-category="Others" href="shop.html?category=Others" aria-hidden="true">
           <div class="ring"></div>
-          <span>Combo</span>
+          <span>Others</span>
         </a>
       </div>
     </div>
@@ -227,6 +204,102 @@
     <div class="product-grid" data-featured-grid></div>
     <div style="text-align:center; margin-top:46px;">
       <a href="shop.html" class="btn">View All Products</a>
+    </div>
+  </div>
+</section>
+
+<!-- Combo Deals slider — container ready; product cards will populate once js/products.js is wired here -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Limited Time</div>
+      <h2>Combo Deals</h2>
+      <p>Save more with our bundled jewellery sets.</p>
+    </div>
+    <div class="deal-slider">
+      <div class="deal-track" data-combo-grid></div>
+    </div>
+    <div style="text-align:center; margin-top:36px;">
+      <a href="shop.html?category=Combo%20Deals" class="btn">View All Combo Deals</a>
+    </div>
+  </div>
+</section>
+
+<!-- Gift Items slider — container ready; product cards will populate once js/products.js is wired here -->
+<section style="background: var(--blush);">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">For Someone Special</div>
+      <h2>Gift Items</h2>
+      <p>Curated pieces, ready to gift.</p>
+    </div>
+    <div class="deal-slider">
+      <div class="deal-track" data-gift-grid></div>
+    </div>
+    <div style="text-align:center; margin-top:36px;">
+      <a href="shop.html?category=Gift%20Items" class="btn">View All Gift Items</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Shop by Gender</div>
+      <h2>For Him</h2>
+    </div>
+    <div class="gender-grid">
+      <a class="gender-tile" href="shop.html?gender=Men&category=Rings">
+        <div class="gender-tile-img" data-gender-tile="Men|Rings"></div>
+        <span>Rings →</span>
+      </a>
+      <a class="gender-tile" href="shop.html?gender=Men&category=Bracelets">
+        <div class="gender-tile-img" data-gender-tile="Men|Bracelets"></div>
+        <span>Bracelets →</span>
+      </a>
+      <a class="gender-tile" href="shop.html?gender=Men&category=Glasses">
+        <div class="gender-tile-img" data-gender-tile="Men|Glasses"></div>
+        <span>Glasses →</span>
+      </a>
+      <a class="gender-tile" href="shop.html?gender=Men&category=Other%20Accessories">
+        <div class="gender-tile-img" data-gender-tile="Men|Other Accessories"></div>
+        <span>Other Accessories →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section style="background: var(--blush);">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Shop by Gender</div>
+      <h2>For Her</h2>
+    </div>
+    <div class="gender-grid">
+      <a class="gender-tile" href="shop.html?gender=Women&category=Rings">
+        <div class="gender-tile-img" data-gender-tile="Women|Rings"></div>
+        <span>Rings →</span>
+      </a>
+      <a class="gender-tile" href="shop.html?gender=Women&category=Necklaces">
+        <div class="gender-tile-img" data-gender-tile="Women|Necklaces"></div>
+        <span>Necklaces →</span>
+      </a>
+      <a class="gender-tile" href="shop.html?gender=Women&category=Pendant">
+        <div class="gender-tile-img" data-gender-tile="Women|Pendant"></div>
+        <span>Pendant →</span>
+      </a>
+      <a class="gender-tile" href="shop.html?gender=Women&category=Bracelets">
+        <div class="gender-tile-img" data-gender-tile="Women|Bracelets"></div>
+        <span>Bracelets →</span>
+      </a>
+      <a class="gender-tile" href="shop.html?gender=Women&category=Earrings">
+        <div class="gender-tile-img" data-gender-tile="Women|Earrings"></div>
+        <span>Earrings →</span>
+      </a>
+      <a class="gender-tile" href="shop.html?gender=Women&category=Others">
+        <div class="gender-tile-img" data-gender-tile="Women|Others"></div>
+        <span>Others →</span>
+      </a>
     </div>
   </div>
 </section>
@@ -261,8 +334,8 @@
         <h4>Shop</h4>
         <ul>
           <li><a href="shop.html">All Products</a></li>
-          <li><a href="shop.html">Rings</a></li>
-          <li><a href="shop.html">Necklaces</a></li>
+          <li><a href="shop.html?gender=Men">Man</a></li>
+          <li><a href="shop.html?gender=Women">Woman</a></li>
         </ul>
       </div>
       <div>
@@ -287,7 +360,6 @@
 <script src="js/nav.js" defer></script>
 <script src="js/cart.js" defer></script>
 <script src="js/search.js" defer></script>
-<script src="js/hero-slider.js" defer></script>
 <script src="js/promo-slider.js" defer></script>
 <script type="module" src="js/products.js"></script>
 <script type="module">
@@ -301,11 +373,6 @@
       if (!snap.exists()) return;
       const t = snap.data();
       if (t.accentColor) document.documentElement.style.setProperty('--gold', t.accentColor);
-      if (t.heroBadge) document.querySelectorAll('.hero-eyebrow').forEach(el => el.textContent = t.heroBadge);
-      if (t.heroSub) {
-        const firstSlideP = document.querySelector('.hero-slide.slide-a p');
-        if (firstSlideP) firstSlideP.textContent = t.heroSub;
-      }
     } catch (err) {
       console.error('Could not load theme settings:', err);
     }
@@ -326,6 +393,7 @@
             <div class="eyebrow">${s.eyebrow || ''}</div>
             <h3>${s.title || ''}</h3>
             ${s.price ? `<div class="price">৳${Number(s.price).toLocaleString('en-IN')}${s.oldPrice ? `<span class="old">৳${Number(s.oldPrice).toLocaleString('en-IN')}</span>` : ''}</div>` : ''}
+            <a href="${s.link || 'shop.html'}" class="btn btn-solid" style="margin-top:14px; display:inline-block;">Shop Now</a>
           </div>
         </div>`).join('');
       const barsHtml = slides.map(() => `<div class="promo-progress-bar"><span class="fill"></span></div>`).join('');
@@ -334,31 +402,6 @@
       if (window.initPromoSlider) window.initPromoSlider();
     } catch (err) {
       console.error('Could not load slides:', err);
-    }
-  }
-
-  async function loadHeroPhotos() {
-    try {
-      const products = window.velmoraProductsReady ? await window.velmoraProductsReady : [];
-      if (!products.length) return;
-
-      const newProduct = products.find(p => p.tag === 'New') || products.find(p => p.featured);
-      const bestProduct = products.find(p => p.bestSeller) || products.find(p => p.tag === 'Bestseller');
-
-      function applyPhoto(slideEl, nameEl, product) {
-        if (!slideEl || !product) return;
-        const img = (product.images && product.images[0]) || product.image;
-        if (!img) return;
-        slideEl.style.backgroundImage = `linear-gradient(160deg, rgba(10,10,10,0.78), rgba(5,5,5,0.88)), url('${img}')`;
-        slideEl.style.backgroundSize = 'cover';
-        slideEl.style.backgroundPosition = 'center';
-        if (nameEl) nameEl.textContent = product.name;
-      }
-
-      applyPhoto(document.getElementById('hero-slide-new'), document.getElementById('hero-new-name'), newProduct);
-      applyPhoto(document.getElementById('hero-slide-bestseller'), document.getElementById('hero-bestseller-name'), bestProduct);
-    } catch (err) {
-      console.error('Could not load hero product photos:', err);
     }
   }
 
@@ -379,10 +422,27 @@
     }
   }
 
+  async function loadGenderTilePhotos() {
+    try {
+      const products = window.velmoraProductsReady ? await window.velmoraProductsReady : [];
+      if (!products.length) return;
+      document.querySelectorAll('[data-gender-tile]').forEach(tile => {
+        const [gender, cat] = tile.dataset.genderTile.split('|');
+        const inTile = p => p.category === cat && p.gender === gender && ((p.images && p.images[0]) || p.image);
+        const match = products.find(p => inTile(p) && p.featured) || products.find(inTile);
+        if (!match) return;
+        const img = (match.images && match.images[0]) || match.image;
+        tile.style.setProperty('--card-bg', `url('${img}')`);
+      });
+    } catch (err) {
+      console.error('Could not load gender tile photos:', err);
+    }
+  }
+
   loadTheme();
   loadSlides();
-  loadHeroPhotos();
   loadCategoryPhotos();
+  loadGenderTilePhotos();
 </script>
 </body>
 </html>
