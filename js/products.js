@@ -82,6 +82,24 @@ let VELMORA_PRODUCTS = [
     tag: null,
   },
   {
+    id: 'pnd-001',
+    name: 'Floral Gold Pendant',
+    category: 'Pendant',
+    gender: 'Women',
+    price: 3900,
+    oldPrice: null,
+    tag: 'New',
+  },
+  {
+    id: 'oth-001',
+    name: 'Pearl Hair Accessory Set',
+    category: 'Others',
+    gender: 'Women',
+    price: 950,
+    oldPrice: null,
+    tag: null,
+  },
+  {
     id: 'rng-003',
     name: "Men's Gold Signet Ring",
     category: 'Rings',
@@ -96,6 +114,24 @@ let VELMORA_PRODUCTS = [
     category: 'Bracelets',
     gender: 'Men',
     price: 3400,
+    oldPrice: null,
+    tag: null,
+  },
+  {
+    id: 'gls-001',
+    name: "Men's Classic Sunglasses",
+    category: 'Glasses',
+    gender: 'Men',
+    price: 2200,
+    oldPrice: null,
+    tag: null,
+  },
+  {
+    id: 'acc-001',
+    name: "Men's Leather Wallet",
+    category: 'Other Accessories',
+    gender: 'Men',
+    price: 1800,
     oldPrice: null,
     tag: null,
   },
@@ -116,6 +152,51 @@ let VELMORA_PRODUCTS = [
     price: 3200,
     oldPrice: null,
     tag: 'Bestseller',
+  },
+  {
+    id: 'cmb-001',
+    name: 'Rings & Earrings Duo Set',
+    category: 'Combo Deals',
+    gender: 'Women',
+    price: 6800,
+    oldPrice: 8600,
+    tag: 'Combo',
+  },
+  {
+    id: 'cmb-002',
+    name: 'Necklace + Bracelet Bundle',
+    category: 'Combo Deals',
+    gender: 'Women',
+    price: 11200,
+    oldPrice: 14000,
+    tag: 'Combo',
+  },
+  {
+    id: 'gft-001',
+    name: 'Gold-Wrapped Rose Bouquet',
+    category: 'Flower',
+    gender: 'Unisex',
+    price: 1200,
+    oldPrice: null,
+    tag: 'Gift',
+  },
+  {
+    id: 'gft-002',
+    name: 'Belgian Chocolate Box',
+    category: 'Chocolate',
+    gender: 'Unisex',
+    price: 950,
+    oldPrice: null,
+    tag: 'Gift',
+  },
+  {
+    id: 'gft-003',
+    name: 'Make-Your-Own Bracelet Kit',
+    category: 'DIY',
+    gender: 'Unisex',
+    price: 1600,
+    oldPrice: null,
+    tag: 'Gift',
   },
 ];
 
@@ -222,7 +303,7 @@ const filterState = { category: 'All', gender: 'All', search: '' };
 
 function applyFilters() {
   return VELMORA_PRODUCTS.filter(p => {
-    const matchCategory = filterState.category === 'All' || p.category === filterState.category;
+    const matchCategory = filterState.category === 'All' || filterState.category.split(',').includes(p.category);
     const matchGender = filterState.gender === 'All' || p.gender === filterState.gender;
     const matchSearch = !filterState.search || p.name.toLowerCase().includes(filterState.search.toLowerCase());
     return matchCategory && matchGender && matchSearch;
@@ -262,7 +343,8 @@ function setupFilters() {
 }
 
 // Reads ?category=, ?gender=, ?search= from the URL (used by nav links
-// like Men/Women/Unisex, and by the nav search bar) and pre-applies them.
+// like Man/Woman/Gift Items/Combo Deals, and by the nav search bar)
+// and pre-applies them.
 function applyUrlFilters() {
   const params = new URLSearchParams(window.location.search);
   const category = params.get('category');
@@ -299,6 +381,37 @@ function renderFeatured() {
   if (!grid) return;
   const featured = VELMORA_PRODUCTS.filter(p => p.featured);
   const items = (featured.length ? featured : VELMORA_PRODUCTS).slice(0, 4);
+  grid.innerHTML = items.map(renderProductCard).join('');
+  wireAddToCartButtons(grid);
+}
+
+// Homepage "Combo Deals" slider — hides its whole section if no
+// products are tagged with this category yet.
+function renderComboDeals() {
+  const grid = document.querySelector('[data-combo-grid]');
+  if (!grid) return;
+  const items = VELMORA_PRODUCTS.filter(p => p.category === 'Combo Deals');
+  const section = grid.closest('section');
+  if (!items.length) {
+    if (section) section.style.display = 'none';
+    return;
+  }
+  if (section) section.style.display = '';
+  grid.innerHTML = items.map(renderProductCard).join('');
+  wireAddToCartButtons(grid);
+}
+
+// Homepage "Gift Items" slider — same hide-when-empty behavior.
+function renderGiftItems() {
+  const grid = document.querySelector('[data-gift-grid]');
+  if (!grid) return;
+  const items = VELMORA_PRODUCTS.filter(p => ['Flower', 'Chocolate', 'DIY'].includes(p.category));
+  const section = grid.closest('section');
+  if (!items.length) {
+    if (section) section.style.display = 'none';
+    return;
+  }
+  if (section) section.style.display = '';
   grid.innerHTML = items.map(renderProductCard).join('');
   wireAddToCartButtons(grid);
 }
@@ -446,6 +559,8 @@ function renderAll() {
   applyUrlFilters();
   renderProductGrid();
   renderFeatured();
+  renderComboDeals();
+  renderGiftItems();
   renderProductDetail();
 }
 
