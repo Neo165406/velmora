@@ -81,8 +81,16 @@
         <button class="chip active" data-pcat="">All</button>
         <button class="chip" data-pcat="Rings">Rings</button>
         <button class="chip" data-pcat="Necklaces">Necklaces</button>
-        <button class="chip" data-pcat="Earrings">Earrings</button>
+        <button class="chip" data-pcat="Pendant">Pendant</button>
         <button class="chip" data-pcat="Bracelets">Bracelets</button>
+        <button class="chip" data-pcat="Earrings">Earrings</button>
+        <button class="chip" data-pcat="Others">Others</button>
+        <button class="chip" data-pcat="Glasses">Glasses</button>
+        <button class="chip" data-pcat="Other Accessories">Other Accessories</button>
+        <button class="chip" data-pcat="Flower">Flower</button>
+        <button class="chip" data-pcat="Chocolate">Chocolate</button>
+        <button class="chip" data-pcat="DIY">DIY</button>
+        <button class="chip" data-pcat="Combo Deals">Combo Deals</button>
       </div>
       <div class="table-card">
         <table>
@@ -158,8 +166,16 @@
         <select id="pCategory">
           <option>Rings</option>
           <option>Necklaces</option>
-          <option>Earrings</option>
+          <option>Pendant</option>
           <option>Bracelets</option>
+          <option>Earrings</option>
+          <option>Others</option>
+          <option>Glasses</option>
+          <option>Other Accessories</option>
+          <option>Flower</option>
+          <option>Chocolate</option>
+          <option>DIY</option>
+          <option>Combo Deals</option>
         </select>
       </div>
       <div class="field">
@@ -807,7 +823,15 @@
         ['Earrings', 'Pearl Drop Chandbali Earrings', 3100, 3800, 'Women'],
         ['Earrings', 'Kundan Jhumka Earrings', 2800, null, 'Women'],
         ['Bracelets', 'Layered Gold Cuff Bracelet', 5400, null, 'Women'],
-        ['Bracelets', "Men's Silver Chain Bracelet", 3400, null, 'Men']
+        ['Bracelets', "Men's Silver Chain Bracelet", 3400, null, 'Men'],
+        ['Pendant', 'Floral Gold Pendant', 3900, null, 'Women'],
+        ['Others', 'Pearl Hair Accessory Set', 950, null, 'Women'],
+        ['Glasses', "Men's Classic Sunglasses", 2200, null, 'Men'],
+        ['Other Accessories', "Men's Leather Wallet", 1800, null, 'Men'],
+        ['Flower', 'Gold-Wrapped Rose Bouquet', 1200, null, 'Unisex'],
+        ['Chocolate', 'Belgian Chocolate Box', 950, null, 'Unisex'],
+        ['DIY', 'Make-Your-Own Bracelet Kit', 1600, null, 'Unisex'],
+        ['Combo Deals', 'Rings & Earrings Duo Set', 6800, 8600, 'Women']
       ];
       const btn = document.getElementById('seedBtn');
       btn.disabled = true;
@@ -822,7 +846,7 @@
           createdAt: serverTimestamp()
         });
       }
-      showToast('8 demo products added ✓');
+      showToast('16 demo products added ✓');
       loadProducts();
       btn.disabled = false;
       btn.textContent = '🌱 Add Demo Products';
