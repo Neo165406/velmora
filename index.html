@@ -281,8 +281,12 @@
       <h2>Combo Deals</h2>
       <p>Save more with our bundled jewellery sets.</p>
     </div>
-    <div class="deal-slider">
-      <div class="deal-track" data-combo-grid></div>
+    <div class="deal-slider-wrap">
+      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
+      <div class="deal-slider">
+        <div class="deal-track" data-combo-grid></div>
+      </div>
+      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
     </div>
     <div style="text-align:center; margin-top:36px;">
       <a href="shop.html?category=Combo%20Deals" class="btn">View All Combo Deals</a>
@@ -298,8 +302,12 @@
       <h2>Gift Items</h2>
       <p>Curated pieces, ready to gift.</p>
     </div>
-    <div class="deal-slider">
-      <div class="deal-track" data-gift-grid></div>
+    <div class="deal-slider-wrap">
+      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
+      <div class="deal-slider">
+        <div class="deal-track" data-gift-grid></div>
+      </div>
+      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
     </div>
     <div style="text-align:center; margin-top:36px;">
       <a href="shop.html?category=Flower,Chocolate,DIY" class="btn">View All Gift Items</a>
@@ -446,6 +454,14 @@
   loadSlides();
   loadCategoryPhotos();
   loadGenderTilePhotos();
+
+  document.querySelectorAll('.deal-slider-wrap').forEach(wrap => {
+    const track = wrap.querySelector('.deal-slider');
+    const prev = wrap.querySelector('[data-slide-prev]');
+    const next = wrap.querySelector('[data-slide-next]');
+    if (prev) prev.addEventListener('click', () => track.scrollBy({ left: -240, behavior: 'smooth' }));
+    if (next) next.addEventListener('click', () => track.scrollBy({ left: 240, behavior: 'smooth' }));
+  });
 </script>
 
 <!-- Floating WhatsApp button — replace the number below with your real WhatsApp number -->
