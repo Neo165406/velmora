@@ -458,6 +458,33 @@ section { padding: 44px 0; }
 .deal-slider::-webkit-scrollbar { height: 6px; }
 .deal-slider::-webkit-scrollbar-thumb { background: rgba(20,20,20,0.2); border-radius: 999px; }
 
+.deal-slider-wrap { position: relative; }
+.deal-arrow {
+  position: absolute;
+  top: 40%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1px solid rgba(20,20,20,0.15);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--maroon);
+  z-index: 10;
+}
+.deal-arrow-prev { left: -6px; }
+.deal-arrow-next { right: -6px; }
+@media (max-width: 700px) {
+  .deal-arrow { width: 32px; height: 32px; font-size: 1.05rem; }
+  .deal-arrow-prev { left: 0; }
+  .deal-arrow-next { right: 0; }
+}
+
 /* ---------- Product grid ---------- */
 .filter-row {
   display: flex;
