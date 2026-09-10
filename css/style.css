@@ -573,6 +573,8 @@ section { padding: 44px 0; }
 .product-info h3 { font-size: 1.02rem; font-weight: 600; margin-bottom: 6px; }
 .product-info .price { color: var(--maroon); font-weight: 500; font-family: 'Jost', sans-serif; }
 .product-info .price .old { color: #a98d90; text-decoration: line-through; font-size: 0.88rem; margin-left: 8px; font-weight: 300; }
+.product-info .stock-note { font-size: 0.74rem; color: #7a9a7c; margin-top: 4px; }
+.oos-overlay { position: absolute; inset: 0; background: rgba(250,246,239,0.55); }
 .add-cart-btn {
   margin-top: 14px;
   width: 100%;
@@ -587,6 +589,8 @@ section { padding: 44px 0; }
 }
 .add-cart-btn:hover { background: var(--maroon-dark); }
 .add-cart-btn.is-added { background: var(--gold); color: var(--maroon-dark); }
+.add-cart-btn:disabled, .quick-add-btn:disabled, .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.add-cart-btn:disabled:hover { background: var(--maroon); }
 
 .qty-stepper {
   display: inline-flex;
