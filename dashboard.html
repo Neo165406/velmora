@@ -80,15 +80,18 @@
       <div class="filter-bar">
         <button class="chip active" data-pcat="">All</button>
         <button class="chip" data-pcat="Rings">Rings</button>
-        <button class="chip" data-pcat="Necklaces">Necklaces</button>
+        <button class="chip" data-pcat="Necklaces">Necklace</button>
         <button class="chip" data-pcat="Pendant">Pendant</button>
         <button class="chip" data-pcat="Bracelets">Bracelets</button>
         <button class="chip" data-pcat="Earrings">Earrings</button>
+        <button class="chip" data-pcat="Jewelry Set">Jewelry Set</button>
         <button class="chip" data-pcat="Others">Others</button>
         <button class="chip" data-pcat="Glasses">Glasses</button>
         <button class="chip" data-pcat="Other Accessories">Other Accessories</button>
+        <button class="chip" data-pcat="Gift Box">Gift Box</button>
         <button class="chip" data-pcat="Flower">Flower</button>
         <button class="chip" data-pcat="Chocolate">Chocolate</button>
+        <button class="chip" data-pcat="Books">Books</button>
         <button class="chip" data-pcat="DIY">DIY</button>
         <button class="chip" data-pcat="Combo Deals">Combo Deals</button>
       </div>
@@ -143,6 +146,26 @@
           <label>Hero Subtext</label>
           <textarea id="tHeroSub" rows="3" placeholder="Antique gold detailing, hand-set stones..."></textarea>
         </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Delivery Fee — Inside Dhaka (৳)</label>
+            <input type="number" id="tFeeDhaka" placeholder="60">
+          </div>
+          <div class="field">
+            <label>Delivery Fee — Outside Dhaka (৳)</label>
+            <input type="number" id="tFeeOutside" placeholder="110">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Coupon Code</label>
+            <input type="text" id="tCouponCode" placeholder="VELMORA10">
+          </div>
+          <div class="field">
+            <label>Discount (%)</label>
+            <input type="number" id="tCouponPercent" placeholder="10">
+          </div>
+        </div>
         <button class="btn btn-aqua btn-block" id="saveThemeBtn">Save Theme</button>
       </div>
     </section>
@@ -169,11 +192,14 @@
           <option>Pendant</option>
           <option>Bracelets</option>
           <option>Earrings</option>
+          <option>Jewelry Set</option>
           <option>Others</option>
           <option>Glasses</option>
           <option>Other Accessories</option>
+          <option>Gift Box</option>
           <option>Flower</option>
           <option>Chocolate</option>
+          <option>Books</option>
           <option>DIY</option>
           <option>Combo Deals</option>
         </select>
@@ -720,6 +746,10 @@
           if (t.accentColor) document.getElementById('tAccentColor').value = t.accentColor;
           if (t.heroSub) document.getElementById('tHeroSub').value = t.heroSub;
           if (t.heroBadge) document.getElementById('tHeroBadge').value = t.heroBadge;
+          document.getElementById('tFeeDhaka').value = t.feeDhaka ?? 60;
+          document.getElementById('tFeeOutside').value = t.feeOutside ?? 110;
+          if (t.couponCode) document.getElementById('tCouponCode').value = t.couponCode;
+          if (t.couponPercent) document.getElementById('tCouponPercent').value = t.couponPercent;
         }
       } catch (e) { /* no settings yet */ }
     }
@@ -727,11 +757,15 @@
       const accentColor = document.getElementById('tAccentColor').value;
       const heroSub = document.getElementById('tHeroSub').value.trim();
       const heroBadge = document.getElementById('tHeroBadge').value.trim();
+      const feeDhaka = Number(document.getElementById('tFeeDhaka').value) || 60;
+      const feeOutside = Number(document.getElementById('tFeeOutside').value) || 110;
+      const couponCode = document.getElementById('tCouponCode').value.trim().toUpperCase();
+      const couponPercent = Number(document.getElementById('tCouponPercent').value) || 0;
       const btn = document.getElementById('saveThemeBtn');
       btn.disabled = true;
       btn.innerHTML = `<span class="spinner"></span> Saving...`;
       try {
-        await setDoc(doc(db, 'settings', 'site'), { accentColor, heroSub, heroBadge }, { merge: true });
+        await setDoc(doc(db, 'settings', 'site'), { accentColor, heroSub, heroBadge, feeDhaka, feeOutside, couponCode, couponPercent }, { merge: true });
         showToast('Theme saved ✓ — refresh the store to see it');
       } catch (err) {
         console.error('Theme save failed:', err);
@@ -793,6 +827,10 @@
               <span>${item.name} × ${item.qty}</span>
               <span>${formatTaka(item.qty * item.price)}</span>
             </div>`).join('')}
+          ${o.couponCode ? `
+            <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:0.9rem; color:#155724;">
+              <span>Coupon (${o.couponCode})</span><span>−${formatTaka(o.discount || 0)}</span>
+            </div>` : ''}
           <div style="display:flex; justify-content:space-between; padding:12px 0 0; font-weight:600; color:var(--maroon);">
             <span>Total</span><span>${formatTaka(o.total)}</span>
           </div>
