@@ -1,18 +1,149 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://velmora-alpha.vercel.app/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://velmora-alpha.vercel.app/shop.html</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://velmora-alpha.vercel.app/contact.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-</urlset>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Return &amp; Exchange Policy — Velmora</title>
+<meta name="description" content="Velmora's return and exchange policy for rings, necklaces, bracelets, earrings and gift items.">
+<link rel="canonical" href="https://velmora-alpha.vercel.app/return-exchange.html">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav-bar">
+    <a href="index.html" class="brand"><img src="img/logo-gold.png" alt="Velmora" class="brand-logo">VEL<span>MORA</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li class="has-sub">
+        <a href="shop.html?gender=Men">Man</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Man categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?gender=Men&category=Rings">Rings</a></li>
+          <li><a href="shop.html?gender=Men&category=Necklaces">Necklace</a></li>
+          <li><a href="shop.html?gender=Men&category=Bracelets">Bracelets</a></li>
+          <li><a href="shop.html?gender=Men&category=Glasses">Glasses</a></li>
+        </ul>
+      </li>
+      <li class="has-sub">
+        <a href="shop.html?gender=Women">Woman</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Woman categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?gender=Women&category=Pendant">Pendant</a></li>
+          <li><a href="shop.html?gender=Women&category=Rings">Ring</a></li>
+          <li><a href="shop.html?gender=Women&category=Bracelets">Bracelet</a></li>
+          <li><a href="shop.html?gender=Women&category=Earrings">Earring</a></li>
+          <li><a href="shop.html?gender=Women&category=Jewelry%20Set">Jewelry Set</a></li>
+        </ul>
+      </li>
+      <li><a href="shop.html?category=DIY">Style your own – DIY</a></li>
+      <li class="has-sub">
+        <a href="shop.html?category=Gift%20Box,Flower,Chocolate,Books">Gift Items</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Gift Items categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?category=Gift%20Box">Gift Box</a></li>
+          <li><a href="shop.html?category=Flower">Flower</a></li>
+          <li><a href="shop.html?category=Chocolate">Chocolate</a></li>
+          <li><a href="shop.html?category=Books">Books</a></li>
+        </ul>
+      </li>
+      <li><a href="shop.html?category=Combo%20Deals">Combo Deals</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="icon-btn search-toggle" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <a href="https://instagram.com/velmora" target="_blank" rel="noopener" class="icon-btn" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#FAF6EF" stroke="none"/></svg>
+      </a>
+      <a href="cart.html" class="cart-icon-wrap" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.6"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="10" cy="20" r="1.2" fill="#E4C766"/><circle cx="17" cy="20" r="1.2" fill="#E4C766"/></svg>
+        <span data-cart-count>0</span>
+      </a>
+      <button class="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="nav-overlay"></div>
+  <div class="search-bar" id="search-bar">
+    <div class="container">
+      <input type="text" id="search-input" placeholder="Search products...">
+    </div>
+  </div>
+</header>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>Return &amp; Exchange Policy</h1>
+    <p>What to do if something isn't quite right.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container" style="max-width:760px;">
+    <div style="margin-bottom:34px;">
+      <h2 style="font-size:1.25rem; margin-bottom:10px;">Exchange Window</h2>
+      <p style="color:#6b4a4e;">If you're not fully happy with your order, you can request an exchange within <strong>3 days</strong> of delivery. Please keep the item unused, unworn, and in its original packaging with all tags attached.</p>
+    </div>
+    <div style="margin-bottom:34px;">
+      <h2 style="font-size:1.25rem; margin-bottom:10px;">Return &amp; Refund</h2>
+      <p style="color:#6b4a4e;">Returns are accepted only if the item received is damaged, defective, or different from what you ordered. Since orders are cash on delivery, please inspect your item at the time of delivery whenever possible. Report any issue within 24 hours of receiving your order by messaging us on WhatsApp with your order details and photos of the item.</p>
+    </div>
+    <div style="margin-bottom:34px;">
+      <h2 style="font-size:1.25rem; margin-bottom:10px;">Non-Returnable Items</h2>
+      <p style="color:#6b4a4e;">Earrings, and any items marked under Combo Deals or Gift Items (flowers, chocolates, DIY kits), cannot be returned or exchanged once delivered, for hygiene and freshness reasons — unless the item arrives damaged or incorrect.</p>
+    </div>
+    <div style="margin-bottom:34px;">
+      <h2 style="font-size:1.25rem; margin-bottom:10px;">How to Request a Return or Exchange</h2>
+      <ol style="color:#6b4a4e; padding-left:20px; line-height:1.9;">
+        <li>Message us on WhatsApp or email with your order details.</li>
+        <li>Share clear photos/video of the item and its packaging.</li>
+        <li>Once approved, send the item back — we'll confirm the pickup or drop-off details with you.</li>
+        <li>Refunds (where applicable) or replacements are processed within 3–5 working days of receiving the returned item.</li>
+      </ol>
+    </div>
+    <div style="background: var(--blush); padding:26px; text-align:center;">
+      <p style="margin-bottom:14px; color:#6b4a4e;">Questions about a return or exchange? We're happy to help.</p>
+      <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+        <a href="https://wa.me/8801707082002?text=Hi%2C%20I%20have%20a%20question%20about%20a%20return%2Fexchange" target="_blank" rel="noopener" class="btn btn-solid">Chat on WhatsApp</a>
+        <a href="mailto:Velmora511@gmail.com" class="btn btn-outline">Email Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="social-icons" style="justify-content:center; margin-bottom:20px;">
+      <a href="https://instagram.com/velmora" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="https://www.facebook.com/share/19JQtaQ3fu/" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M15 8h2V4h-2a4 4 0 0 0-4 4v2H9v4h2v6h4v-6h2.5l.5-4H15V8a1 1 0 0 1 1-1z"/></svg>
+      </a>
+      <a href="https://tiktok.com/@velmora___1" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M16.5 3c.3 1.9 1.5 3.3 3.5 3.6v2.6c-1.3 0-2.5-.4-3.5-1.1v6.4c0 3-2.4 5.5-5.5 5.5S5.5 17.5 5.5 14.5 7.9 9 11 9c.3 0 .6 0 .9.1v2.7c-.3-.1-.6-.2-.9-.2-1.6 0-2.9 1.3-2.9 2.9S9.4 17.4 11 17.4s2.9-1.3 2.9-2.9V3h2.6z"/></svg>
+      </a>
+      <a href="mailto:Velmora511@gmail.com" aria-label="Email">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>
+      </a>
+      <a href="https://wa.me/8801707082002" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M3 21l1.6-4.8A8 8 0 1 1 8.8 19.4L3 21z"/><path d="M8.5 9.5c0 3.5 3 6.5 6.5 6.5.6 0 1-.5.8-1l-1.3-1.9a.8.8 0 0 0-.9-.2l-1 .4a5 5 0 0 1-2.9-2.9l.4-1a.8.8 0 0 0-.2-.9L8.9 8.7c-.5-.2-1 .2-1 .8z"/></svg>
+      </a>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Velmora. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/nav.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/search.js"></script>
+<a href="https://wa.me/8801707082002" target="_blank" rel="noopener" class="whatsapp-float" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16.001 3C9.104 3 3.5 8.604 3.5 15.5c0 2.385.663 4.614 1.814 6.516L3 29l7.146-2.267A12.44 12.44 0 0 0 16 28c6.897 0 12.5-5.604 12.5-12.5S22.898 3 16.001 3zm7.29 17.74c-.31.87-1.532 1.593-2.51 1.8-.667.14-1.538.252-4.47-.96-3.75-1.552-6.166-5.354-6.354-5.6-.18-.246-1.522-2.026-1.522-3.865 0-1.838.964-2.744 1.306-3.12.31-.34.674-.425.899-.425.224 0 .45.002.646.012.207.01.485-.078.759.579.31.744 1.055 2.583 1.147 2.77.093.187.155.404.03.65-.124.246-.187.404-.373.62-.187.216-.393.483-.56.65-.187.187-.382.39-.164.766.217.375.964 1.59 2.07 2.575 1.422 1.268 2.62 1.66 2.995 1.847.375.187.594.156.812-.093.217-.25.933-1.088 1.182-1.462.25-.375.5-.31.842-.187.343.124 2.176 1.026 2.55 1.213.375.187.626.28.717.436.093.156.093.9-.216 1.772z"/>
+  </svg>
+</a>
+</body>
+</html>
