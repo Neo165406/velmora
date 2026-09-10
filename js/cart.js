@@ -1,12 +1,50 @@
 // ---------------------------------------------------------------
 // Velmora cart — localStorage-based, no backend required.
-// Delivery: Inside Dhaka ৳60, Outside Dhaka ৳130.
+// Delivery: Inside Dhaka ৳60, Outside Dhaka ৳110 (admin can override in dashboard Theme tab).
 // Once Firestore is wired (see firebase-init.js), checkout() can be
 // extended to also write the order into an `orders` collection.
 // ---------------------------------------------------------------
 
 const CART_KEY = 'velmora_cart';
-const DELIVERY_FEES = { dhaka: 60, outside: 130 };
+const COUPON_KEY = 'velmora_coupon';
+const DELIVERY_FEES = { dhaka: 60, outside: 110 };
+
+// Simple built-in coupon codes. Admin can add more from the dashboard
+// Theme tab later — this list is the fallback used when no Firestore
+// coupon settings are configured.
+const VELMORA_COUPONS = {
+  'VELMORA10': { type: 'percent', value: 10 },
+  'WELCOME50': { type: 'flat', value: 50 }
+};
+
+function getAppliedCoupon() {
+  try {
+    return JSON.parse(localStorage.getItem(COUPON_KEY)) || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function applyCoupon(code) {
+  const clean = (code || '').trim().toUpperCase();
+  const coupon = VELMORA_COUPONS[clean];
+  if (!coupon) return { ok: false, message: 'Invalid coupon code.' };
+  const record = { code: clean, ...coupon };
+  localStorage.setItem(COUPON_KEY, JSON.stringify(record));
+  return { ok: true, message: 'Coupon applied ✓', coupon: record };
+}
+
+function removeCoupon() {
+  localStorage.removeItem(COUPON_KEY);
+}
+
+function couponDiscount(subtotal) {
+  const coupon = getAppliedCoupon();
+  if (!coupon) return 0;
+  if (coupon.type === 'percent') return Math.round(subtotal * (coupon.value / 100));
+  if (coupon.type === 'flat') return Math.min(coupon.value, subtotal);
+  return 0;
+}
 
 function getCart() {
   try {
