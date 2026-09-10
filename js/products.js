@@ -259,21 +259,28 @@ function productMedia(p) {
     : velmoraGemIcon();
 }
 
+function isOutOfStock(p) {
+  return p.stock !== undefined && p.stock !== null && Number(p.stock) <= 0;
+}
+
 function renderProductCard(p) {
+  const outOfStock = isOutOfStock(p);
   return `
     <div class="product-card">
       <a href="product.html?id=${p.id}">
         <div class="product-media">
-          ${p.tag ? `<span class="product-tag">${p.tag}</span>` : ''}
+          ${outOfStock ? `<span class="product-tag" style="left:auto; right:12px; background:#a15a5a; color:#fff;">Out of Stock</span>` : (p.tag ? `<span class="product-tag">${p.tag}</span>` : '')}
           ${productMedia(p)}
+          ${outOfStock ? `<div class="oos-overlay"></div>` : ''}
         </div>
         <div class="product-info">
           <div class="cat">${p.category}</div>
           <h3>${p.name}</h3>
           <div class="price">${formatTaka(p.price)}${p.oldPrice ? `<span class="old">${formatTaka(p.oldPrice)}</span>` : ''}</div>
+          ${(p.stock !== undefined && p.stock !== null && !outOfStock) ? `<div class="stock-note">${p.stock} in stock</div>` : ''}
         </div>
       </a>
-      <button class="quick-add-btn" data-add-to-cart="${p.id}" aria-label="Add to cart">
+      <button class="quick-add-btn" data-add-to-cart="${p.id}" aria-label="Add to cart" ${outOfStock ? 'disabled' : ''}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
       </button>
     </div>`;
@@ -405,7 +412,7 @@ function renderComboDeals() {
 function renderGiftItems() {
   const grid = document.querySelector('[data-gift-grid]');
   if (!grid) return;
-  const items = VELMORA_PRODUCTS.filter(p => ['Flower', 'Chocolate', 'DIY'].includes(p.category));
+  const items = VELMORA_PRODUCTS.filter(p => ['Gift Box', 'Flower', 'Chocolate', 'Books'].includes(p.category));
   const section = grid.closest('section');
   if (!items.length) {
     if (section) section.style.display = 'none';
@@ -478,9 +485,18 @@ function renderProductDetail() {
   const p = VELMORA_PRODUCTS.find(item => item.id === id) || VELMORA_PRODUCTS[0];
   const images = (Array.isArray(p.images) && p.images.length) ? p.images : (p.image ? [p.image] : []);
 
+  const outOfStock = isOutOfStock(p);
+  const bio = p.description && p.description.trim()
+    ? p.description
+    : `${p.name} is a handcrafted ${p.category.toLowerCase()} piece finished with a polished antique detail. Every Velmora piece is hand-set and hand-polished, made to catch the light without ever feeling heavy. Pair it with everyday looks or festive wear — it holds up either way. A thoughtful pick for yourself or as a gift for someone special. Cash on delivery is available across Bangladesh.`;
+  const waNumber = '8801707082002';
+  const waText = `Hi, I'm interested in: ${p.name} (${formatTaka(p.price)})`;
+  const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
+
   mount.innerHTML = `
     <div>
       <div class="pd-media product-media" style="aspect-ratio:1/1;" id="pd-main-media">
+        ${outOfStock ? `<span class="product-tag" style="left:auto; right:12px; background:#a15a5a; color:#fff; z-index:2;">Out of Stock</span>` : ''}
         ${images.length ? `<img src="${images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">` : velmoraGemIcon()}
       </div>
       ${images.length > 1 ? `
@@ -495,12 +511,16 @@ function renderProductDetail() {
     <div class="pd-info">
       <div class="cat">${p.category}</div>
       <h1 class="display" style="font-size:2rem; margin-bottom:14px;">${p.name}</h1>
-      <div class="price" style="font-size:1.3rem; margin-bottom:24px;">
+      <div class="price" style="font-size:1.3rem; margin-bottom:10px;">
         ${formatTaka(p.price)}${p.oldPrice ? `<span class="old">${formatTaka(p.oldPrice)}</span>` : ''}
       </div>
-      <p style="color:#6b4a4e; margin-bottom:28px; max-width:440px;">
-        Handcrafted detailing with a polished antique finish. Cash on delivery available across Bangladesh — ৳60 inside Dhaka, ৳130 outside Dhaka.
-      </p>
+      <div style="margin-bottom:20px;">
+        ${outOfStock
+          ? `<span class="status-badge" style="background:#f4d4d4; color:#7a1a1a; padding:5px 12px;">Out of Stock</span>`
+          : (p.stock !== undefined && p.stock !== null ? `<span class="status-badge" style="background:#d4edda; color:#155724; padding:5px 12px;">In Stock — ${p.stock} piece${p.stock == 1 ? '' : 's'} left</span>` : '')}
+      </div>
+      <p style="color:#6b4a4e; margin-bottom:22px; max-width:460px; line-height:1.7;">${bio}</p>
+      <p style="color:#6b4a4e; font-size:0.86rem; margin-bottom:28px;">Cash on delivery across Bangladesh — ৳60 inside Dhaka, ৳110 outside Dhaka.</p>
       ${Array.isArray(p.sizes) && p.sizes.length ? `
         <div style="margin-bottom:24px;">
           <div style="font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--maroon); margin-bottom:10px;">Available Sizes</div>
@@ -508,18 +528,34 @@ function renderProductDetail() {
             ${p.sizes.map(s => `<span style="padding:6px 14px; border:1px solid rgba(107,15,26,0.3); font-size:0.85rem;">${s}</span>`).join('')}
           </div>
         </div>` : ''}
-      <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+      <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
         <div class="qty-stepper">
-          <button type="button" data-qty-minus>−</button>
+          <button type="button" data-qty-minus ${outOfStock ? 'disabled' : ''}>−</button>
           <input type="text" value="1" data-qty-input readonly>
-          <button type="button" data-qty-plus>+</button>
+          <button type="button" data-qty-plus ${outOfStock ? 'disabled' : ''}>+</button>
         </div>
-        <button class="add-cart-btn" style="width:auto; padding:13px 32px;" data-add-to-cart="${p.id}">Add to Cart</button>
+      </div>
+      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+        <button class="add-cart-btn" style="width:auto; padding:13px 32px;" data-add-to-cart="${p.id}" ${outOfStock ? 'disabled' : ''}>${outOfStock ? 'Out of Stock' : 'Add to Cart'}</button>
+        <button class="btn btn-solid" style="border:none;" data-buy-now="${p.id}" ${outOfStock ? 'disabled' : ''}>Buy Now</button>
+        <a href="${waLink}" target="_blank" rel="noopener" class="btn" style="border-color:#25D366; color:#128C3F; display:inline-flex; align-items:center; gap:8px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16.001 3C9.104 3 3.5 8.604 3.5 15.5c0 2.385.663 4.614 1.814 6.516L3 29l7.146-2.267A12.44 12.44 0 0 0 16 28c6.897 0 12.5-5.604 12.5-12.5S22.898 3 16.001 3z" opacity="0"/><path d="M3 21l1.6-4.8A8 8 0 1 1 8.8 19.4L3 21z"/><path d="M8.5 9.5c0 3.5 3 6.5 6.5 6.5.6 0 1-.5.8-1l-1.3-1.9a.8.8 0 0 0-.9-.2l-1 .4a5 5 0 0 1-2.9-2.9l.4-1a.8.8 0 0 0-.2-.9L8.9 8.7c-.5-.2-1 .2-1 .8z"/></svg>
+          WhatsApp
+        </a>
       </div>
     </div>`;
   document.title = p.name + ' — Velmora';
   updateProductSEO(p);
   renderRelated(p);
+
+  const buyNowBtn = mount.querySelector('[data-buy-now]');
+  if (buyNowBtn) {
+    buyNowBtn.addEventListener('click', function () {
+      const qty = parseInt(mount.querySelector('[data-qty-input]').value) || 1;
+      addToCart(p, qty);
+      window.location.href = 'cart.html';
+    });
+  }
 
   if (images.length > 1) {
     mount.querySelectorAll('[data-thumb]').forEach(btn => {
