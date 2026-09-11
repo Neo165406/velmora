@@ -537,7 +537,12 @@ function renderProductDetail() {
     <div>
       <div class="pd-media product-media" style="aspect-ratio:1/1; position:relative; touch-action:pan-y;" id="pd-main-media">
         ${outOfStock ? `<span class="product-tag" style="left:auto; right:12px; background:#a15a5a; color:#fff; z-index:2;">Out of Stock</span>` : ''}
-        ${images.length ? `<img src="${images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;" data-pd-img draggable="false">` : velmoraGemIcon()}
+        ${images.length ? `
+          <img src="${images[0]}" alt="" aria-hidden="true" data-pd-bg draggable="false"
+            style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:blur(20px) brightness(0.92); transform:scale(1.15); z-index:0;">
+          <img src="${images[0]}" alt="${p.name}" data-pd-img draggable="false"
+            style="position:relative; width:100%; height:100%; object-fit:contain; z-index:1;">
+        ` : velmoraGemIcon()}
         ${images.length > 1 ? `
           <button type="button" class="pd-media-arrow pd-media-arrow-prev" data-pd-prev aria-label="Previous image">‹</button>
           <button type="button" class="pd-media-arrow pd-media-arrow-next" data-pd-next aria-label="Next image">›</button>
@@ -606,6 +611,7 @@ function renderProductDetail() {
   if (images.length > 1) {
     const mediaEl = document.getElementById('pd-main-media');
     const imgEl = mediaEl.querySelector('[data-pd-img]');
+    const bgEl = mediaEl.querySelector('[data-pd-bg]');
     const thumbBtns = mount.querySelectorAll('[data-thumb]');
     const dots = mediaEl.querySelectorAll('[data-dot]');
     let current = 0;
@@ -613,6 +619,7 @@ function renderProductDetail() {
     function showImage(idx) {
       current = (idx + images.length) % images.length;
       imgEl.src = images[current];
+      if (bgEl) bgEl.src = images[current];
       thumbBtns.forEach((b, i) => { b.style.borderColor = i === current ? 'var(--gold)' : 'transparent'; });
       dots.forEach((d, i) => d.classList.toggle('is-active', i === current));
     }
