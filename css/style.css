@@ -613,6 +613,37 @@ section { padding: 44px 0; }
   height: 38px; font-family: 'Jost', sans-serif;
 }
 
+/* ---------- Product detail page action buttons (Add to Cart / Buy Now / WhatsApp) ---------- */
+.action-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.action-row > * {
+  flex: 1 1 180px;
+  height: 52px;
+  margin-top: 0;
+  padding: 0 20px;
+  width: auto;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+}
+.btn-whatsapp {
+  border-color: #25D366;
+  color: #128C3F;
+}
+.btn-whatsapp:hover { background: #25D366; color: var(--white); }
+@media (max-width: 520px) {
+  .action-row { flex-direction: column; }
+  .action-row > * { flex: 1 1 auto; width: 100%; }
+}
+
 /* ---------- Cart page ---------- */
 .cart-layout {
   display: grid;
