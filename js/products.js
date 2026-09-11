@@ -263,8 +263,20 @@ function isOutOfStock(p) {
   return p.stock !== undefined && p.stock !== null && Number(p.stock) <= 0;
 }
 
+// Returns { save, percent } when a product has a genuine discount
+// (oldPrice set and greater than the current price), otherwise null.
+function discountInfo(p) {
+  const oldPrice = Number(p.oldPrice);
+  const price = Number(p.price);
+  if (!oldPrice || oldPrice <= price) return null;
+  const save = oldPrice - price;
+  const percent = Math.round((save / oldPrice) * 100);
+  return { save, percent };
+}
+
 function renderProductCard(p) {
   const outOfStock = isOutOfStock(p);
+  const discount = discountInfo(p);
   return `
     <div class="product-card">
       <a href="product.html?id=${p.id}">
@@ -277,6 +289,7 @@ function renderProductCard(p) {
           <div class="cat">${p.category}</div>
           <h3>${p.name}</h3>
           <div class="price">${formatTaka(p.price)}${p.oldPrice ? `<span class="old">${formatTaka(p.oldPrice)}</span>` : ''}</div>
+          ${discount ? `<div class="save-badge">Save ${formatTaka(discount.save)} (${discount.percent}% off)</div>` : ''}
           ${(p.stock !== undefined && p.stock !== null && !outOfStock) ? `<div class="stock-note">${p.stock} in stock</div>` : ''}
         </div>
       </a>
@@ -306,14 +319,15 @@ function wireAddToCartButtons(scope) {
 
 // Renders into any element with [data-product-grid], applying the
 // current category, gender, and search filters together.
-const filterState = { category: 'All', gender: 'All', search: '' };
+const filterState = { category: 'All', gender: 'All', search: '', tag: 'All' };
 
 function applyFilters() {
   return VELMORA_PRODUCTS.filter(p => {
     const matchCategory = filterState.category === 'All' || filterState.category.split(',').includes(p.category);
     const matchGender = filterState.gender === 'All' || p.gender === filterState.gender;
     const matchSearch = !filterState.search || p.name.toLowerCase().includes(filterState.search.toLowerCase());
-    return matchCategory && matchGender && matchSearch;
+    const matchTag = filterState.tag === 'All' || (p.tag || '').toLowerCase() === filterState.tag.toLowerCase();
+    return matchCategory && matchGender && matchSearch && matchTag;
   });
 }
 
@@ -357,6 +371,7 @@ function applyUrlFilters() {
   const category = params.get('category');
   const gender = params.get('gender');
   const search = params.get('search');
+  const tag = params.get('tag');
 
   if (category) {
     filterState.category = category;
@@ -369,6 +384,9 @@ function applyUrlFilters() {
     document.querySelectorAll('[data-gender-filter]').forEach(c => {
       c.classList.toggle('active', c.dataset.genderFilter === gender);
     });
+  }
+  if (tag) {
+    filterState.tag = tag;
   }
   if (search) {
     filterState.search = search;
@@ -408,11 +426,20 @@ function renderComboDeals() {
   wireAddToCartButtons(grid);
 }
 
-// Homepage "Gift Items" slider — same hide-when-empty behavior.
-function renderGiftItems() {
-  const grid = document.querySelector('[data-gift-grid]');
+// Generic homepage section curation: uses products the admin has
+// manually tagged for this section (product edit modal → "Show on
+// Homepage"); falls back to an automatic rule when nothing has been
+// picked yet, so the section never looks empty before setup.
+function curatedForSection(key, fallbackPredicate, limit = 8) {
+  const manual = VELMORA_PRODUCTS.filter(p => Array.isArray(p.homeSections) && p.homeSections.includes(key));
+  const pool = manual.length ? manual : VELMORA_PRODUCTS.filter(fallbackPredicate);
+  return pool.slice().sort((a, b) => (Number(a.homeOrder) || 0) - (Number(b.homeOrder) || 0)).slice(0, limit);
+}
+
+function renderCuratedSection(gridSelector, key, fallbackPredicate) {
+  const grid = document.querySelector(gridSelector);
   if (!grid) return;
-  const items = VELMORA_PRODUCTS.filter(p => ['Gift Box', 'Flower', 'Chocolate', 'Books'].includes(p.category));
+  const items = curatedForSection(key, fallbackPredicate);
   const section = grid.closest('section');
   if (!items.length) {
     if (section) section.style.display = 'none';
@@ -421,6 +448,19 @@ function renderGiftItems() {
   if (section) section.style.display = '';
   grid.innerHTML = items.map(renderProductCard).join('');
   wireAddToCartButtons(grid);
+}
+
+function renderNewArrivals() {
+  renderCuratedSection('[data-newarrivals-grid]', 'newArrivals', p => (p.tag || '').toLowerCase() === 'new');
+}
+function renderForWomen() {
+  renderCuratedSection('[data-forwomen-grid]', 'forWomen', p => p.gender === 'Women');
+}
+function renderForMan() {
+  renderCuratedSection('[data-forman-grid]', 'forMan', p => p.gender === 'Men');
+}
+function renderGiftBox() {
+  renderCuratedSection('[data-giftbox-grid]', 'giftBox', p => ['Gift Box', 'Flower', 'Chocolate', 'Books'].includes(p.category));
 }
 
 function renderRelated(current) {
@@ -511,9 +551,10 @@ function renderProductDetail() {
     <div class="pd-info">
       <div class="cat">${p.category}</div>
       <h1 class="display" style="font-size:2rem; margin-bottom:14px;">${p.name}</h1>
-      <div class="price" style="font-size:1.3rem; margin-bottom:10px;">
+      <div class="price" style="font-size:1.3rem; margin-bottom:6px;">
         ${formatTaka(p.price)}${p.oldPrice ? `<span class="old">${formatTaka(p.oldPrice)}</span>` : ''}
       </div>
+      ${discountInfo(p) ? `<div class="save-badge" style="font-size:0.92rem; margin-bottom:16px;">Save ${formatTaka(discountInfo(p).save)} (${discountInfo(p).percent}% off)</div>` : '<div style="margin-bottom:16px;"></div>'}
       <div style="margin-bottom:20px;">
         ${outOfStock
           ? `<span class="status-badge" style="background:#f4d4d4; color:#7a1a1a; padding:5px 12px;">Out of Stock</span>`
@@ -596,7 +637,10 @@ function renderAll() {
   renderProductGrid();
   renderFeatured();
   renderComboDeals();
-  renderGiftItems();
+  renderNewArrivals();
+  renderForWomen();
+  renderForMan();
+  renderGiftBox();
   renderProductDetail();
 }
 
