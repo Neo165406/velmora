@@ -146,6 +146,10 @@
           <label>Hero Subtext</label>
           <textarea id="tHeroSub" rows="3" placeholder="Antique gold detailing, hand-set stones..."></textarea>
         </div>
+        <div class="field">
+          <label>Combo Deals — "Sale Ends" Note</label>
+          <input type="text" id="tSaleEndsText" placeholder="e.g. This Friday, midnight">
+        </div>
         <div class="field-row">
           <div class="field">
             <label>Delivery Fee — Inside Dhaka (৳)</label>
@@ -253,6 +257,20 @@
       <label style="display:flex; align-items:center; gap:8px; font-weight:600; text-transform:none;">
         <input type="checkbox" id="pBestSeller" style="width:auto;"> Mark as Bestseller
       </label>
+    </div>
+    <div class="field">
+      <label>Show on Homepage</label>
+      <div style="display:flex; flex-wrap:wrap; gap:14px; font-size:0.86rem; color:var(--maroon); text-transform:none;">
+        <label style="display:flex; align-items:center; gap:6px; font-weight:400;"><input type="checkbox" id="pHomeNewArrivals" style="width:auto;"> New Arrivals</label>
+        <label style="display:flex; align-items:center; gap:6px; font-weight:400;"><input type="checkbox" id="pHomeForWomen" style="width:auto;"> For Women</label>
+        <label style="display:flex; align-items:center; gap:6px; font-weight:400;"><input type="checkbox" id="pHomeForMan" style="width:auto;"> For Man</label>
+        <label style="display:flex; align-items:center; gap:6px; font-weight:400;"><input type="checkbox" id="pHomeGiftBox" style="width:auto;"> Gift Box</label>
+      </div>
+      <p style="font-size:0.76rem; color:#7a5a5d; margin-top:8px;">Tick a section to feature this product there on the homepage. If nothing is ticked for a section, it fills automatically.</p>
+    </div>
+    <div class="field">
+      <label>Homepage Order (lower shows first, optional)</label>
+      <input type="number" id="pHomeOrder" value="0">
     </div>
     <div class="field">
       <label>Photos</label>
@@ -507,6 +525,12 @@
         document.getElementById('pDescription').value = p.description || '';
         document.getElementById('pFeatured').checked = !!p.featured;
         document.getElementById('pBestSeller').checked = !!p.bestSeller;
+        const homeSections = Array.isArray(p.homeSections) ? p.homeSections : [];
+        document.getElementById('pHomeNewArrivals').checked = homeSections.includes('newArrivals');
+        document.getElementById('pHomeForWomen').checked = homeSections.includes('forWomen');
+        document.getElementById('pHomeForMan').checked = homeSections.includes('forMan');
+        document.getElementById('pHomeGiftBox').checked = homeSections.includes('giftBox');
+        document.getElementById('pHomeOrder').value = p.homeOrder ?? 0;
         currentImages = [...(p.images || (p.image ? [p.image] : []))];
         selectedSizes = [...(p.sizes || [])];
         renderImagePreviews();
@@ -517,6 +541,11 @@
         document.getElementById('pStock').value = 10;
         document.getElementById('pFeatured').checked = false;
         document.getElementById('pBestSeller').checked = false;
+        document.getElementById('pHomeNewArrivals').checked = false;
+        document.getElementById('pHomeForWomen').checked = false;
+        document.getElementById('pHomeForMan').checked = false;
+        document.getElementById('pHomeGiftBox').checked = false;
+        document.getElementById('pHomeOrder').value = 0;
         document.getElementById('pCategory').value = 'Rings';
         document.getElementById('pGender').value = 'Women';
       }
@@ -576,6 +605,13 @@
         description: document.getElementById('pDescription').value.trim(),
         featured: document.getElementById('pFeatured').checked,
         bestSeller: document.getElementById('pBestSeller').checked,
+        homeSections: [
+          document.getElementById('pHomeNewArrivals').checked ? 'newArrivals' : null,
+          document.getElementById('pHomeForWomen').checked ? 'forWomen' : null,
+          document.getElementById('pHomeForMan').checked ? 'forMan' : null,
+          document.getElementById('pHomeGiftBox').checked ? 'giftBox' : null,
+        ].filter(Boolean),
+        homeOrder: Number(document.getElementById('pHomeOrder').value) || 0,
         images: currentImages
       };
 
@@ -748,6 +784,7 @@
           if (t.heroBadge) document.getElementById('tHeroBadge').value = t.heroBadge;
           document.getElementById('tFeeDhaka').value = t.feeDhaka ?? 60;
           document.getElementById('tFeeOutside').value = t.feeOutside ?? 110;
+          if (t.comboSaleEndsText) document.getElementById('tSaleEndsText').value = t.comboSaleEndsText;
           if (t.couponCode) document.getElementById('tCouponCode').value = t.couponCode;
           if (t.couponPercent) document.getElementById('tCouponPercent').value = t.couponPercent;
         }
@@ -759,13 +796,14 @@
       const heroBadge = document.getElementById('tHeroBadge').value.trim();
       const feeDhaka = Number(document.getElementById('tFeeDhaka').value) || 60;
       const feeOutside = Number(document.getElementById('tFeeOutside').value) || 110;
+      const comboSaleEndsText = document.getElementById('tSaleEndsText').value.trim();
       const couponCode = document.getElementById('tCouponCode').value.trim().toUpperCase();
       const couponPercent = Number(document.getElementById('tCouponPercent').value) || 0;
       const btn = document.getElementById('saveThemeBtn');
       btn.disabled = true;
       btn.innerHTML = `<span class="spinner"></span> Saving...`;
       try {
-        await setDoc(doc(db, 'settings', 'site'), { accentColor, heroSub, heroBadge, feeDhaka, feeOutside, couponCode, couponPercent }, { merge: true });
+        await setDoc(doc(db, 'settings', 'site'), { accentColor, heroSub, heroBadge, feeDhaka, feeOutside, comboSaleEndsText, couponCode, couponPercent }, { merge: true });
         showToast('Theme saved ✓ — refresh the store to see it');
       } catch (err) {
         console.error('Theme save failed:', err);
