@@ -450,16 +450,21 @@ section { padding: 44px 0; }
 }
 .deal-track {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   width: max-content;
 }
 .deal-track .product-card {
-  width: 220px;
+  width: 190px;
   scroll-snap-align: start;
   flex-shrink: 0;
 }
 .deal-slider::-webkit-scrollbar { height: 6px; }
 .deal-slider::-webkit-scrollbar-thumb { background: rgba(20,20,20,0.2); border-radius: 999px; }
+
+@media (max-width: 520px) {
+  .deal-track { gap: 12px; }
+  .deal-track .product-card { width: 156px; }
+}
 
 .deal-slider-wrap { position: relative; }
 .deal-arrow {
@@ -597,6 +602,18 @@ section { padding: 44px 0; }
 .add-cart-btn:disabled, .quick-add-btn:disabled, .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .add-cart-btn:disabled:hover { background: var(--maroon); }
 
+/* Product page action row — Add to Cart / Buy Now / WhatsApp share one size */
+.pd-action-btn {
+  flex: 1 1 150px;
+  width: auto;
+  padding: 14px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
 .qty-stepper {
   display: inline-flex;
   align-items: center;
@@ -611,37 +628,6 @@ section { padding: 44px 0; }
   width: 44px; text-align: center;
   border: none; border-left: 1px solid rgba(20,20,20,0.25); border-right: 1px solid rgba(20,20,20,0.25);
   height: 38px; font-family: 'Jost', sans-serif;
-}
-
-/* ---------- Product detail page action buttons (Add to Cart / Buy Now / WhatsApp) ---------- */
-.action-row {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-.action-row > * {
-  flex: 1 1 180px;
-  height: 52px;
-  margin-top: 0;
-  padding: 0 20px;
-  width: auto;
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-sizing: border-box;
-}
-.btn-whatsapp {
-  border-color: #25D366;
-  color: #128C3F;
-}
-.btn-whatsapp:hover { background: #25D366; color: var(--white); }
-@media (max-width: 520px) {
-  .action-row { flex-direction: column; }
-  .action-row > * { flex: 1 1 auto; width: 100%; }
 }
 
 /* ---------- Cart page ---------- */
