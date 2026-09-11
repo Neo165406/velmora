@@ -581,6 +581,17 @@ section { padding: 15px 0; }
   cursor: pointer;
 }
 .pd-media-dot.is-active { background: var(--gold); border-color: var(--gold); }
+
+/* On narrow screens the two-column product layout collapses to one
+   column — let the main image bleed edge-to-edge there instead of
+   sitting inside the page's side padding. */
+@media (max-width: 860px) {
+  .pd-media {
+    margin: 0 -24px;
+    width: calc(100% + 48px);
+    max-width: none;
+  }
+}
 .product-tag {
   position: absolute;
   top: 12px; left: 12px;
