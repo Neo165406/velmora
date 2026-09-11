@@ -535,9 +535,14 @@ function renderProductDetail() {
 
   mount.innerHTML = `
     <div>
-      <div class="pd-media product-media" style="aspect-ratio:1/1;" id="pd-main-media">
+      <div class="pd-media product-media" style="aspect-ratio:1/1; position:relative; touch-action:pan-y;" id="pd-main-media">
         ${outOfStock ? `<span class="product-tag" style="left:auto; right:12px; background:#a15a5a; color:#fff; z-index:2;">Out of Stock</span>` : ''}
-        ${images.length ? `<img src="${images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">` : velmoraGemIcon()}
+        ${images.length ? `<img src="${images[0]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;" data-pd-img draggable="false">` : velmoraGemIcon()}
+        ${images.length > 1 ? `
+          <button type="button" class="pd-media-arrow pd-media-arrow-prev" data-pd-prev aria-label="Previous image">‹</button>
+          <button type="button" class="pd-media-arrow pd-media-arrow-next" data-pd-next aria-label="Next image">›</button>
+          <div class="pd-media-dots">${images.map((_, i) => `<span class="pd-media-dot ${i === 0 ? 'is-active' : ''}" data-dot="${i}"></span>`).join('')}</div>
+        ` : ''}
       </div>
       ${images.length > 1 ? `
         <div style="display:flex; gap:10px; margin-top:14px;">
@@ -599,15 +604,49 @@ function renderProductDetail() {
   }
 
   if (images.length > 1) {
-    mount.querySelectorAll('[data-thumb]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = Number(btn.dataset.thumb);
-        document.getElementById('pd-main-media').innerHTML =
-          `<img src="${images[idx]}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">`;
-        mount.querySelectorAll('[data-thumb]').forEach(b => { b.style.borderColor = 'transparent'; });
-        btn.style.borderColor = 'var(--gold)';
-      });
+    const mediaEl = document.getElementById('pd-main-media');
+    const imgEl = mediaEl.querySelector('[data-pd-img]');
+    const thumbBtns = mount.querySelectorAll('[data-thumb]');
+    const dots = mediaEl.querySelectorAll('[data-dot]');
+    let current = 0;
+
+    function showImage(idx) {
+      current = (idx + images.length) % images.length;
+      imgEl.src = images[current];
+      thumbBtns.forEach((b, i) => { b.style.borderColor = i === current ? 'var(--gold)' : 'transparent'; });
+      dots.forEach((d, i) => d.classList.toggle('is-active', i === current));
+    }
+
+    thumbBtns.forEach((btn, i) => btn.addEventListener('click', () => showImage(i)));
+    dots.forEach(dot => dot.addEventListener('click', () => showImage(Number(dot.dataset.dot))));
+    mediaEl.querySelector('[data-pd-prev]').addEventListener('click', () => showImage(current - 1));
+    mediaEl.querySelector('[data-pd-next]').addEventListener('click', () => showImage(current + 1));
+
+    // Swipe support (touch) for mobile
+    let touchStartX = 0;
+    let touchStartY = 0;
+    mediaEl.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].clientX;
+      touchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+    mediaEl.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        showImage(dx < 0 ? current + 1 : current - 1);
+      }
+    }, { passive: true });
+
+    // Mouse drag support (desktop)
+    let dragStartX = null;
+    mediaEl.addEventListener('mousedown', (e) => { dragStartX = e.clientX; });
+    mediaEl.addEventListener('mouseup', (e) => {
+      if (dragStartX === null) return;
+      const dx = e.clientX - dragStartX;
+      if (Math.abs(dx) > 40) showImage(dx < 0 ? current + 1 : current - 1);
+      dragStartX = null;
     });
+    mediaEl.addEventListener('mouseleave', () => { dragStartX = null; });
   }
 
   const qtyInput = mount.querySelector('[data-qty-input]');
