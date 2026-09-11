@@ -576,10 +576,10 @@ function renderProductDetail() {
           <button type="button" data-qty-plus ${outOfStock ? 'disabled' : ''}>+</button>
         </div>
       </div>
-      <div class="action-row">
-        <button class="add-cart-btn" data-add-to-cart="${p.id}" ${outOfStock ? 'disabled' : ''}>${outOfStock ? 'Out of Stock' : 'Add to Cart'}</button>
-        <button class="btn btn-solid" data-buy-now="${p.id}" ${outOfStock ? 'disabled' : ''}>Buy Now</button>
-        <a href="${waLink}" target="_blank" rel="noopener" class="btn btn-whatsapp">
+      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+        <button class="add-cart-btn pd-action-btn" data-add-to-cart="${p.id}" ${outOfStock ? 'disabled' : ''}>${outOfStock ? 'Out of Stock' : 'Add to Cart'}</button>
+        <button class="btn btn-solid pd-action-btn" style="border:none;" data-buy-now="${p.id}" ${outOfStock ? 'disabled' : ''}>Buy Now</button>
+        <a href="${waLink}" target="_blank" rel="noopener" class="btn pd-action-btn" style="border-color:#25D366; color:#128C3F;">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16.001 3C9.104 3 3.5 8.604 3.5 15.5c0 2.385.663 4.614 1.814 6.516L3 29l7.146-2.267A12.44 12.44 0 0 0 16 28c6.897 0 12.5-5.604 12.5-12.5S22.898 3 16.001 3z" opacity="0"/><path d="M3 21l1.6-4.8A8 8 0 1 1 8.8 19.4L3 21z"/><path d="M8.5 9.5c0 3.5 3 6.5 6.5 6.5.6 0 1-.5.8-1l-1.3-1.9a.8.8 0 0 0-.9-.2l-1 .4a5 5 0 0 1-2.9-2.9l.4-1a.8.8 0 0 0-.2-.9L8.9 8.7c-.5-.2-1 .2-1 .8z"/></svg>
           WhatsApp
         </a>
