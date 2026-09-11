@@ -90,7 +90,10 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 700;
   letter-spacing: 0.06em;
   color: var(--ivory);
+  display: inline-flex;
+  align-items: center;
 }
+.brand-logo { height: 32px; width: auto; max-width: 32px; object-fit: contain; margin-right: 8px; display: inline-block; }
 .brand span { color: var(--gold-light); }
 
 .nav-links {
@@ -839,7 +842,8 @@ section { padding: 44px 0; }
   font-weight: 500;
 }
 .footer-grid ul { list-style: none; }
-.footer-grid li { margin-bottom: 10px; font-size: 0.92rem; }
+.footer-grid li { margin-bottom: 10px; font-size: 0.92rem; overflow-wrap: anywhere; word-break: break-word; }
+.footer-grid li a { overflow-wrap: anywhere; word-break: break-word; }
 .footer-brand { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--ivory); margin-bottom: 12px; }
 .footer-brand span { color: var(--gold); }
 .footer-bottom {
