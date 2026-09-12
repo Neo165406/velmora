@@ -417,7 +417,7 @@ section { padding: 15px 0; }
 /* ---------- Gender category tile grid (homepage "For Him" / "For Her") ---------- */
 .gender-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
 .gender-tile { display: block; }
@@ -436,7 +436,7 @@ section { padding: 15px 0; }
   color: var(--maroon);
 }
 @media (max-width: 620px) {
-  .gender-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .gender-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
   .gender-tile span { font-size: 0.92rem; }
 }
 
@@ -520,7 +520,7 @@ section { padding: 15px 0; }
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
 .product-card {
@@ -654,14 +654,20 @@ section { padding: 15px 0; }
 
 /* Product page action row — Add to Cart / Buy Now / WhatsApp share one size */
 .pd-action-btn {
-  flex: 1 1 150px;
-  width: auto;
-  padding: 14px 18px;
+  width: 100%;
+  padding: 13px 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   text-align: center;
+  font-size: 0.76rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 400px) {
+  .pd-action-btn { font-size: 0.68rem; padding: 12px 4px; letter-spacing: 0.02em; }
 }
 
 .qty-stepper {
@@ -683,7 +689,7 @@ section { padding: 15px 0; }
 /* ---------- Cart page ---------- */
 .cart-layout {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   gap: 28px;
   align-items: start;
 }
@@ -895,7 +901,7 @@ section { padding: 15px 0; }
 }
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr);
   gap: 26px;
   margin-bottom: 22px;
 }
@@ -924,7 +930,7 @@ section { padding: 15px 0; }
 /* ---------- Contact form ---------- */
 .contact-wrap {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 34px;
   align-items: start;
 }
@@ -964,16 +970,16 @@ section { padding: 15px 0; }
 .page-hero p { color: #6b4a4e; }
 
 @media (max-width: 980px) {
-  .product-grid { grid-template-columns: repeat(2, 1fr); }
-  .footer-grid { grid-template-columns: 1fr 1fr; }
-  .contact-wrap { grid-template-columns: 1fr; }
+  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .contact-wrap { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 520px) {
-  .product-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .product-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
   section { padding: 20px 0; }
 }
 @media (max-width: 860px) {
-  .cart-layout { grid-template-columns: 1fr; }
+  .cart-layout { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ---------- Floating WhatsApp button ---------- */
