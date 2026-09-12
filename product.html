@@ -15,12 +15,12 @@
 <style>
   .pd-wrap {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 34px;
     align-items: center;
   }
   @media (max-width: 860px) {
-    .pd-wrap { grid-template-columns: 1fr; }
+    .pd-wrap { grid-template-columns: minmax(0, 1fr); }
   }
 </style>
 </head>
