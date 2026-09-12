@@ -535,7 +535,7 @@ function renderProductDetail() {
 
   mount.innerHTML = `
     <div>
-      <div class="pd-media product-media" style="aspect-ratio:1/1; position:relative; touch-action:pan-y;" id="pd-main-media">
+      <div class="pd-media product-media" style="aspect-ratio:4/3; position:relative; touch-action:pan-y;" id="pd-main-media">
         ${outOfStock ? `<span class="product-tag" style="left:auto; right:12px; background:#a15a5a; color:#fff; z-index:2;">Out of Stock</span>` : ''}
         ${images.length ? `
           <img src="${images[0]}" alt="" aria-hidden="true" data-pd-bg draggable="false"
