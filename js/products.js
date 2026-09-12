@@ -582,7 +582,7 @@ function renderProductDetail() {
           <button type="button" data-qty-plus ${outOfStock ? 'disabled' : ''}>+</button>
         </div>
       </div>
-      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+      <div style="display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:10px;">
         <button class="add-cart-btn pd-action-btn" data-add-to-cart="${p.id}" ${outOfStock ? 'disabled' : ''}>${outOfStock ? 'Out of Stock' : 'Add to Cart'}</button>
         <button class="btn btn-solid pd-action-btn" style="border:none;" data-buy-now="${p.id}" ${outOfStock ? 'disabled' : ''}>Buy Now</button>
         <a href="${waLink}" target="_blank" rel="noopener" class="btn pd-action-btn" style="border-color:#25D366; color:#128C3F;">
