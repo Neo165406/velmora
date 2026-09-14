@@ -653,21 +653,22 @@ section { padding: 15px 0; }
 .add-cart-btn:disabled:hover { background: var(--maroon); }
 
 /* Product page action row — Add to Cart / Buy Now / WhatsApp share one size */
-.pd-action-btn {
+a.pd-action-btn, button.pd-action-btn {
   width: 100%;
-  padding: 13px 8px;
+  padding: 13px 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   text-align: center;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0.02em;
 }
 @media (max-width: 400px) {
-  .pd-action-btn { font-size: 0.68rem; padding: 12px 4px; letter-spacing: 0.02em; }
+  a.pd-action-btn, button.pd-action-btn { font-size: 0.62rem; padding: 11px 3px; gap: 3px; }
 }
 
 .qty-stepper {
