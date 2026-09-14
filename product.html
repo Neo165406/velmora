@@ -1,750 +1,138 @@
-// ---------------------------------------------------------------
-// Velmora product data.
-// Falls back to the static demo list below until Firebase is
-// configured (js/firebase-config.js) — then it loads live products
-// from your Firestore `products` collection instead, same as
-// StrDust's dashboard.html writes them.
-// ---------------------------------------------------------------
-import { db, isFirebaseConfigured } from './firebase-config.js';
-import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-
-let VELMORA_PRODUCTS = [
-  {
-    id: 'rng-001',
-    name: 'Antique Gold Kundan Ring',
-    category: 'Rings',
-    gender: 'Women',
-    price: 4200,
-    oldPrice: 5200,
-    tag: 'New',
-  },
-  {
-    id: 'nck-001',
-    name: 'Maroon Stone Bridal Necklace',
-    category: 'Necklaces',
-    gender: 'Women',
-    price: 12500,
-    oldPrice: null,
-    tag: 'Bestseller',
-  },
-  {
-    id: 'ear-001',
-    name: 'Pearl Drop Chandbali Earrings',
-    category: 'Earrings',
-    gender: 'Women',
-    price: 3100,
-    oldPrice: 3800,
-    tag: null,
-  },
-  {
-    id: 'brc-001',
-    name: 'Layered Gold Cuff Bracelet',
-    category: 'Bracelets',
-    gender: 'Women',
-    price: 5400,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'nck-002',
-    name: 'Antique Temple Choker',
-    category: 'Necklaces',
-    gender: 'Women',
-    price: 9800,
-    oldPrice: 11000,
-    tag: 'New',
-  },
-  {
-    id: 'rng-002',
-    name: 'Rose Gold Solitaire Ring',
-    category: 'Rings',
-    gender: 'Women',
-    price: 6600,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'ear-002',
-    name: 'Kundan Jhumka Earrings',
-    category: 'Earrings',
-    gender: 'Women',
-    price: 2800,
-    oldPrice: null,
-    tag: 'Bestseller',
-  },
-  {
-    id: 'brc-002',
-    name: 'Ruby Studded Bangle Set',
-    category: 'Bracelets',
-    gender: 'Women',
-    price: 8200,
-    oldPrice: 9500,
-    tag: null,
-  },
-  {
-    id: 'pnd-001',
-    name: 'Floral Gold Pendant',
-    category: 'Pendant',
-    gender: 'Women',
-    price: 3900,
-    oldPrice: null,
-    tag: 'New',
-  },
-  {
-    id: 'oth-001',
-    name: 'Pearl Hair Accessory Set',
-    category: 'Others',
-    gender: 'Women',
-    price: 950,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'rng-003',
-    name: "Men's Gold Signet Ring",
-    category: 'Rings',
-    gender: 'Men',
-    price: 5800,
-    oldPrice: null,
-    tag: 'New',
-  },
-  {
-    id: 'brc-003',
-    name: "Men's Silver Chain Bracelet",
-    category: 'Bracelets',
-    gender: 'Men',
-    price: 3400,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'gls-001',
-    name: "Men's Classic Sunglasses",
-    category: 'Glasses',
-    gender: 'Men',
-    price: 2200,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'acc-001',
-    name: "Men's Leather Wallet",
-    category: 'Other Accessories',
-    gender: 'Men',
-    price: 1800,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'brc-004',
-    name: 'Minimal Gold Bangle',
-    category: 'Bracelets',
-    gender: 'Unisex',
-    price: 4600,
-    oldPrice: null,
-    tag: null,
-  },
-  {
-    id: 'rng-004',
-    name: 'Plain Band Couple Ring',
-    category: 'Rings',
-    gender: 'Unisex',
-    price: 3200,
-    oldPrice: null,
-    tag: 'Bestseller',
-  },
-  {
-    id: 'cmb-001',
-    name: 'Rings & Earrings Duo Set',
-    category: 'Combo Deals',
-    gender: 'Women',
-    price: 6800,
-    oldPrice: 8600,
-    tag: 'Combo',
-  },
-  {
-    id: 'cmb-002',
-    name: 'Necklace + Bracelet Bundle',
-    category: 'Combo Deals',
-    gender: 'Women',
-    price: 11200,
-    oldPrice: 14000,
-    tag: 'Combo',
-  },
-  {
-    id: 'gft-001',
-    name: 'Gold-Wrapped Rose Bouquet',
-    category: 'Flower',
-    gender: 'Unisex',
-    price: 1200,
-    oldPrice: null,
-    tag: 'Gift',
-  },
-  {
-    id: 'gft-002',
-    name: 'Belgian Chocolate Box',
-    category: 'Chocolate',
-    gender: 'Unisex',
-    price: 950,
-    oldPrice: null,
-    tag: 'Gift',
-  },
-  {
-    id: 'gft-003',
-    name: 'Make-Your-Own Bracelet Kit',
-    category: 'DIY',
-    gender: 'Unisex',
-    price: 1600,
-    oldPrice: null,
-    tag: 'Gift',
-  },
-];
-
-function velmoraGemIcon() {
-  return `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M8 22L32 6L56 22L32 58L8 22Z" stroke="#161616" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M8 22H56M20 22L32 6M44 22L32 6M20 22L32 58M44 22L32 58" stroke="#161616" stroke-width="1" opacity="0.6"/>
-  </svg>`;
-}
-
-function formatTaka(amount) {
-  return '৳' + amount.toLocaleString('en-IN');
-}
-
-const PRODUCTS_CACHE_KEY = 'velmora_products_cache';
-
-function loadCachedProducts() {
-  try {
-    const cached = localStorage.getItem(PRODUCTS_CACHE_KEY);
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      if (Array.isArray(parsed) && parsed.length) {
-        VELMORA_PRODUCTS = parsed;
-        return true;
-      }
-    }
-  } catch (e) { /* corrupt or unavailable cache, ignore */ }
-  return false;
-}
-
-function saveCachedProducts() {
-  try {
-    localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(VELMORA_PRODUCTS));
-  } catch (e) { /* storage full or unavailable, ignore */ }
-}
-
-async function loadProducts() {
-  if (!isFirebaseConfigured) return; // keep static demo data
-  try {
-    const snapshot = await getDocs(collection(db, 'products'));
-    if (!snapshot.empty) {
-      VELMORA_PRODUCTS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      saveCachedProducts();
-    }
-  } catch (err) {
-    console.error('Could not load live products, showing demo data instead:', err);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — Velmora</title>
+<meta name="description" content="Shop rings, necklaces, bracelets and earrings at Velmora — affordable gold jewellery at BD price, cash on delivery across Bangladesh.">
+<meta property="og:title" content="Product — Velmora">
+<meta property="og:description" content="Affordable rings, necklaces, bracelets and earrings at Velmora — BD price, cash on delivery.">
+<meta property="og:type" content="product">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://firestore.googleapis.com">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .pd-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 34px;
+    align-items: center;
   }
-}
+  @media (max-width: 860px) {
+    .pd-wrap { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+</head>
+<body>
 
-function primaryImage(p) {
-  if (Array.isArray(p.images) && p.images.length) return p.images[0];
-  if (p.image) return p.image;
-  return null;
-}
-
-function productMedia(p) {
-  const img = primaryImage(p);
-  return img
-    ? `<img src="${img}" alt="${p.name}" loading="lazy" style="width:100%; height:100%; object-fit:cover;">`
-    : velmoraGemIcon();
-}
-
-function isOutOfStock(p) {
-  return p.stock !== undefined && p.stock !== null && Number(p.stock) <= 0;
-}
-
-// Returns { save, percent } when a product has a genuine discount
-// (oldPrice set and greater than the current price), otherwise null.
-function discountInfo(p) {
-  const oldPrice = Number(p.oldPrice);
-  const price = Number(p.price);
-  if (!oldPrice || oldPrice <= price) return null;
-  const save = oldPrice - price;
-  const percent = Math.round((save / oldPrice) * 100);
-  return { save, percent };
-}
-
-function renderProductCard(p) {
-  const outOfStock = isOutOfStock(p);
-  const discount = discountInfo(p);
-  return `
-    <div class="product-card">
-      <a href="product.html?id=${p.id}">
-        <div class="product-media">
-          ${outOfStock ? `<span class="product-tag" style="left:auto; right:12px; background:#a15a5a; color:#fff;">Out of Stock</span>` : (p.tag ? `<span class="product-tag">${p.tag}</span>` : '')}
-          ${productMedia(p)}
-          ${outOfStock ? `<div class="oos-overlay"></div>` : ''}
-        </div>
-        <div class="product-info">
-          <div class="cat">${p.category}</div>
-          <h3>${p.name}</h3>
-          <div class="price">${formatTaka(p.price)}${p.oldPrice ? `<span class="old">${formatTaka(p.oldPrice)}</span>` : ''}</div>
-          ${discount ? `<div class="save-badge">Save ${formatTaka(discount.save)} (${discount.percent}% off)</div>` : ''}
-          ${(p.stock !== undefined && p.stock !== null && !outOfStock) ? `<div class="stock-note">${p.stock} in stock</div>` : ''}
-        </div>
-      </a>
-      <button class="quick-add-btn" data-add-to-cart="${p.id}" aria-label="Add to cart" ${outOfStock ? 'disabled' : ''}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+<header class="site-header">
+  <nav class="nav-bar">
+    <a href="index.html" class="brand">VEL<span>MORA</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li class="has-sub">
+        <a href="shop.html?gender=Men">Man</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Man categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?gender=Men&category=Rings">Rings</a></li>
+          <li><a href="shop.html?gender=Men&category=Necklaces">Necklace</a></li>
+          <li><a href="shop.html?gender=Men&category=Bracelets">Bracelets</a></li>
+          <li><a href="shop.html?gender=Men&category=Glasses">Glasses</a></li>
+        </ul>
+      </li>
+      <li class="has-sub">
+        <a href="shop.html?gender=Women">Woman</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Woman categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?gender=Women&category=Pendant">Pendant</a></li>
+          <li><a href="shop.html?gender=Women&category=Rings">Ring</a></li>
+          <li><a href="shop.html?gender=Women&category=Bracelets">Bracelet</a></li>
+          <li><a href="shop.html?gender=Women&category=Earrings">Earring</a></li>
+          <li><a href="shop.html?gender=Women&category=Jewelry%20Set">Jewelry Set</a></li>
+        </ul>
+      </li>
+      <li><a href="shop.html?category=DIY">Style your own – DIY</a></li>
+      <li class="has-sub">
+        <a href="shop.html?category=Gift%20Box,Flower,Chocolate,Books">Gift Items</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Gift Items categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?category=Gift%20Box">Gift Box</a></li>
+          <li><a href="shop.html?category=Flower">Flower</a></li>
+          <li><a href="shop.html?category=Chocolate">Chocolate</a></li>
+          <li><a href="shop.html?category=Books">Books</a></li>
+        </ul>
+      </li>
+      <li><a href="shop.html?category=Combo%20Deals">Combo Deals</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="icon-btn search-toggle" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
-    </div>`;
-}
-
-function wireAddToCartButtons(scope) {
-  scope.querySelectorAll('[data-add-to-cart]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const p = VELMORA_PRODUCTS.find(item => item.id === btn.dataset.addToCart);
-      if (!p) return;
-      addToCart(p, 1);
-      btn.classList.add('is-added');
-      if (btn.classList.contains('add-cart-btn')) {
-        btn.textContent = 'Added ✓';
-      }
-      setTimeout(() => {
-        if (btn.classList.contains('add-cart-btn')) btn.textContent = 'Add to Cart';
-        btn.classList.remove('is-added');
-      }, 1200);
-    });
-  });
-}
-
-// Renders into any element with [data-product-grid], applying the
-// current category, gender, and search filters together.
-const filterState = { category: 'All', gender: 'All', search: '', tag: 'All' };
-
-function applyFilters() {
-  return VELMORA_PRODUCTS.filter(p => {
-    const matchCategory = filterState.category === 'All' || filterState.category.split(',').includes(p.category);
-    const matchGender = filterState.gender === 'All' || p.gender === filterState.gender;
-    const matchSearch = !filterState.search || p.name.toLowerCase().includes(filterState.search.toLowerCase());
-    const matchTag = filterState.tag === 'All' || (p.tag || '').toLowerCase() === filterState.tag.toLowerCase();
-    return matchCategory && matchGender && matchSearch && matchTag;
-  });
-}
-
-function renderProductGrid() {
-  const grid = document.querySelector('[data-product-grid]');
-  if (!grid) return;
-  const items = applyFilters();
-  grid.innerHTML = items.length
-    ? items.map(renderProductCard).join('')
-    : `<p style="grid-column:1/-1; text-align:center; color:#6b4a4e; padding:40px 0;">No products found.</p>`;
-  wireAddToCartButtons(grid);
-  updateFilterSummary();
-}
-
-// Keeps the "Filter" trigger's active-count badge and summary label
-// in sync with the current category/gender selection.
-function updateFilterSummary() {
-  const label = document.getElementById('filterActiveLabel');
-  const countBadge = document.getElementById('filterActiveCount');
-  if (!label && !countBadge) return;
-  const parts = [];
-  if (filterState.category !== 'All') parts.push(filterState.category);
-  if (filterState.gender !== 'All') parts.push(filterState.gender);
-  if (label) label.textContent = parts.length ? parts.join(' · ') : 'All Products';
-  if (countBadge) {
-    countBadge.textContent = parts.length;
-    countBadge.style.display = parts.length ? 'inline-flex' : 'none';
-  }
-}
-
-function setupFilters() {
-  const catChips = document.querySelectorAll('[data-filter]');
-  catChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      catChips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      filterState.category = chip.dataset.filter;
-      renderProductGrid();
-    });
-  });
-
-  const genderChips = document.querySelectorAll('[data-gender-filter]');
-  genderChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      genderChips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      filterState.gender = chip.dataset.genderFilter;
-      renderProductGrid();
-    });
-  });
-}
-
-// Wires the "Filter" button, its slide-up drawer, and Clear/Show Results
-// actions. Safe no-op on pages that don't have a filter drawer.
-function setupFilterDrawer() {
-  const drawer = document.getElementById('filterDrawer');
-  const overlay = document.getElementById('filterDrawerOverlay');
-  const toggle = document.getElementById('filterDrawerToggle');
-  if (!drawer || !overlay || !toggle) return;
-
-  const closeBtn = document.getElementById('filterDrawerClose');
-  const applyBtn = document.getElementById('filterApplyBtn');
-  const clearBtn = document.getElementById('filterClearBtn');
-
-  function openDrawer() {
-    drawer.classList.add('is-open');
-    overlay.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeDrawer() {
-    drawer.classList.remove('is-open');
-    overlay.classList.remove('is-open');
-    document.body.style.overflow = '';
-  }
-
-  toggle.addEventListener('click', openDrawer);
-  overlay.addEventListener('click', closeDrawer);
-  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
-  if (applyBtn) applyBtn.addEventListener('click', closeDrawer);
-  if (clearBtn) {
-    clearBtn.addEventListener('click', () => {
-      filterState.category = 'All';
-      filterState.gender = 'All';
-      document.querySelectorAll('[data-filter]').forEach(c => c.classList.toggle('active', c.dataset.filter === 'All'));
-      document.querySelectorAll('[data-gender-filter]').forEach(c => c.classList.toggle('active', c.dataset.genderFilter === 'All'));
-      renderProductGrid();
-    });
-  }
-}
-
-// Reads ?category=, ?gender=, ?search= from the URL (used by nav links
-// like Man/Woman/Gift Items/Combo Deals, and by the nav search bar)
-// and pre-applies them.
-function applyUrlFilters() {
-  const params = new URLSearchParams(window.location.search);
-  const category = params.get('category');
-  const gender = params.get('gender');
-  const search = params.get('search');
-  const tag = params.get('tag');
-
-  if (category) {
-    filterState.category = category;
-    document.querySelectorAll('[data-filter]').forEach(c => {
-      c.classList.toggle('active', c.dataset.filter === category);
-    });
-  }
-  if (gender) {
-    filterState.gender = gender;
-    document.querySelectorAll('[data-gender-filter]').forEach(c => {
-      c.classList.toggle('active', c.dataset.genderFilter === gender);
-    });
-  }
-  if (tag) {
-    filterState.tag = tag;
-  }
-  if (search) {
-    filterState.search = search;
-    const input = document.getElementById('search-input');
-    if (input) input.value = search;
-  }
-}
-
-// Exposed so the nav search bar can filter in place when already on shop.html
-window.applyVelmoraSearch = function (value) {
-  filterState.search = value;
-  renderProductGrid();
-};
-
-function renderFeatured() {
-  const grid = document.querySelector('[data-featured-grid]');
-  if (!grid) return;
-  const featured = VELMORA_PRODUCTS.filter(p => p.featured);
-  const items = (featured.length ? featured : VELMORA_PRODUCTS).slice(0, 4);
-  grid.innerHTML = items.map(renderProductCard).join('');
-  wireAddToCartButtons(grid);
-}
-
-// Homepage "Combo Deals" slider — hides its whole section if no
-// products are tagged with this category yet.
-function renderComboDeals() {
-  const grid = document.querySelector('[data-combo-grid]');
-  if (!grid) return;
-  const items = VELMORA_PRODUCTS.filter(p => p.category === 'Combo Deals');
-  const section = grid.closest('section');
-  if (!items.length) {
-    if (section) section.style.display = 'none';
-    return;
-  }
-  if (section) section.style.display = '';
-  grid.innerHTML = items.map(renderProductCard).join('');
-  wireAddToCartButtons(grid);
-}
-
-// Generic homepage section curation: uses products the admin has
-// manually tagged for this section (product edit modal → "Show on
-// Homepage"); falls back to an automatic rule when nothing has been
-// picked yet, so the section never looks empty before setup.
-function curatedForSection(key, fallbackPredicate, limit = 8) {
-  const manual = VELMORA_PRODUCTS.filter(p => Array.isArray(p.homeSections) && p.homeSections.includes(key));
-  const pool = manual.length ? manual : VELMORA_PRODUCTS.filter(fallbackPredicate);
-  return pool.slice().sort((a, b) => (Number(a.homeOrder) || 0) - (Number(b.homeOrder) || 0)).slice(0, limit);
-}
-
-function renderCuratedSection(gridSelector, key, fallbackPredicate) {
-  const grid = document.querySelector(gridSelector);
-  if (!grid) return;
-  const items = curatedForSection(key, fallbackPredicate);
-  const section = grid.closest('section');
-  if (!items.length) {
-    if (section) section.style.display = 'none';
-    return;
-  }
-  if (section) section.style.display = '';
-  grid.innerHTML = items.map(renderProductCard).join('');
-  wireAddToCartButtons(grid);
-}
-
-function renderNewArrivals() {
-  renderCuratedSection('[data-newarrivals-grid]', 'newArrivals', p => (p.tag || '').toLowerCase() === 'new');
-}
-function renderForWomen() {
-  renderCuratedSection('[data-forwomen-grid]', 'forWomen', p => p.gender === 'Women');
-}
-function renderForMan() {
-  renderCuratedSection('[data-forman-grid]', 'forMan', p => p.gender === 'Men');
-}
-function renderGiftBox() {
-  renderCuratedSection('[data-giftbox-grid]', 'giftBox', p => ['Gift Box', 'Flower', 'Chocolate', 'Books'].includes(p.category));
-}
-
-function renderRelated(current) {
-  const grid = document.querySelector('[data-related-grid]');
-  if (!grid) return;
-  const related = VELMORA_PRODUCTS.filter(p => p.category === current.category && p.id !== current.id).slice(0, 4);
-  grid.innerHTML = related.length
-    ? related.map(renderProductCard).join('')
-    : `<p style="grid-column:1/-1; text-align:center; color:#6b4a4e;">No other pieces in this category yet.</p>`;
-  wireAddToCartButtons(grid);
-}
-
-function updateProductSEO(p) {
-  const desc = `${p.name} — ${p.category} at Velmora. ${p.description || 'Handcrafted detailing with a polished antique finish.'} ৳${p.price} — cash on delivery across Bangladesh.`.slice(0, 160);
-  const img = primaryImage(p) || '';
-
-  const setMeta = (selector, attr, value) => {
-    const el = document.querySelector(selector);
-    if (el) el.setAttribute(attr, value);
-  };
-  setMeta('meta[name="description"]', 'content', desc);
-  setMeta('meta[property="og:title"]', 'content', p.name + ' — Velmora');
-  setMeta('meta[property="og:description"]', 'content', desc);
-  if (img) {
-    let ogImg = document.querySelector('meta[property="og:image"]');
-    if (!ogImg) {
-      ogImg = document.createElement('meta');
-      ogImg.setAttribute('property', 'og:image');
-      document.head.appendChild(ogImg);
-    }
-    ogImg.setAttribute('content', img);
-  }
-
-  let ld = document.getElementById('product-jsonld');
-  if (!ld) {
-    ld = document.createElement('script');
-    ld.type = 'application/ld+json';
-    ld.id = 'product-jsonld';
-    document.head.appendChild(ld);
-  }
-  ld.textContent = JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: p.name,
-    description: desc,
-    image: img || undefined,
-    category: p.category,
-    offers: {
-      '@type': 'Offer',
-      priceCurrency: 'BDT',
-      price: p.price,
-      availability: (p.stock === undefined || p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
-    }
-  });
-}
-
-function renderProductDetail() {
-  const mount = document.querySelector('[data-product-detail]');
-  if (!mount) return;
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
-  const p = VELMORA_PRODUCTS.find(item => item.id === id) || VELMORA_PRODUCTS[0];
-  const images = (Array.isArray(p.images) && p.images.length) ? p.images : (p.image ? [p.image] : []);
-
-  const outOfStock = isOutOfStock(p);
-  const bio = p.description && p.description.trim()
-    ? p.description
-    : `${p.name} is a handcrafted ${p.category.toLowerCase()} piece finished with a polished antique detail. Every Velmora piece is hand-set and hand-polished, made to catch the light without ever feeling heavy. Pair it with everyday looks or festive wear — it holds up either way. A thoughtful pick for yourself or as a gift for someone special. Cash on delivery is available across Bangladesh.`;
-  const waNumber = '8801707082002';
-  const waText = `Hi, I'm interested in: ${p.name} (${formatTaka(p.price)})`;
-  const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`;
-
-  mount.innerHTML = `
-    <div>
-      <div class="pd-media product-media" style="aspect-ratio:4/3; position:relative; touch-action:pan-y;" id="pd-main-media">
-        ${outOfStock ? `<span class="product-tag" style="left:auto; right:12px; background:#a15a5a; color:#fff; z-index:2;">Out of Stock</span>` : ''}
-        ${images.length ? `<img src="${images[0]}" alt="${p.name}" data-pd-img draggable="false"
-            style="width:100%; height:100%; object-fit:contain; background:var(--blush);">` : velmoraGemIcon()}
-        ${images.length > 1 ? `
-          <button type="button" class="pd-media-arrow pd-media-arrow-prev" data-pd-prev aria-label="Previous image">‹</button>
-          <button type="button" class="pd-media-arrow pd-media-arrow-next" data-pd-next aria-label="Next image">›</button>
-          <div class="pd-media-dots">${images.map((_, i) => `<span class="pd-media-dot ${i === 0 ? 'is-active' : ''}" data-dot="${i}"></span>`).join('')}</div>
-        ` : ''}
-      </div>
-      ${images.length > 1 ? `
-        <div style="display:flex; gap:10px; margin-top:14px;">
-          ${images.map((img, i) => `
-            <button type="button" class="pd-thumb-btn" data-thumb="${i}"
-              style="width:64px; height:64px; padding:0; border:2px solid ${i === 0 ? 'var(--gold)' : 'transparent'}; overflow:hidden; cursor:pointer; background:none;">
-              <img src="${img}" style="width:100%; height:100%; object-fit:cover; display:block;">
-            </button>`).join('')}
-        </div>` : ''}
+      <a href="https://instagram.com/velmora" target="_blank" rel="noopener" class="icon-btn" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#FAF6EF" stroke="none"/></svg>
+      </a>
+      <a href="cart.html" class="cart-icon-wrap" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.6"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="10" cy="20" r="1.2" fill="#E4C766"/><circle cx="17" cy="20" r="1.2" fill="#E4C766"/></svg>
+        <span data-cart-count>0</span>
+      </a>
+      <button class="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-    <div class="pd-info">
-      <div class="cat">${p.category}</div>
-      <h1 class="display" style="font-size:2rem; margin-bottom:14px;">${p.name}</h1>
-      <div class="price" style="font-size:1.3rem; margin-bottom:6px;">
-        ${formatTaka(p.price)}${p.oldPrice ? `<span class="old">${formatTaka(p.oldPrice)}</span>` : ''}
-      </div>
-      ${discountInfo(p) ? `<div class="save-badge" style="font-size:0.92rem; margin-bottom:16px;">Save ${formatTaka(discountInfo(p).save)} (${discountInfo(p).percent}% off)</div>` : '<div style="margin-bottom:16px;"></div>'}
-      <div style="margin-bottom:20px;">
-        ${outOfStock
-          ? `<span class="status-badge" style="background:#f4d4d4; color:#7a1a1a; padding:5px 12px;">Out of Stock</span>`
-          : (p.stock !== undefined && p.stock !== null ? `<span class="status-badge" style="background:#d4edda; color:#155724; padding:5px 12px;">In Stock — ${p.stock} piece${p.stock == 1 ? '' : 's'} left</span>` : '')}
-      </div>
-      <p style="color:#6b4a4e; margin-bottom:22px; max-width:460px; line-height:1.7;">${bio}</p>
-      <p style="color:#6b4a4e; font-size:0.86rem; margin-bottom:28px;">Cash on delivery across Bangladesh — ৳60 inside Dhaka, ৳110 outside Dhaka.</p>
-      ${Array.isArray(p.sizes) && p.sizes.length ? `
-        <div style="margin-bottom:24px;">
-          <div style="font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--maroon); margin-bottom:10px;">Available Sizes</div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            ${p.sizes.map(s => `<span style="padding:6px 14px; border:1px solid rgba(107,15,26,0.3); font-size:0.85rem;">${s}</span>`).join('')}
-          </div>
-        </div>` : ''}
-      <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
-        <div class="qty-stepper">
-          <button type="button" data-qty-minus ${outOfStock ? 'disabled' : ''}>−</button>
-          <input type="text" value="1" data-qty-input readonly>
-          <button type="button" data-qty-plus ${outOfStock ? 'disabled' : ''}>+</button>
-        </div>
-      </div>
-      <div style="display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:10px;">
-        <button class="add-cart-btn pd-action-btn" data-add-to-cart="${p.id}" ${outOfStock ? 'disabled' : ''}>${outOfStock ? 'Out of Stock' : 'Add to Cart'}</button>
-        <button class="btn btn-solid pd-action-btn" style="border:none;" data-buy-now="${p.id}" ${outOfStock ? 'disabled' : ''}>Buy Now</button>
-        <a href="${waLink}" target="_blank" rel="noopener" class="btn pd-action-btn" style="border-color:#25D366; color:#128C3F;">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16.001 3C9.104 3 3.5 8.604 3.5 15.5c0 2.385.663 4.614 1.814 6.516L3 29l7.146-2.267A12.44 12.44 0 0 0 16 28c6.897 0 12.5-5.604 12.5-12.5S22.898 3 16.001 3z" opacity="0"/><path d="M3 21l1.6-4.8A8 8 0 1 1 8.8 19.4L3 21z"/><path d="M8.5 9.5c0 3.5 3 6.5 6.5 6.5.6 0 1-.5.8-1l-1.3-1.9a.8.8 0 0 0-.9-.2l-1 .4a5 5 0 0 1-2.9-2.9l.4-1a.8.8 0 0 0-.2-.9L8.9 8.7c-.5-.2-1 .2-1 .8z"/></svg>
-          WhatsApp
-        </a>
-      </div>
-    </div>`;
-  document.title = p.name + ' — Velmora';
-  updateProductSEO(p);
-  renderRelated(p);
+  </nav>
+  <div class="nav-overlay"></div>
+  <div class="search-bar" id="search-bar">
+    <div class="container">
+      <input type="text" id="search-input" placeholder="Search products...">
+    </div>
+  </div>
+</header>
 
-  const buyNowBtn = mount.querySelector('[data-buy-now]');
-  if (buyNowBtn) {
-    buyNowBtn.addEventListener('click', function () {
-      const qty = parseInt(mount.querySelector('[data-qty-input]').value) || 1;
-      addToCart(p, qty);
-      window.location.href = 'cart.html';
-    });
-  }
+<section>
+  <div class="container">
+    <div class="pd-wrap" data-product-detail></div>
+  </div>
+</section>
 
-  if (images.length > 1) {
-    const mediaEl = document.getElementById('pd-main-media');
-    const imgEl = mediaEl.querySelector('[data-pd-img]');
-    const thumbBtns = mount.querySelectorAll('[data-thumb]');
-    const dots = mediaEl.querySelectorAll('[data-dot]');
-    let current = 0;
+<section style="background: var(--blush); padding-top:60px;">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">You May Also Like</div>
+      <h2>Related Pieces</h2>
+    </div>
+    <div class="product-grid" data-related-grid></div>
+  </div>
+</section>
 
-    function showImage(idx) {
-      current = (idx + images.length) % images.length;
-      imgEl.src = images[current];
-      thumbBtns.forEach((b, i) => { b.style.borderColor = i === current ? 'var(--gold)' : 'transparent'; });
-      dots.forEach((d, i) => d.classList.toggle('is-active', i === current));
-    }
+<footer class="site-footer">
+  <div class="container">
+    <div class="social-icons" style="justify-content:center; margin-bottom:20px;">
+      <a href="https://instagram.com/velmora" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="https://www.facebook.com/share/19JQtaQ3fu/" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M15 8h2V4h-2a4 4 0 0 0-4 4v2H9v4h2v6h4v-6h2.5l.5-4H15V8a1 1 0 0 1 1-1z"/></svg>
+      </a>
+      <a href="https://tiktok.com/@velmora___1" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M16.5 3c.3 1.9 1.5 3.3 3.5 3.6v2.6c-1.3 0-2.5-.4-3.5-1.1v6.4c0 3-2.4 5.5-5.5 5.5S5.5 17.5 5.5 14.5 7.9 9 11 9c.3 0 .6 0 .9.1v2.7c-.3-.1-.6-.2-.9-.2-1.6 0-2.9 1.3-2.9 2.9S9.4 17.4 11 17.4s2.9-1.3 2.9-2.9V3h2.6z"/></svg>
+      </a>
+      <a href="mailto:Velmora511@gmail.com" aria-label="Email">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>
+      </a>
+      <a href="https://wa.me/8801707082002" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M3 21l1.6-4.8A8 8 0 1 1 8.8 19.4L3 21z"/><path d="M8.5 9.5c0 3.5 3 6.5 6.5 6.5.6 0 1-.5.8-1l-1.3-1.9a.8.8 0 0 0-.9-.2l-1 .4a5 5 0 0 1-2.9-2.9l.4-1a.8.8 0 0 0-.2-.9L8.9 8.7c-.5-.2-1 .2-1 .8z"/></svg>
+      </a>
+    </div>
+    <p style="text-align:center; font-size:0.85rem; margin-bottom:16px;"><a href="return-exchange.html" style="text-decoration:underline;">Return &amp; Exchange Policy</a></p>
+    <div class="footer-bottom">&copy; 2026 Velmora. All rights reserved.</div>
+  </div>
+</footer>
 
-    thumbBtns.forEach((btn, i) => btn.addEventListener('click', () => showImage(i)));
-    dots.forEach(dot => dot.addEventListener('click', () => showImage(Number(dot.dataset.dot))));
-    mediaEl.querySelector('[data-pd-prev]').addEventListener('click', () => showImage(current - 1));
-    mediaEl.querySelector('[data-pd-next]').addEventListener('click', () => showImage(current + 1));
-
-    // Swipe support (touch) for mobile
-    let touchStartX = 0;
-    let touchStartY = 0;
-    mediaEl.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].clientX;
-      touchStartY = e.changedTouches[0].clientY;
-    }, { passive: true });
-    mediaEl.addEventListener('touchend', (e) => {
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      const dy = e.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-        showImage(dx < 0 ? current + 1 : current - 1);
-      }
-    }, { passive: true });
-
-    // Mouse drag support (desktop)
-    let dragStartX = null;
-    mediaEl.addEventListener('mousedown', (e) => { dragStartX = e.clientX; });
-    mediaEl.addEventListener('mouseup', (e) => {
-      if (dragStartX === null) return;
-      const dx = e.clientX - dragStartX;
-      if (Math.abs(dx) > 40) showImage(dx < 0 ? current + 1 : current - 1);
-      dragStartX = null;
-    });
-    mediaEl.addEventListener('mouseleave', () => { dragStartX = null; });
-  }
-
-  const qtyInput = mount.querySelector('[data-qty-input]');
-  mount.querySelector('[data-qty-minus]').addEventListener('click', () => {
-    qtyInput.value = Math.max(1, parseInt(qtyInput.value) - 1);
-  });
-  mount.querySelector('[data-qty-plus]').addEventListener('click', () => {
-    qtyInput.value = parseInt(qtyInput.value) + 1;
-  });
-  mount.querySelector('[data-add-to-cart]').addEventListener('click', function () {
-    addToCart(p, parseInt(qtyInput.value));
-    this.textContent = 'Added ✓';
-    this.classList.add('is-added');
-    setTimeout(() => {
-      this.textContent = 'Add to Cart';
-      this.classList.remove('is-added');
-    }, 1200);
-  });
-}
-
-const hasCachedProducts = loadCachedProducts();
-const productsReadyPromise = loadProducts().then(() => VELMORA_PRODUCTS);
-window.velmoraProductsReady = productsReadyPromise;
-
-function renderAll() {
-  applyUrlFilters();
-  renderProductGrid();
-  renderFeatured();
-  renderComboDeals();
-  renderNewArrivals();
-  renderForWomen();
-  renderForMan();
-  renderGiftBox();
-  renderProductDetail();
-}
-
-document.addEventListener('DOMContentLoaded', async function () {
-  setupFilters();
-  setupFilterDrawer();
-  if (hasCachedProducts) {
-    renderAll(); // instant paint from last visit's cache
-  }
-  await productsReadyPromise;
-  renderAll(); // refresh with live data once it arrives
-});
+<script src="js/nav.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/search.js"></script>
+<script type="module" src="js/products.js"></script>
+</body>
+</html>
