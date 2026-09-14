@@ -339,6 +339,23 @@ function renderProductGrid() {
     ? items.map(renderProductCard).join('')
     : `<p style="grid-column:1/-1; text-align:center; color:#6b4a4e; padding:40px 0;">No products found.</p>`;
   wireAddToCartButtons(grid);
+  updateFilterSummary();
+}
+
+// Keeps the "Filter" trigger's active-count badge and summary label
+// in sync with the current category/gender selection.
+function updateFilterSummary() {
+  const label = document.getElementById('filterActiveLabel');
+  const countBadge = document.getElementById('filterActiveCount');
+  if (!label && !countBadge) return;
+  const parts = [];
+  if (filterState.category !== 'All') parts.push(filterState.category);
+  if (filterState.gender !== 'All') parts.push(filterState.gender);
+  if (label) label.textContent = parts.length ? parts.join(' · ') : 'All Products';
+  if (countBadge) {
+    countBadge.textContent = parts.length;
+    countBadge.style.display = parts.length ? 'inline-flex' : 'none';
+  }
 }
 
 function setupFilters() {
@@ -361,6 +378,44 @@ function setupFilters() {
       renderProductGrid();
     });
   });
+}
+
+// Wires the "Filter" button, its slide-up drawer, and Clear/Show Results
+// actions. Safe no-op on pages that don't have a filter drawer.
+function setupFilterDrawer() {
+  const drawer = document.getElementById('filterDrawer');
+  const overlay = document.getElementById('filterDrawerOverlay');
+  const toggle = document.getElementById('filterDrawerToggle');
+  if (!drawer || !overlay || !toggle) return;
+
+  const closeBtn = document.getElementById('filterDrawerClose');
+  const applyBtn = document.getElementById('filterApplyBtn');
+  const clearBtn = document.getElementById('filterClearBtn');
+
+  function openDrawer() {
+    drawer.classList.add('is-open');
+    overlay.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    drawer.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  toggle.addEventListener('click', openDrawer);
+  overlay.addEventListener('click', closeDrawer);
+  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+  if (applyBtn) applyBtn.addEventListener('click', closeDrawer);
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      filterState.category = 'All';
+      filterState.gender = 'All';
+      document.querySelectorAll('[data-filter]').forEach(c => c.classList.toggle('active', c.dataset.filter === 'All'));
+      document.querySelectorAll('[data-gender-filter]').forEach(c => c.classList.toggle('active', c.dataset.genderFilter === 'All'));
+      renderProductGrid();
+    });
+  }
 }
 
 // Reads ?category=, ?gender=, ?search= from the URL (used by nav links
@@ -686,6 +741,7 @@ function renderAll() {
 
 document.addEventListener('DOMContentLoaded', async function () {
   setupFilters();
+  setupFilterDrawer();
   if (hasCachedProducts) {
     renderAll(); // instant paint from last visit's cache
   }
