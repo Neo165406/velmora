@@ -93,33 +93,62 @@
 
 <section>
   <div class="container">
-    <div class="filter-row">
-      <button class="filter-chip active" data-filter="All">All</button>
-      <button class="filter-chip" data-filter="Rings">Rings</button>
-      <button class="filter-chip" data-filter="Necklaces">Necklace</button>
-      <button class="filter-chip" data-filter="Pendant">Pendant</button>
-      <button class="filter-chip" data-filter="Bracelets">Bracelets</button>
-      <button class="filter-chip" data-filter="Earrings">Earrings</button>
-      <button class="filter-chip" data-filter="Jewelry Set">Jewelry Set</button>
-      <button class="filter-chip" data-filter="Glasses">Glasses</button>
-      <button class="filter-chip" data-filter="Other Accessories">Other Accessories</button>
-      <button class="filter-chip" data-filter="Others">Others</button>
-      <button class="filter-chip" data-filter="Gift Box">Gift Box</button>
-      <button class="filter-chip" data-filter="Flower">Flower</button>
-      <button class="filter-chip" data-filter="Chocolate">Chocolate</button>
-      <button class="filter-chip" data-filter="Books">Books</button>
-      <button class="filter-chip" data-filter="DIY">DIY</button>
-      <button class="filter-chip" data-filter="Combo Deals">Combo Deals</button>
-    </div>
-    <div class="filter-row">
-      <button class="filter-chip active" data-gender-filter="All">All Genders</button>
-      <button class="filter-chip" data-gender-filter="Men">Men</button>
-      <button class="filter-chip" data-gender-filter="Women">Women</button>
-      <button class="filter-chip" data-gender-filter="Unisex">Unisex</button>
+    <div class="filter-bar-row">
+      <button type="button" class="filter-trigger" id="filterDrawerToggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+        Filter
+        <span class="filter-count" id="filterActiveCount" style="display:none;">0</span>
+      </button>
+      <div class="filter-active-label" id="filterActiveLabel">All Products</div>
     </div>
     <div class="product-grid" data-product-grid></div>
   </div>
 </section>
+
+<div class="filter-drawer-overlay" id="filterDrawerOverlay"></div>
+<div class="filter-drawer" id="filterDrawer" role="dialog" aria-label="Filter products">
+  <div class="filter-drawer-head">
+    <h3>Filters</h3>
+    <button type="button" class="filter-drawer-close" id="filterDrawerClose" aria-label="Close filters">✕</button>
+  </div>
+  <div class="filter-drawer-body">
+    <div class="filter-group">
+      <div class="filter-group-label">Category</div>
+      <div class="filter-chip-grid">
+        <button class="filter-chip active" data-filter="All">All</button>
+        <button class="filter-chip" data-filter="Rings">Rings</button>
+        <button class="filter-chip" data-filter="Necklaces">Necklace</button>
+        <button class="filter-chip" data-filter="Pendant">Pendant</button>
+        <button class="filter-chip" data-filter="Bracelets">Bracelets</button>
+        <button class="filter-chip" data-filter="Earrings">Earrings</button>
+        <button class="filter-chip" data-filter="Jewelry Set">Jewelry Set</button>
+        <button class="filter-chip" data-filter="Glasses">Glasses</button>
+        <button class="filter-chip" data-filter="Other Accessories">Other Accessories</button>
+        <button class="filter-chip" data-filter="Others">Others</button>
+        <button class="filter-chip" data-filter="Gift Box">Gift Box</button>
+        <button class="filter-chip" data-filter="Flower">Flower</button>
+        <button class="filter-chip" data-filter="Chocolate">Chocolate</button>
+        <button class="filter-chip" data-filter="Books">Books</button>
+        <button class="filter-chip" data-filter="DIY">DIY</button>
+        <button class="filter-chip" data-filter="Combo Deals">Combo Deals</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group-label">Gender</div>
+      <div class="filter-chip-grid">
+        <button class="filter-chip active" data-gender-filter="All">All</button>
+        <button class="filter-chip" data-gender-filter="Men">Men</button>
+        <button class="filter-chip" data-gender-filter="Women">Women</button>
+        <button class="filter-chip" data-gender-filter="Unisex">Unisex</button>
+      </div>
+    </div>
+  </div>
+  <div class="filter-drawer-foot">
+    <button type="button" class="btn btn-outline" id="filterClearBtn">Clear All</button>
+    <button type="button" class="btn btn-solid" id="filterApplyBtn" style="border:none;">Show Results</button>
+  </div>
+</div>
+
 
 <footer class="site-footer">
   <div class="container">
