@@ -142,6 +142,22 @@
         <button class="filter-chip" data-gender-filter="Unisex">Unisex</button>
       </div>
     </div>
+    <div class="filter-group">
+      <div class="filter-group-label">Price</div>
+      <div class="filter-chip-grid">
+        <button class="filter-chip active" data-price-filter="All">All</button>
+        <button class="filter-chip" data-price-filter="0-500">Under ৳500</button>
+        <button class="filter-chip" data-price-filter="500-1000">৳500 – ৳1,000</button>
+        <button class="filter-chip" data-price-filter="1000-3000">৳1,000 – ৳3,000</button>
+        <button class="filter-chip" data-price-filter="3000-999999">৳3,000+</button>
+      </div>
+      <div class="price-range-custom">
+        <input type="number" id="priceMinInput" placeholder="Min ৳" min="0">
+        <span>–</span>
+        <input type="number" id="priceMaxInput" placeholder="Max ৳" min="0">
+        <button type="button" class="btn btn-outline btn-sm" id="priceCustomApply">Go</button>
+      </div>
+    </div>
   </div>
   <div class="filter-drawer-foot">
     <button type="button" class="btn btn-outline" id="filterClearBtn">Clear All</button>
