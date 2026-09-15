@@ -625,6 +625,25 @@ section { padding: 15px 0; }
   font-weight: 500;
 }
 .filter-chip-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.price-range-custom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.price-range-custom input {
+  width: 0;
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1px solid rgba(20,20,20,0.25);
+  background: var(--white);
+  padding: 10px 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.85rem;
+  color: var(--plum);
+}
+.price-range-custom span { color: #7a5a5d; flex-shrink: 0; }
+.price-range-custom .btn-sm { flex-shrink: 0; padding: 9px 16px; }
 .filter-drawer-foot {
   display: flex;
   gap: 12px;
