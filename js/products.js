@@ -319,7 +319,14 @@ function wireAddToCartButtons(scope) {
 
 // Renders into any element with [data-product-grid], applying the
 // current category, gender, and search filters together.
-const filterState = { category: 'All', gender: 'All', search: '', tag: 'All' };
+const filterState = { category: 'All', gender: 'All', search: '', tag: 'All', price: 'All' };
+
+const PRICE_FILTER_LABELS = {
+  '0-500': 'Under ৳500',
+  '500-1000': '৳500–1,000',
+  '1000-3000': '৳1,000–3,000',
+  '3000-999999': '৳3,000+'
+};
 
 function applyFilters() {
   return VELMORA_PRODUCTS.filter(p => {
@@ -327,7 +334,12 @@ function applyFilters() {
     const matchGender = filterState.gender === 'All' || p.gender === filterState.gender;
     const matchSearch = !filterState.search || p.name.toLowerCase().includes(filterState.search.toLowerCase());
     const matchTag = filterState.tag === 'All' || (p.tag || '').toLowerCase() === filterState.tag.toLowerCase();
-    return matchCategory && matchGender && matchSearch && matchTag;
+    let matchPrice = true;
+    if (filterState.price !== 'All') {
+      const [min, max] = filterState.price.split('-').map(Number);
+      matchPrice = Number(p.price) >= min && Number(p.price) <= max;
+    }
+    return matchCategory && matchGender && matchSearch && matchTag && matchPrice;
   });
 }
 
@@ -351,6 +363,7 @@ function updateFilterSummary() {
   const parts = [];
   if (filterState.category !== 'All') parts.push(filterState.category);
   if (filterState.gender !== 'All') parts.push(filterState.gender);
+  if (filterState.price !== 'All') parts.push(PRICE_FILTER_LABELS[filterState.price] || 'Custom price');
   if (label) label.textContent = parts.length ? parts.join(' · ') : 'All Products';
   if (countBadge) {
     countBadge.textContent = parts.length;
@@ -378,6 +391,34 @@ function setupFilters() {
       renderProductGrid();
     });
   });
+
+  const priceChips = document.querySelectorAll('[data-price-filter]');
+  priceChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      priceChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      filterState.price = chip.dataset.priceFilter;
+      const minInput = document.getElementById('priceMinInput');
+      const maxInput = document.getElementById('priceMaxInput');
+      if (minInput) minInput.value = '';
+      if (maxInput) maxInput.value = '';
+      renderProductGrid();
+    });
+  });
+
+  const priceCustomApply = document.getElementById('priceCustomApply');
+  if (priceCustomApply) {
+    priceCustomApply.addEventListener('click', () => {
+      const minInput = document.getElementById('priceMinInput');
+      const maxInput = document.getElementById('priceMaxInput');
+      const min = minInput && minInput.value ? Number(minInput.value) : 0;
+      const max = maxInput && maxInput.value ? Number(maxInput.value) : 999999;
+      filterState.price = `${min}-${max}`;
+      PRICE_FILTER_LABELS[filterState.price] = `৳${min.toLocaleString('en-IN')} – ৳${max.toLocaleString('en-IN')}`;
+      priceChips.forEach(c => c.classList.remove('active'));
+      renderProductGrid();
+    });
+  }
 }
 
 // Wires the "Filter" button, its slide-up drawer, and Clear/Show Results
@@ -411,8 +452,14 @@ function setupFilterDrawer() {
     clearBtn.addEventListener('click', () => {
       filterState.category = 'All';
       filterState.gender = 'All';
+      filterState.price = 'All';
       document.querySelectorAll('[data-filter]').forEach(c => c.classList.toggle('active', c.dataset.filter === 'All'));
       document.querySelectorAll('[data-gender-filter]').forEach(c => c.classList.toggle('active', c.dataset.genderFilter === 'All'));
+      document.querySelectorAll('[data-price-filter]').forEach(c => c.classList.toggle('active', c.dataset.priceFilter === 'All'));
+      const minInput = document.getElementById('priceMinInput');
+      const maxInput = document.getElementById('priceMaxInput');
+      if (minInput) minInput.value = '';
+      if (maxInput) maxInput.value = '';
       renderProductGrid();
     });
   }
