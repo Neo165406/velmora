@@ -151,11 +151,16 @@
         <button class="filter-chip" data-price-filter="1000-3000">৳1,000 – ৳3,000</button>
         <button class="filter-chip" data-price-filter="3000-999999">৳3,000+</button>
       </div>
-      <div class="price-range-custom">
-        <input type="number" id="priceMinInput" placeholder="Min ৳" min="0">
-        <span>–</span>
-        <input type="number" id="priceMaxInput" placeholder="Max ৳" min="0">
-        <button type="button" class="btn btn-outline btn-sm" id="priceCustomApply">Go</button>
+      <div class="price-slider-wrap">
+        <div class="price-slider-values">
+          <span id="priceSliderMinLabel">৳0</span>
+          <span id="priceSliderMaxLabel">৳20,000+</span>
+        </div>
+        <div class="price-slider-track">
+          <div class="price-slider-range" id="priceSliderRange"></div>
+          <input type="range" id="priceRangeMin" min="0" max="20000" step="100" value="0" aria-label="Minimum price">
+          <input type="range" id="priceRangeMax" min="0" max="20000" step="100" value="20000" aria-label="Maximum price">
+        </div>
       </div>
     </div>
   </div>
