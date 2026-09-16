@@ -371,6 +371,69 @@ function updateFilterSummary() {
   }
 }
 
+// Draggable dual-handle price range slider — lets the shopper pull the
+// two handles to any custom min/max instead of typing numbers in.
+const PRICE_SLIDER_MAX = 20000;
+
+function updatePriceSliderVisual() {
+  const minRange = document.getElementById('priceRangeMin');
+  const maxRange = document.getElementById('priceRangeMax');
+  const rangeFill = document.getElementById('priceSliderRange');
+  const minLabel = document.getElementById('priceSliderMinLabel');
+  const maxLabel = document.getElementById('priceSliderMaxLabel');
+  if (!minRange || !maxRange) return;
+
+  let minVal = Number(minRange.value);
+  let maxVal = Number(maxRange.value);
+  if (minVal > maxVal) {
+    minVal = maxVal;
+    minRange.value = minVal;
+  }
+  const minPct = (minVal / PRICE_SLIDER_MAX) * 100;
+  const maxPct = (maxVal / PRICE_SLIDER_MAX) * 100;
+  if (rangeFill) {
+    rangeFill.style.left = minPct + '%';
+    rangeFill.style.right = (100 - maxPct) + '%';
+  }
+  if (minLabel) minLabel.textContent = '৳' + minVal.toLocaleString('en-IN');
+  if (maxLabel) maxLabel.textContent = maxVal >= PRICE_SLIDER_MAX
+    ? `৳${PRICE_SLIDER_MAX.toLocaleString('en-IN')}+`
+    : '৳' + maxVal.toLocaleString('en-IN');
+}
+
+function resetPriceSlider() {
+  const minRange = document.getElementById('priceRangeMin');
+  const maxRange = document.getElementById('priceRangeMax');
+  if (minRange) minRange.value = 0;
+  if (maxRange) maxRange.value = PRICE_SLIDER_MAX;
+  updatePriceSliderVisual();
+}
+
+function setupPriceSlider() {
+  const minRange = document.getElementById('priceRangeMin');
+  const maxRange = document.getElementById('priceRangeMax');
+  if (!minRange || !maxRange) return;
+
+  function applySliderFilter() {
+    const minVal = Number(minRange.value);
+    const maxRaw = Number(maxRange.value);
+    const maxVal = maxRaw >= PRICE_SLIDER_MAX ? 999999 : maxRaw;
+    filterState.price = `${minVal}-${maxVal}`;
+    PRICE_FILTER_LABELS[filterState.price] = `৳${minVal.toLocaleString('en-IN')} – ${
+      maxVal >= 999999 ? `৳${PRICE_SLIDER_MAX.toLocaleString('en-IN')}+` : '৳' + maxVal.toLocaleString('en-IN')
+    }`;
+    document.querySelectorAll('[data-price-filter]').forEach(c => c.classList.remove('active'));
+    renderProductGrid();
+  }
+
+  minRange.addEventListener('input', updatePriceSliderVisual);
+  maxRange.addEventListener('input', updatePriceSliderVisual);
+  minRange.addEventListener('change', applySliderFilter);
+  maxRange.addEventListener('change', applySliderFilter);
+
+  updatePriceSliderVisual();
+}
+
 function setupFilters() {
   const catChips = document.querySelectorAll('[data-filter]');
   catChips.forEach(chip => {
@@ -398,27 +461,12 @@ function setupFilters() {
       priceChips.forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       filterState.price = chip.dataset.priceFilter;
-      const minInput = document.getElementById('priceMinInput');
-      const maxInput = document.getElementById('priceMaxInput');
-      if (minInput) minInput.value = '';
-      if (maxInput) maxInput.value = '';
+      resetPriceSlider();
       renderProductGrid();
     });
   });
 
-  const priceCustomApply = document.getElementById('priceCustomApply');
-  if (priceCustomApply) {
-    priceCustomApply.addEventListener('click', () => {
-      const minInput = document.getElementById('priceMinInput');
-      const maxInput = document.getElementById('priceMaxInput');
-      const min = minInput && minInput.value ? Number(minInput.value) : 0;
-      const max = maxInput && maxInput.value ? Number(maxInput.value) : 999999;
-      filterState.price = `${min}-${max}`;
-      PRICE_FILTER_LABELS[filterState.price] = `৳${min.toLocaleString('en-IN')} – ৳${max.toLocaleString('en-IN')}`;
-      priceChips.forEach(c => c.classList.remove('active'));
-      renderProductGrid();
-    });
-  }
+  setupPriceSlider();
 }
 
 // Wires the "Filter" button, its slide-up drawer, and Clear/Show Results
@@ -456,10 +504,7 @@ function setupFilterDrawer() {
       document.querySelectorAll('[data-filter]').forEach(c => c.classList.toggle('active', c.dataset.filter === 'All'));
       document.querySelectorAll('[data-gender-filter]').forEach(c => c.classList.toggle('active', c.dataset.genderFilter === 'All'));
       document.querySelectorAll('[data-price-filter]').forEach(c => c.classList.toggle('active', c.dataset.priceFilter === 'All'));
-      const minInput = document.getElementById('priceMinInput');
-      const maxInput = document.getElementById('priceMaxInput');
-      if (minInput) minInput.value = '';
-      if (maxInput) maxInput.value = '';
+      resetPriceSlider();
       renderProductGrid();
     });
   }
