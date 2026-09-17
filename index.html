@@ -432,8 +432,13 @@
     try {
       const products = window.velmoraProductsReady ? await window.velmoraProductsReady : [];
       if (!products.length) return;
+      const categoriesPresent = new Set(products.map(p => p.category));
       document.querySelectorAll('[data-category]').forEach(card => {
         const cat = card.dataset.category;
+        if (!categoriesPresent.has(cat)) {
+          card.remove();
+          return;
+        }
         const inCategory = p => p.category === cat && ((p.images && p.images[0]) || p.image);
         const match = products.find(p => inCategory(p) && p.featured) || products.find(inCategory);
         if (!match) return;
