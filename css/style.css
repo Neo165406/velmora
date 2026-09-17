@@ -373,22 +373,25 @@ section { padding: 15px 0; }
 .section-head h2 { font-size: clamp(1.9rem, 3.4vw, 2.6rem); margin-bottom: 6px; }
 .section-head p { max-width: 520px; margin: 0 auto; color: #6b4a4e; }
 
-/* ---------- Category strip (compact, auto-scrolling circles) ---------- */
+/* ---------- Category strip (compact, auto-scrolling circles) ----------
+   Auto-scrolls via JS (see index.html) instead of a CSS keyframe +
+   :hover pause. On touch devices a tap triggers :hover with no
+   mouseleave to ever clear it, which used to freeze this strip
+   permanently after a single tap. JS handles pause/resume explicitly
+   for both mouse and touch, so it always keeps moving. */
 .category-strip {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
   mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
 }
+.category-strip::-webkit-scrollbar { display: none; }
 .category-track {
   display: flex;
   gap: 20px;
   width: max-content;
-  animation: category-scroll 20s linear infinite;
-}
-.category-strip:hover .category-track { animation-play-state: paused; }
-@keyframes category-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
 }
 .category-circle {
   display: flex;
