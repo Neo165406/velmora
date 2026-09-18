@@ -15,7 +15,13 @@ document.addEventListener('DOMContentLoaded', function () {
   input.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
     const value = input.value.trim();
-    if (typeof window.applyVelmoraSearch === 'function') {
+    // products.js (and window.applyVelmoraSearch) is loaded on every
+    // page, not just shop.html — so checking only for that function
+    // used to "filter in place" on pages with no product grid at all
+    // (like the homepage), which silently showed nothing. Only filter
+    // in place when this page actually has the grid to filter.
+    const hasProductGrid = document.querySelector('[data-product-grid]');
+    if (hasProductGrid && typeof window.applyVelmoraSearch === 'function') {
       window.applyVelmoraSearch(value);
       bar.classList.remove('is-open');
     } else {
