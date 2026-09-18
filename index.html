@@ -384,6 +384,53 @@
 <script src="js/cart.js" defer></script>
 <script src="js/search.js" defer></script>
 <script src="js/promo-slider.js" defer></script>
+<script>
+  // Auto-scrolls the category strip by nudging scrollLeft each frame,
+  // instead of the old CSS keyframe + :hover pause. A tap on touch
+  // devices triggers :hover with no mouseleave to ever clear it, which
+  // used to freeze this strip for good after a single tap. Pausing and
+  // resuming is handled explicitly here for both mouse and touch, so
+  // it always keeps moving.
+  document.addEventListener('DOMContentLoaded', function () {
+    const strip = document.querySelector('.category-strip');
+    const track = document.getElementById('category-track');
+    if (!strip || !track) return;
+
+    let paused = false;
+    let resumeTimer = null;
+    const SPEED = 0.5; // px per animation frame
+
+    function step() {
+      if (!paused) {
+        strip.scrollLeft += SPEED;
+        // The circle set is duplicated in the markup, so looping back
+        // once we pass the halfway point keeps the scroll seamless.
+        const halfWidth = track.scrollWidth / 2;
+        if (strip.scrollLeft >= halfWidth) strip.scrollLeft -= halfWidth;
+      }
+      requestAnimationFrame(step);
+    }
+    function pause() {
+      paused = true;
+      clearTimeout(resumeTimer);
+    }
+    function resumeSoon(delay) {
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(function () { paused = false; }, delay);
+    }
+
+    // Real mouse hover (desktop) — pause while hovered, resume on leave.
+    strip.addEventListener('mouseenter', pause);
+    strip.addEventListener('mouseleave', function () { resumeSoon(0); });
+
+    // Touch — pause while the user is actively touching/scrolling,
+    // then resume automatically a moment later instead of staying stuck.
+    strip.addEventListener('touchstart', pause, { passive: true });
+    strip.addEventListener('touchend', function () { resumeSoon(1200); }, { passive: true });
+
+    step();
+  });
+</script>
 <script type="module" src="js/products.js"></script>
 <script type="module">
   import { db, isFirebaseConfigured } from './js/firebase-config.js';
