@@ -47,4 +47,49 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
   else start();
+
+  // ---------- Button tap glow + ripple ----------
+  // Event delegation, so it also covers .btn elements rendered later by JS.
+  // pointerdown fires instantly on touch, so the glow starts the moment the
+  // finger lands (the CSS burst then plays to completion even on a quick tap).
+  const TAP_CLASS = 'is-tapped';
+
+  const glowButton = (btn, x, y) => {
+    if (!btn || btn.disabled) return;
+
+    // Restart the burst animation if the button is tapped again quickly
+    btn.classList.remove(TAP_CLASS);
+    void btn.offsetWidth;
+    btn.classList.add(TAP_CLASS);
+    clearTimeout(btn._tapTimer);
+    btn._tapTimer = setTimeout(() => btn.classList.remove(TAP_CLASS), 700);
+
+    if (reduced) return;
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 2;
+    const cx = x == null ? rect.width / 2 : x - rect.left;
+    const cy = y == null ? rect.height / 2 : y - rect.top;
+    const ripple = document.createElement('span');
+    ripple.className = 'btn-ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (cx - size / 2) + 'px';
+    ripple.style.top = (cy - size / 2) + 'px';
+    btn.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+  };
+
+  document.addEventListener('pointerdown', (e) => {
+    const btn = e.target.closest && e.target.closest('.btn');
+    if (btn) glowButton(btn, e.clientX, e.clientY);
+  }, { passive: true });
+
+  // Keyboard activation (Enter / Space) has no pointerdown — detail === 0 marks it
+  document.addEventListener('click', (e) => {
+    if (e.detail !== 0) return;
+    const btn = e.target.closest && e.target.closest('.btn');
+    if (btn) glowButton(btn);
+  });
+
+  // iOS Safari only applies :active styles when a touch listener exists
+  document.addEventListener('touchstart', () => {}, { passive: true });
 })();

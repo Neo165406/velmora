@@ -1292,3 +1292,78 @@ a.pd-action-btn, button.pd-action-btn {
   .product-card::after { display: none; }
   .product-card, .product-media img, .category-circle .ring, .btn, .deal-arrow, .icon-btn { transition: none !important; }
 }
+
+
+/* ---------- Velmora button glow: visible outline buttons + tap glow/ripple ----------
+   Applies to every .btn ("View Others", "Shop Now", "Order via WhatsApp", ...).
+   The tap burst + ripple are triggered by js/motion.js, which adds .is-tapped
+   and a .btn-ripple element on pointerdown. */
+.btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;              /* keeps the ripple behind the label text */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Outline buttons: darker gold text/solid border so they stand out on ivory + blush,
+   plus a slow breathing glow so they are always noticeable. */
+.btn:not(.btn-solid):not(.btn-outline):not(.btn-danger):not(.btn-aqua) {
+  color: #7a5a06;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 8px rgba(201, 162, 39, 0.3);
+  animation: velmora-btn-idle 2.8s ease-in-out infinite;
+}
+.btn:not(.btn-solid):not(.btn-outline):not(.btn-danger):not(.btn-aqua):hover {
+  background: var(--gold);
+  color: var(--maroon-dark);
+}
+
+/* Solid buttons get a soft resting glow (no infinite animation, keeps the hero calm) */
+.btn-solid { box-shadow: 0 0 10px rgba(201, 162, 39, 0.35); }
+
+@keyframes velmora-btn-idle {
+  0%, 100% { box-shadow: 0 0 6px rgba(201, 162, 39, 0.3), 0 2px 8px rgba(201, 162, 39, 0.2); }
+  50%      { box-shadow: 0 0 20px rgba(201, 162, 39, 0.7), 0 2px 12px rgba(201, 162, 39, 0.35); }
+}
+
+/* Press-in feedback while the finger is down */
+.btn:active { transform: scale(0.95); }
+
+/* Tap burst: bright glow expands outward, button flashes light gold, then settles.
+   Selector is doubled so it also beats .promo-slide.is-active .btn (hero buttons). */
+.btn.is-tapped.is-tapped {
+  animation: velmora-btn-burst 0.65s ease-out;
+}
+@keyframes velmora-btn-burst {
+  0%   { box-shadow: 0 0 0 0 rgba(228, 199, 102, 0.95), 0 0 0 0 rgba(201, 162, 39, 0.7); }
+  30%  { background-color: var(--gold-light); color: var(--maroon-dark); }
+  45%  { box-shadow: 0 0 28px 8px rgba(228, 199, 102, 1), 0 0 52px 18px rgba(201, 162, 39, 0.5); }
+  100% { box-shadow: 0 0 12px 2px rgba(228, 199, 102, 0.35), 0 0 0 0 rgba(201, 162, 39, 0); }
+}
+
+/* Ripple that spreads from the exact tap point */
+.btn .btn-ripple {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 233, 160, 0.6) 40%, rgba(255, 233, 160, 0) 70%);
+  transform: scale(0);
+  animation: velmora-btn-ripple 0.65s ease-out forwards;
+}
+@keyframes velmora-btn-ripple {
+  to { transform: scale(1); opacity: 0; }
+}
+
+.btn:disabled { animation: none; box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn.is-tapped.is-tapped,
+  .btn:not(.btn-solid):not(.btn-outline):not(.btn-danger):not(.btn-aqua) { animation: none !important; }
+  .btn:not(.btn-solid):not(.btn-outline):not(.btn-danger):not(.btn-aqua) { box-shadow: 0 0 14px rgba(201, 162, 39, 0.5); }
+  .btn .btn-ripple { display: none; }
+}
