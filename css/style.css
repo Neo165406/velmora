@@ -1367,3 +1367,32 @@ a.pd-action-btn, button.pd-action-btn {
   .btn:not(.btn-solid):not(.btn-outline):not(.btn-danger):not(.btn-aqua) { box-shadow: 0 0 14px rgba(201, 162, 39, 0.5); }
   .btn .btn-ripple { display: none; }
 }
+
+
+/* ---------- Buy Now (lightning) quick button on product cards ----------
+   Used on home, shop and related-product cards. Sits directly under the
+   round Add-to-Cart button in the card's top-right corner. */
+.quick-buy-btn {
+  position: absolute;
+  top: 54px; right: 12px;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--maroon-dark);
+  box-shadow: 0 4px 10px rgba(10,10,10,0.18);
+  z-index: 3;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.quick-buy-btn svg { width: 16px; height: 16px; }
+.quick-buy-btn:hover { background: var(--gold-light); transform: scale(1.08); }
+.quick-buy-btn:active {
+  transform: scale(0.92);
+  background: var(--gold-light);
+  box-shadow: 0 0 14px 4px rgba(228, 199, 102, 0.85);
+}
+.quick-buy-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
