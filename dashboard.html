@@ -48,7 +48,7 @@
     <a href="#" data-tab="overview" class="tab-link active">Overview</a>
     <a href="#" data-tab="products" class="tab-link">Products</a>
     <a href="#" data-tab="orders" class="tab-link">Orders</a>
-    <a href="#" data-tab="slides" class="tab-link">Slides</a>
+    <a href="#" data-tab="about" class="tab-link">About Cards</a>
     <a href="#" data-tab="theme" class="tab-link">Theme</a>
     <a href="index.html" target="_blank">View Store ↗</a>
     <a href="#" id="logoutBtn">Log Out</a>
@@ -114,37 +114,22 @@
       </div>
     </section>
 
-    <!-- SLIDES (homepage promo banner) -->
-    <section id="tab-slides" class="hidden">
-      <div class="admin-topbar">
-        <h1>Slides</h1>
-        <button class="btn btn-aqua" id="newSlideBtn">+ New Slide</button>
-      </div>
-      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Controls the promo banner on the homepage — add photos and text here instead of editing code.</p>
-      <div class="table-card">
-        <table>
-          <thead><tr><th>Slide</th><th>Title</th><th>Order</th><th></th></tr></thead>
-          <tbody id="slidesTableBody"></tbody>
-        </table>
-      </div>
+    <!-- ABOUT CARDS (homepage "About Velmora" section) -->
+    <section id="tab-about" class="hidden">
+      <div class="admin-topbar"><h1>About Cards</h1></div>
+      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Controls the three cards under "About Velmora" on the homepage. Change the photo, title and text of each card, then save. With no photo, the store shows an automatic product photo.</p>
+      <div id="aboutCardsWrap" style="display:grid; gap:16px; max-width:520px;"></div>
+      <button class="btn btn-aqua" id="saveAboutBtn" style="margin-top:16px; max-width:520px; width:100%;">Save About Cards</button>
     </section>
 
     <!-- THEME -->
     <section id="tab-theme" class="hidden">
       <div class="admin-topbar"><h1>Theme</h1></div>
-      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Change the homepage hero text and accent gold shade — saves instantly to the live site.</p>
+      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Accent gold, delivery fees and coupon — saves instantly to the live site.</p>
       <div class="table-card" style="padding:24px; max-width:480px;">
         <div class="field">
           <label>Accent Gold</label>
           <input type="color" id="tAccentColor" value="#C9A227" style="height:44px; padding:4px;">
-        </div>
-        <div class="field">
-          <label>Hero Eyebrow</label>
-          <input type="text" id="tHeroBadge" placeholder="Velmora Fine Jewellery">
-        </div>
-        <div class="field">
-          <label>Hero Subtext</label>
-          <textarea id="tHeroSub" rows="3" placeholder="Antique gold detailing, hand-set stones..."></textarea>
         </div>
         <div class="field">
           <label>Combo Deals — "Sale Ends" Note</label>
@@ -284,47 +269,6 @@
   </div>
 </div>
 
-<!-- Slide modal -->
-<div class="modal-overlay" id="slideModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h3 id="slideModalTitle">New Slide</h3>
-      <button class="modal-close" id="closeSlideModal">✕</button>
-    </div>
-    <div class="field">
-      <label>Eyebrow</label>
-      <input type="text" id="sEyebrow" placeholder="New Arrivals">
-    </div>
-    <div class="field">
-      <label>Title</label>
-      <input type="text" id="sTitle" placeholder="Explore Our New Pieces">
-    </div>
-    <div class="field">
-      <label>Order (lower shows first)</label>
-      <input type="number" id="sOrder" value="1" min="0">
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label>Price (৳) — optional</label>
-        <input type="number" id="sPrice" placeholder="1200">
-      </div>
-      <div class="field">
-        <label>Old Price (৳) — optional</label>
-        <input type="number" id="sOldPrice" placeholder="Show a discount">
-      </div>
-    </div>
-    <div class="field">
-      <label>Image</label>
-      <div class="img-upload" id="slideImgUploadZone">
-        <input type="file" id="slideImgInput" accept="image/*" style="display:none;">
-        <span id="slideUploadLabel">📷 Select photo</span>
-      </div>
-      <div class="img-preview-row" id="slideImgPreviewRow"></div>
-    </div>
-    <button class="btn btn-aqua btn-block" id="saveSlideBtn" style="margin-top:8px;">Save Slide</button>
-  </div>
-</div>
-
 <!-- Order modal -->
 <div class="modal-overlay" id="orderModal">
   <div class="modal">
@@ -366,6 +310,9 @@
     const auth = getAuth(app);
 
     function formatTaka(n) { return '৳' + Number(n || 0).toLocaleString('en-IN'); }
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -403,7 +350,7 @@
         e.preventDefault();
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         link.classList.add('active');
-        ['overview', 'products', 'orders', 'slides', 'theme'].forEach(t =>
+        ['overview', 'products', 'orders', 'about', 'theme'].forEach(t =>
           document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== link.dataset.tab));
       });
     });
@@ -420,7 +367,7 @@
     function init() {
       loadProducts();
       loadOrders();
-      loadSlides();
+      loadAbout();
       loadTheme();
     }
 
@@ -648,130 +595,104 @@
       loadProducts();
     }
 
-    /* ---------- Slides ---------- */
-    let allSlides = [];
-    let editingSlideId = null;
-    let currentSlideImage = '';
+    /* ---------- About Cards (homepage "About Velmora") ---------- */
+    // Stored in Firestore settings/site -> aboutCards: [{ title, text, image }, x3]
+    const ABOUT_DEFAULTS = [
+      { title: 'For Her', text: 'Rings, necklaces, bracelets and earrings for her.', image: '' },
+      { title: 'For Him', text: 'Rings, necklaces, bracelets and glasses for him.', image: '' },
+      { title: 'Gifts', text: 'Curated gifts, ready for every occasion.', image: '' }
+    ];
+    let aboutCards = ABOUT_DEFAULTS.map(c => ({ ...c }));
+    const aboutWrap = document.getElementById('aboutCardsWrap');
 
-    async function loadSlides() {
-      const snap = await getDocs(collection(db, 'slides'));
-      allSlides = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-      renderSlidesTable();
+    function syncAboutInputs() {
+      aboutWrap.querySelectorAll('[data-about-title-input]').forEach(el => {
+        aboutCards[Number(el.dataset.aboutTitleInput)].title = el.value;
+      });
+      aboutWrap.querySelectorAll('[data-about-text-input]').forEach(el => {
+        aboutCards[Number(el.dataset.aboutTextInput)].text = el.value;
+      });
     }
 
-    function renderSlidesTable() {
-      const body = document.getElementById('slidesTableBody');
-      if (!allSlides.length) {
-        body.innerHTML = `<tr><td colspan="4" class="text-center" style="color:#7a5a5d; padding:30px;">No slides yet — homepage shows its default banner</td></tr>`;
-        return;
+    function renderAboutCards() {
+      aboutWrap.innerHTML = aboutCards.map((c, i) => `
+        <div class="table-card" style="padding:20px;">
+          <h3 style="margin-bottom:12px;">Card ${i + 1}</h3>
+          <div class="field">
+            <label>Photo</label>
+            <div class="img-upload" data-about-upload="${i}"><span>${c.image ? '📷 Change photo' : '📷 Select photo'}</span></div>
+            <input type="file" accept="image/*" data-about-file="${i}" style="display:none;">
+            <div class="img-preview-row">${c.image
+              ? `<div style="position:relative;"><img src="${esc(c.image)}"><span data-about-rm="${i}" style="position:absolute;top:-6px;right:-6px;background:var(--maroon-dark);color:#fff;width:18px;height:18px;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</span></div>`
+              : `<span style="font-size:0.8rem; color:#7a5a5d;">No photo — the store uses an automatic product photo</span>`}</div>
+          </div>
+          <div class="field">
+            <label>Title</label>
+            <input type="text" data-about-title-input="${i}" value="${esc(c.title)}">
+          </div>
+          <div class="field">
+            <label>Text</label>
+            <textarea rows="3" data-about-text-input="${i}">${esc(c.text)}</textarea>
+          </div>
+        </div>`).join('');
+    }
+
+    aboutWrap.addEventListener('click', (e) => {
+      const up = e.target.closest('[data-about-upload]');
+      const rm = e.target.closest('[data-about-rm]');
+      if (up) aboutWrap.querySelector(`[data-about-file="${up.dataset.aboutUpload}"]`).click();
+      if (rm) {
+        syncAboutInputs();
+        aboutCards[Number(rm.dataset.aboutRm)].image = '';
+        renderAboutCards();
       }
-      body.innerHTML = allSlides.map(s => `
-        <tr>
-          <td><div class="row-thumb">${s.image ? `<img src="${s.image}">` : ''}<span>${s.eyebrow || ''}</span></div></td>
-          <td>${s.title || ''}</td>
-          <td>${s.order ?? '—'}</td>
-          <td>
-            <button class="btn btn-outline btn-sm" data-sedit="${s.id}">Edit</button>
-            <button class="btn btn-danger btn-sm" data-sdel="${s.id}">Delete</button>
-          </td>
-        </tr>`).join('');
-    }
-
-    document.getElementById('slidesTableBody').addEventListener('click', (e) => {
-      const edit = e.target.closest('[data-sedit]');
-      const del = e.target.closest('[data-sdel]');
-      if (edit) openSlideModal(edit.dataset.sedit);
-      if (del) deleteSlide(del.dataset.sdel);
     });
-
-    function openSlideModal(id = null) {
-      editingSlideId = id;
-      currentSlideImage = '';
-      document.getElementById('slideImgPreviewRow').innerHTML = '';
-      if (id) {
-        const s = allSlides.find(x => x.id === id);
-        document.getElementById('slideModalTitle').textContent = 'Edit Slide';
-        document.getElementById('sEyebrow').value = s.eyebrow || '';
-        document.getElementById('sTitle').value = s.title || '';
-        document.getElementById('sOrder').value = s.order ?? 1;
-        document.getElementById('sPrice').value = s.price || '';
-        document.getElementById('sOldPrice').value = s.oldPrice || '';
-        currentSlideImage = s.image || '';
-        renderSlideImagePreview();
-      } else {
-        document.getElementById('slideModalTitle').textContent = 'New Slide';
-        document.getElementById('sEyebrow').value = '';
-        document.getElementById('sTitle').value = '';
-        document.getElementById('sPrice').value = '';
-        document.getElementById('sOldPrice').value = '';
-        document.getElementById('sOrder').value = allSlides.length + 1;
-      }
-      document.getElementById('slideModal').classList.add('open');
-    }
-    document.getElementById('newSlideBtn').addEventListener('click', () => openSlideModal());
-    document.getElementById('closeSlideModal').addEventListener('click', () => document.getElementById('slideModal').classList.remove('open'));
-
-    function renderSlideImagePreview() {
-      document.getElementById('slideImgPreviewRow').innerHTML = currentSlideImage
-        ? `<div style="position:relative;"><img src="${currentSlideImage}"><span id="rmSlideImg" style="position:absolute;top:-6px;right:-6px;background:var(--maroon-dark);color:#fff;width:18px;height:18px;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</span></div>`
-        : '';
-      const rm = document.getElementById('rmSlideImg');
-      if (rm) rm.addEventListener('click', () => { currentSlideImage = ''; renderSlideImagePreview(); });
-    }
-
-    document.getElementById('slideImgUploadZone').addEventListener('click', () => document.getElementById('slideImgInput').click());
-    document.getElementById('slideImgInput').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const label = document.getElementById('slideUploadLabel');
+    aboutWrap.addEventListener('change', async (e) => {
+      const input = e.target.closest('[data-about-file]');
+      if (!input || !input.files[0]) return;
+      const i = Number(input.dataset.aboutFile);
+      const file = input.files[0];
+      const label = aboutWrap.querySelector(`[data-about-upload="${i}"] span`);
       label.innerHTML = `<span class="spinner" style="border-top-color:var(--maroon-dark); border-color:rgba(107,15,26,0.2);"></span> Uploading...`;
       try {
-        currentSlideImage = await uploadToImgbb(file);
-        renderSlideImagePreview();
+        const url = await uploadToImgbb(file);
+        syncAboutInputs();
+        aboutCards[i].image = url;
       } catch (err) {
+        console.error(err);
         showToast('Photo upload failed — check imgbb key');
       }
-      label.textContent = '📷 Select photo';
-      e.target.value = '';
+      renderAboutCards();
     });
 
-    async function saveSlide() {
-      const eyebrow = document.getElementById('sEyebrow').value.trim();
-      const title = document.getElementById('sTitle').value.trim();
-      const order = Number(document.getElementById('sOrder').value) || 0;
-      const price = document.getElementById('sPrice').value ? Number(document.getElementById('sPrice').value) : null;
-      const oldPrice = document.getElementById('sOldPrice').value ? Number(document.getElementById('sOldPrice').value) : null;
-      if (!title) { showToast('Title is required'); return; }
+    async function loadAbout() {
+      try {
+        const snap = await getDoc(doc(db, 'settings', 'site'));
+        const saved = snap.exists() ? snap.data().aboutCards : null;
+        if (Array.isArray(saved)) {
+          aboutCards = ABOUT_DEFAULTS.map((d, i) => ({ ...d, ...(saved[i] || {}) }));
+        }
+      } catch (e) { /* no settings yet — defaults */ }
+      renderAboutCards();
+    }
 
-      const btn = document.getElementById('saveSlideBtn');
+    async function saveAbout() {
+      syncAboutInputs();
+      const btn = document.getElementById('saveAboutBtn');
       btn.disabled = true;
       btn.innerHTML = `<span class="spinner"></span> Saving...`;
-
-      const data = { eyebrow, title, order, price, oldPrice, image: currentSlideImage };
       try {
-        if (editingSlideId) {
-          await updateDoc(doc(db, 'slides', editingSlideId), data);
-        } else {
-          await addDoc(collection(db, 'slides'), data);
-        }
-        document.getElementById('slideModal').classList.remove('open');
-        showToast('Slide saved ✓');
-        loadSlides();
+        const cards = aboutCards.map(c => ({ title: c.title.trim(), text: c.text.trim(), image: c.image || '' }));
+        await setDoc(doc(db, 'settings', 'site'), { aboutCards: cards }, { merge: true });
+        showToast('About cards saved ✓ — refresh the store to see it');
       } catch (err) {
-        console.error('Slide save failed:', err);
+        console.error('About save failed:', err);
         showToast('Could not save — try again');
       }
       btn.disabled = false;
-      btn.textContent = 'Save Slide';
+      btn.textContent = 'Save About Cards';
     }
-    document.getElementById('saveSlideBtn').addEventListener('click', saveSlide);
-
-    async function deleteSlide(id) {
-      if (!confirm('Delete this slide?')) return;
-      await deleteDoc(doc(db, 'slides', id));
-      showToast('Slide deleted');
-      loadSlides();
-    }
+    document.getElementById('saveAboutBtn').addEventListener('click', saveAbout);
 
     /* ---------- Theme ---------- */
     async function loadTheme() {
@@ -780,8 +701,6 @@
         if (snap.exists()) {
           const t = snap.data();
           if (t.accentColor) document.getElementById('tAccentColor').value = t.accentColor;
-          if (t.heroSub) document.getElementById('tHeroSub').value = t.heroSub;
-          if (t.heroBadge) document.getElementById('tHeroBadge').value = t.heroBadge;
           document.getElementById('tFeeDhaka').value = t.feeDhaka ?? 60;
           document.getElementById('tFeeOutside').value = t.feeOutside ?? 110;
           if (t.comboSaleEndsText) document.getElementById('tSaleEndsText').value = t.comboSaleEndsText;
@@ -792,8 +711,6 @@
     }
     async function saveTheme() {
       const accentColor = document.getElementById('tAccentColor').value;
-      const heroSub = document.getElementById('tHeroSub').value.trim();
-      const heroBadge = document.getElementById('tHeroBadge').value.trim();
       const feeDhaka = Number(document.getElementById('tFeeDhaka').value) || 60;
       const feeOutside = Number(document.getElementById('tFeeOutside').value) || 110;
       const comboSaleEndsText = document.getElementById('tSaleEndsText').value.trim();
@@ -803,7 +720,7 @@
       btn.disabled = true;
       btn.innerHTML = `<span class="spinner"></span> Saving...`;
       try {
-        await setDoc(doc(db, 'settings', 'site'), { accentColor, heroSub, heroBadge, feeDhaka, feeOutside, comboSaleEndsText, couponCode, couponPercent }, { merge: true });
+        await setDoc(doc(db, 'settings', 'site'), { accentColor, feeDhaka, feeOutside, comboSaleEndsText, couponCode, couponPercent }, { merge: true });
         showToast('Theme saved ✓ — refresh the store to see it');
       } catch (err) {
         console.error('Theme save failed:', err);
