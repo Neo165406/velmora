@@ -831,6 +831,21 @@ const hasCachedProducts = loadCachedProducts();
 const productsReadyPromise = loadProducts().then(() => VELMORA_PRODUCTS);
 window.velmoraProductsReady = productsReadyPromise;
 
+// Homepage category strip: fills each [data-category] circle with a real
+// product photo from that category (prefers a featured product).
+function loadCategoryPhotos() {
+  const products = VELMORA_PRODUCTS || [];
+  if (!products.length) return;
+  document.querySelectorAll('[data-category]').forEach(card => {
+    const cat = card.dataset.category;
+    const hasImg = p => p.category === cat && ((p.images && p.images[0]) || p.image);
+    const match = products.find(p => hasImg(p) && p.featured) || products.find(hasImg);
+    if (!match) return;
+    const img = (match.images && match.images[0]) || match.image;
+    if (img) card.style.setProperty('--card-bg', "url('" + img + "')");
+  });
+}
+
 function renderAll() {
   applyUrlFilters();
   renderProductGrid();
@@ -841,6 +856,7 @@ function renderAll() {
   renderForMan();
   renderGiftBox();
   renderProductDetail();
+  loadCategoryPhotos();
 }
 
 document.addEventListener('DOMContentLoaded', async function () {
