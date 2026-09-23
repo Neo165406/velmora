@@ -163,6 +163,18 @@
         return photoOf(p) && (!cats.length || cats.indexOf(p.category) > -1) && (!gender || p.gender === gender);
       });
       if (match) el.style.setProperty('--photo-bg', "url('" + photoOf(match).replace(/'/g, '%27') + "')");
+      // Category tiles (For Women / For Man): hide a tile when no product is assigned to it.
+      var tile = el.closest('.jr-tile');
+      if (tile) tile.style.display = match ? '' : 'none';
+    });
+    // Hide a whole "For Women" / "For Man" section when none of its tiles has a product.
+    document.querySelectorAll('.jr-tiles').forEach(function (grid) {
+      var section = grid.closest('section');
+      if (!section) return;
+      var anyVisible = Array.prototype.some.call(grid.querySelectorAll('.jr-tile'), function (t) {
+        return t.style.display !== 'none';
+      });
+      section.style.display = anyVisible ? '' : 'none';
     });
   }
   function initPhotos() {
