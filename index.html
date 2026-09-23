@@ -18,6 +18,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/buy-now.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -129,48 +130,6 @@
   </div>
 </section>
 
-<!-- Combo Deals — topmost product section, sale-ends note + live discount range badge -->
-<section style="padding-top:12px;">
-  <div class="container">
-    <div class="section-head">
-      <div class="section-eyebrow">Limited Time</div>
-      <h2>Combo Deals <span class="discount-pill" data-combo-discount-badge style="display:none;"></span></h2>
-      <p data-combo-sale-ends style="display:none; color:#a15a5a; font-weight:500;"></p>
-      <p>Save more with our bundled jewellery sets.</p>
-    </div>
-    <div class="deal-slider-wrap">
-      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
-      <div class="deal-slider">
-        <div class="deal-track" data-combo-grid></div>
-      </div>
-      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
-    </div>
-    <div style="text-align:center; margin-top:12px;">
-      <a href="shop.html?category=Combo%20Deals" class="btn">View Others</a>
-    </div>
-  </div>
-</section>
-
-<!-- New Arrivals — products tagged "New" -->
-<section style="background: var(--blush);">
-  <div class="container">
-    <div class="section-head">
-      <div class="section-eyebrow">Just In</div>
-      <h2>New Arrivals</h2>
-    </div>
-    <div class="deal-slider-wrap">
-      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
-      <div class="deal-slider">
-        <div class="deal-track" data-newarrivals-grid></div>
-      </div>
-      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
-    </div>
-    <div style="text-align:center; margin-top:12px;">
-      <a href="shop.html?tag=New" class="btn">View Others</a>
-    </div>
-  </div>
-</section>
-
 <section style="padding: 5px 0;">
   <div class="container">
     <div class="category-strip">
@@ -241,6 +200,48 @@
           <span>Others</span>
         </a>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- Combo Deals — topmost product section, sale-ends note + live discount range badge -->
+<section style="padding-top:12px;">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Limited Time</div>
+      <h2>Combo Deals <span class="discount-pill" data-combo-discount-badge style="display:none;"></span></h2>
+      <p data-combo-sale-ends style="display:none; color:#a15a5a; font-weight:500;"></p>
+      <p>Save more with our bundled jewellery sets.</p>
+    </div>
+    <div class="deal-slider-wrap">
+      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
+      <div class="deal-slider">
+        <div class="deal-track" data-combo-grid></div>
+      </div>
+      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
+    </div>
+    <div style="text-align:center; margin-top:12px;">
+      <a href="shop.html?category=Combo%20Deals" class="btn">View Others</a>
+    </div>
+  </div>
+</section>
+
+<!-- New Arrivals — products tagged "New" -->
+<section style="background: var(--blush);">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Just In</div>
+      <h2>New Arrivals</h2>
+    </div>
+    <div class="deal-slider-wrap">
+      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
+      <div class="deal-slider">
+        <div class="deal-track" data-newarrivals-grid></div>
+      </div>
+      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
+    </div>
+    <div style="text-align:center; margin-top:12px;">
+      <a href="shop.html?tag=New" class="btn">View Others</a>
     </div>
   </div>
 </section>
@@ -365,7 +366,7 @@
         <ul>
           <li><a href="contact.html">Contact</a></li>
           <li><a href="index.html">Home</a></li>
-          <li><a href="return-exchange.html">Return &amp; Exchange Policy</a></li>
+          <li><a href="return-exchange.html">Return & Exchange Policy</a></li>
         </ul>
       </div>
       <div>
@@ -384,192 +385,7 @@
 <script src="js/cart.js" defer></script>
 <script src="js/search.js" defer></script>
 <script src="js/promo-slider.js" defer></script>
-<script>
-  // Auto-scrolls the category strip by nudging scrollLeft each frame.
-  // Pause/resume is driven by the Pointer Events API with pointerType
-  // checks (not mouseenter/mouseleave + touchstart/touchend together) —
-  // mobile browsers fire a synthetic "ghost" mouseenter ~300ms after a
-  // real touchend for compatibility, and with separate mouse/touch
-  // listeners that ghost event re-paused the strip with no matching
-  // mouseleave ever coming, freezing it after a single tap. Checking
-  // pointerType avoids that conflict entirely.
-  document.addEventListener('DOMContentLoaded', function () {
-    const strip = document.querySelector('.category-strip');
-    const track = document.getElementById('category-track');
-    if (!strip || !track) return;
-
-    let paused = false;
-    let resumeTimer = null;
-    const SPEED = 0.5; // px per animation frame
-
-    function step() {
-      if (!paused) {
-        strip.scrollLeft += SPEED;
-        // The circle set is duplicated in the markup, so looping back
-        // once we pass the halfway point keeps the scroll seamless.
-        const halfWidth = track.scrollWidth / 2;
-        if (strip.scrollLeft >= halfWidth) strip.scrollLeft -= halfWidth;
-      }
-      requestAnimationFrame(step);
-    }
-    function pause() {
-      paused = true;
-      clearTimeout(resumeTimer);
-    }
-    function resumeSoon(delay) {
-      clearTimeout(resumeTimer);
-      resumeTimer = setTimeout(function () { paused = false; }, delay);
-    }
-
-    if (window.PointerEvent) {
-      // Real mouse hover (desktop) — pause while hovered, resume on leave.
-      strip.addEventListener('pointerenter', function (e) {
-        if (e.pointerType === 'mouse') pause();
-      });
-      strip.addEventListener('pointerleave', function (e) {
-        if (e.pointerType === 'mouse') resumeSoon(0);
-      });
-      // Touch/pen — pause while actively touching, resume shortly after
-      // release instead of relying on a hover state that never clears.
-      strip.addEventListener('pointerdown', function (e) {
-        if (e.pointerType !== 'mouse') pause();
-      });
-      strip.addEventListener('pointerup', function (e) {
-        if (e.pointerType !== 'mouse') resumeSoon(1200);
-      });
-      strip.addEventListener('pointercancel', function (e) {
-        if (e.pointerType !== 'mouse') resumeSoon(1200);
-      });
-    } else {
-      // Very old browsers with no Pointer Events support are desktop-only
-      // in practice, so plain mouse events are safe here.
-      strip.addEventListener('mouseenter', pause);
-      strip.addEventListener('mouseleave', function () { resumeSoon(0); });
-    }
-
-    step();
-  });
-</script>
 <script type="module" src="js/products.js"></script>
-<script type="module">
-  import { db, isFirebaseConfigured } from './js/firebase-config.js';
-  import { collection, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-
-  async function loadTheme() {
-    if (!isFirebaseConfigured) return;
-    try {
-      const snap = await getDoc(doc(db, 'settings', 'site'));
-      if (!snap.exists()) return;
-      const t = snap.data();
-      if (t.accentColor) document.documentElement.style.setProperty('--gold', t.accentColor);
-    } catch (err) {
-      console.error('Could not load theme settings:', err);
-    }
-  }
-
-  async function loadSlides() {
-    if (!isFirebaseConfigured) return;
-    try {
-      const snapshot = await getDocs(collection(db, 'slides'));
-      if (snapshot.empty) return;
-      const slides = snapshot.docs.map(d => d.data()).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-
-      const wrap = document.querySelector('.promo-slider');
-      if (!wrap) return;
-      const slideHtml = slides.map((s, i) => `
-        <div class="promo-slide p-${String.fromCharCode(97 + (i % 3))} ${i === 0 ? 'is-active' : ''}" ${s.image ? `style="background-image:url('${s.image}'); background-size:cover; background-position:center;"` : ''}>
-          <div>
-            <div class="eyebrow">${s.eyebrow || ''}</div>
-            <h3>${s.title || ''}</h3>
-            ${s.price ? `<div class="price">৳${Number(s.price).toLocaleString('en-IN')}${s.oldPrice ? `<span class="old">৳${Number(s.oldPrice).toLocaleString('en-IN')}</span>` : ''}</div>` : ''}
-            <a href="${s.link || 'shop.html'}" class="btn btn-solid" style="margin-top:14px; display:inline-block;">Shop Now</a>
-          </div>
-        </div>`).join('');
-      const barsHtml = slides.map(() => `<div class="promo-progress-bar"><span class="fill"></span></div>`).join('');
-      wrap.innerHTML = slideHtml + `<div class="promo-progress-track">${barsHtml}</div>`;
-
-      if (window.initPromoSlider) window.initPromoSlider();
-    } catch (err) {
-      console.error('Could not load slides:', err);
-    }
-  }
-
-  async function loadCategoryPhotos() {
-    try {
-      const products = window.velmoraProductsReady ? await window.velmoraProductsReady : [];
-      if (!products.length) return;
-      const categoriesPresent = new Set(products.map(p => p.category));
-      document.querySelectorAll('[data-category]').forEach(card => {
-        const cat = card.dataset.category;
-        if (!categoriesPresent.has(cat)) {
-          card.remove();
-          return;
-        }
-        const inCategory = p => p.category === cat && ((p.images && p.images[0]) || p.image);
-        const match = products.find(p => inCategory(p) && p.featured) || products.find(inCategory);
-        if (!match) return;
-        const img = (match.images && match.images[0]) || match.image;
-        card.style.setProperty('--card-bg', `url('${img}')`);
-      });
-    } catch (err) {
-      console.error('Could not load category photos:', err);
-    }
-  }
-
-  async function loadComboBadge() {
-    try {
-      const products = window.velmoraProductsReady ? await window.velmoraProductsReady : [];
-      const comboItems = products.filter(p => p.category === 'Combo Deals' && p.oldPrice && p.oldPrice > p.price);
-      const badge = document.querySelector('[data-combo-discount-badge]');
-      if (badge && comboItems.length) {
-        const percents = comboItems.map(p => Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100));
-        const min = Math.min(...percents);
-        const max = Math.max(...percents);
-        badge.textContent = min === max ? `(${min}% OFF)` : `(${min}–${max}% OFF)`;
-        badge.style.display = 'inline-block';
-      }
-    } catch (err) {
-      console.error('Could not compute combo discount badge:', err);
-    }
-  }
-
-  async function loadSaleEndsNote() {
-    if (!isFirebaseConfigured) return;
-    try {
-      const snap = await getDoc(doc(db, 'settings', 'site'));
-      if (!snap.exists()) return;
-      const t = snap.data();
-      const note = document.querySelector('[data-combo-sale-ends]');
-      if (note && t.comboSaleEndsText) {
-        note.textContent = `Sale ends: ${t.comboSaleEndsText}`;
-        note.style.display = 'block';
-      }
-    } catch (err) {
-      console.error('Could not load sale-ends note:', err);
-    }
-  }
-
-  loadTheme();
-  loadSlides();
-  loadCategoryPhotos();
-  loadComboBadge();
-  loadSaleEndsNote();
-
-  document.querySelectorAll('.deal-slider-wrap').forEach(wrap => {
-    const track = wrap.querySelector('.deal-slider');
-    const prev = wrap.querySelector('[data-slide-prev]');
-    const next = wrap.querySelector('[data-slide-next]');
-    if (prev) prev.addEventListener('click', () => track.scrollBy({ left: -240, behavior: 'smooth' }));
-    if (next) next.addEventListener('click', () => track.scrollBy({ left: 240, behavior: 'smooth' }));
-  });
-</script>
-
-<!-- Floating WhatsApp button — replace the number below with your real WhatsApp number -->
-<a href="https://wa.me/8801707082002" target="_blank" rel="noopener" class="whatsapp-float" aria-label="Chat on WhatsApp">
-  <svg viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M16.001 3C9.104 3 3.5 8.604 3.5 15.5c0 2.385.663 4.614 1.814 6.516L3 29l7.146-2.267A12.44 12.44 0 0 0 16 28c6.897 0 12.5-5.604 12.5-12.5S22.898 3 16.001 3zm7.29 17.74c-.31.87-1.532 1.593-2.51 1.8-.667.14-1.538.252-4.47-.96-3.75-1.552-6.166-5.354-6.354-5.6-.18-.246-1.522-2.026-1.522-3.865 0-1.838.964-2.744 1.306-3.12.31-.34.674-.425.899-.425.224 0 .45.002.646.012.207.01.485-.078.759.579.31.744 1.055 2.583 1.147 2.77.093.187.155.404.03.65-.124.246-.187.404-.373.62-.187.216-.393.483-.56.65-.187.187-.382.39-.164.766.217.375.964 1.59 2.07 2.575 1.422 1.268 2.62 1.66 2.995 1.847.375.187.594.156.812-.093.217-.25.933-1.088 1.182-1.462.25-.375.5-.31.842-.187.343.124 2.176 1.026 2.55 1.213.375.187.626.28.717.436.093.156.093.9-.216 1.772z"/>
-  </svg>
-</a>
 <script src="js/motion.js" defer></script>
 </body>
 </html>
