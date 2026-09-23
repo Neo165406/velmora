@@ -832,17 +832,26 @@ const productsReadyPromise = loadProducts().then(() => VELMORA_PRODUCTS);
 window.velmoraProductsReady = productsReadyPromise;
 
 // Homepage category strip: fills each [data-category] circle with a real
-// product photo from that category (prefers a featured product).
+// product photo from that category (prefers a featured product), and hides
+// circles for categories that have no product with a photo assigned, so the
+// strip never shows blank gradient placeholders.
 function loadCategoryPhotos() {
   const products = VELMORA_PRODUCTS || [];
-  if (!products.length) return;
-  document.querySelectorAll('[data-category]').forEach(card => {
+  const cards = document.querySelectorAll('[data-category]');
+  if (!products.length || !cards.length) return;
+  // No product has a photo at all (e.g. demo data) — leave the strip as is.
+  if (!products.some(p => primaryImage(p))) return;
+
+  cards.forEach(card => {
     const cat = card.dataset.category;
-    const hasImg = p => p.category === cat && ((p.images && p.images[0]) || p.image);
+    const hasImg = p => p.category === cat && primaryImage(p);
     const match = products.find(p => hasImg(p) && p.featured) || products.find(hasImg);
-    if (!match) return;
-    const img = (match.images && match.images[0]) || match.image;
-    if (img) card.style.setProperty('--card-bg', "url('" + img + "')");
+    if (!match) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = '';
+    card.style.setProperty('--card-bg', "url('" + primaryImage(match) + "')");
   });
 }
 
