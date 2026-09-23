@@ -101,129 +101,26 @@
   </div>
 </header>
 
-<!-- Promo slider now doubles as the page hero -->
-<section class="promo-slider" aria-label="Promotions">
-  <div class="promo-slide p-a is-active">
-    <div>
-      <div class="eyebrow">Velmora Fine Jewellery</div>
-      <h3>Glamour for the Stylish Woman</h3>
-      <a href="shop.html" class="btn btn-solid" style="margin-top:14px; display:inline-block;">Shop Now</a>
-    </div>
-  </div>
-  <div class="promo-slide p-b">
-    <div>
-      <div class="eyebrow">New Arrivals</div>
-      <h3>Explore Our New Pieces</h3>
-      <a href="shop.html?tag=New" class="btn btn-solid" style="margin-top:14px; display:inline-block;">Shop New Arrivals</a>
-    </div>
-  </div>
-  <div class="promo-slide p-c">
-    <div>
-      <div class="eyebrow">Festive Edit</div>
-      <h3>Antique Gold, Freshly In</h3>
-      <a href="shop.html" class="btn btn-solid" style="margin-top:14px; display:inline-block;">Shop Now</a>
-    </div>
-  </div>
-  <div class="promo-progress-track">
-    <div class="promo-progress-bar"><span class="fill"></span></div>
-    <div class="promo-progress-bar"><span class="fill"></span></div>
-    <div class="promo-progress-bar"><span class="fill"></span></div>
-  </div>
-</section>
-
-<section style="padding: 5px 0;">
-  <div class="container">
-    <div class="category-strip">
-      <div class="category-track" id="category-track">
-        <a class="category-circle" data-category="Rings" href="shop.html?category=Rings">
-          <div class="ring"></div>
-          <span>Rings</span>
-        </a>
-        <a class="category-circle" data-category="Necklaces" href="shop.html?category=Necklaces">
-          <div class="ring"></div>
-          <span>Necklaces</span>
-        </a>
-        <a class="category-circle" data-category="Earrings" href="shop.html?category=Earrings">
-          <div class="ring"></div>
-          <span>Earrings</span>
-        </a>
-        <a class="category-circle" data-category="Bracelets" href="shop.html?category=Bracelets">
-          <div class="ring"></div>
-          <span>Bracelets</span>
-        </a>
-        <a class="category-circle" data-category="Pendant" href="shop.html?category=Pendant">
-          <div class="ring"></div>
-          <span>Pendant</span>
-        </a>
-        <a class="category-circle" data-category="Glasses" href="shop.html?category=Glasses">
-          <div class="ring"></div>
-          <span>Glasses</span>
-        </a>
-        <a class="category-circle" data-category="Other Accessories" href="shop.html?category=Other%20Accessories">
-          <div class="ring"></div>
-          <span>Accessories</span>
-        </a>
-        <a class="category-circle" data-category="Others" href="shop.html?category=Others">
-          <div class="ring"></div>
-          <span>Others</span>
-        </a>
-        <!-- duplicated set for a seamless infinite scroll loop -->
-        <a class="category-circle" data-category="Rings" href="shop.html?category=Rings" aria-hidden="true">
-          <div class="ring"></div>
-          <span>Rings</span>
-        </a>
-        <a class="category-circle" data-category="Necklaces" href="shop.html?category=Necklaces" aria-hidden="true">
-          <div class="ring"></div>
-          <span>Necklaces</span>
-        </a>
-        <a class="category-circle" data-category="Earrings" href="shop.html?category=Earrings" aria-hidden="true">
-          <div class="ring"></div>
-          <span>Earrings</span>
-        </a>
-        <a class="category-circle" data-category="Bracelets" href="shop.html?category=Bracelets" aria-hidden="true">
-          <div class="ring"></div>
-          <span>Bracelets</span>
-        </a>
-        <a class="category-circle" data-category="Pendant" href="shop.html?category=Pendant" aria-hidden="true">
-          <div class="ring"></div>
-          <span>Pendant</span>
-        </a>
-        <a class="category-circle" data-category="Glasses" href="shop.html?category=Glasses" aria-hidden="true">
-          <div class="ring"></div>
-          <span>Glasses</span>
-        </a>
-        <a class="category-circle" data-category="Other Accessories" href="shop.html?category=Other%20Accessories" aria-hidden="true">
-          <div class="ring"></div>
-          <span>Accessories</span>
-        </a>
-        <a class="category-circle" data-category="Others" href="shop.html?category=Others" aria-hidden="true">
-          <div class="ring"></div>
-          <span>Others</span>
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- About Velmora — three rounded cards -->
+<!-- About Velmora — three rounded cards. Photo, title and text are editable
+     from Dashboard → About Cards (js/about-cards.js); the text below is the default. -->
 <section>
   <div class="container">
     <h2 class="jr-about-title">About Velmora<span class="gem"></span></h2>
     <div class="jr-brands">
-      <a class="jr-brand" href="shop.html?gender=Women">
-        <div class="jr-brand-img" data-jr-photo data-gender="Women"></div>
-        <p>Rings, necklaces, bracelets and earrings for her.</p>
-        <h3>For Her</h3>
+      <a class="jr-brand" data-about-card="0" href="shop.html?gender=Women">
+        <div class="jr-brand-img" data-about-img data-jr-photo data-gender="Women"></div>
+        <p data-about-text>Rings, necklaces, bracelets and earrings for her.</p>
+        <h3 data-about-title>For Her</h3>
       </a>
-      <a class="jr-brand" href="shop.html?gender=Men">
-        <div class="jr-brand-img" data-jr-photo data-gender="Men"></div>
-        <p>Rings, necklaces, bracelets and glasses for him.</p>
-        <h3>For Him</h3>
+      <a class="jr-brand" data-about-card="1" href="shop.html?gender=Men">
+        <div class="jr-brand-img" data-about-img data-jr-photo data-gender="Men"></div>
+        <p data-about-text>Rings, necklaces, bracelets and glasses for him.</p>
+        <h3 data-about-title>For Him</h3>
       </a>
-      <a class="jr-brand" href="shop.html?category=Gift%20Box,Flower,Chocolate,Books">
-        <div class="jr-brand-img" data-jr-photo data-category="Gift Box,Flower,Chocolate,Books"></div>
-        <p>Curated gifts, ready for every occasion.</p>
-        <h3>Gifts</h3>
+      <a class="jr-brand" data-about-card="2" href="shop.html?category=Gift%20Box,Flower,Chocolate,Books">
+        <div class="jr-brand-img" data-about-img data-jr-photo data-category="Gift Box,Flower,Chocolate,Books"></div>
+        <p data-about-text>Curated gifts, ready for every occasion.</p>
+        <h3 data-about-title>Gifts</h3>
       </a>
     </div>
     <p class="jr-about-line">Fine jewellery, made for everyday glamour</p>
@@ -425,9 +322,8 @@
 <script src="js/nav.js" defer></script>
 <script src="js/cart.js" defer></script>
 <script src="js/search.js" defer></script>
-<script src="js/promo-slider.js" defer></script>
-<script src="js/category-scroll.js" defer></script>
 <script type="module" src="js/products.js"></script>
+<script type="module" src="js/about-cards.js"></script>
 <script src="js/motion.js" defer></script>
 <script src="js/johrot-layout.js" defer></script>
 </body>
