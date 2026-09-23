@@ -13,6 +13,22 @@
   }
 })();
 
+// Buyer accounts: login icon in the header + Login / My Account links in the menu (js/auth.js)
+(function () {
+  if (!document.querySelector('link[href$="css/account.css"]')) {
+    var c = document.createElement('link');
+    c.rel = 'stylesheet';
+    c.href = 'css/account.css';
+    document.head.appendChild(c);
+  }
+  if (!document.querySelector('script[src$="js/auth.js"]')) {
+    var a = document.createElement('script');
+    a.type = 'module';
+    a.src = 'js/auth.js';
+    document.head.appendChild(a);
+  }
+})();
+
 // Shared hamburger navigation — include on every page
 document.addEventListener('DOMContentLoaded', function () {
   const hamburger = document.querySelector('.hamburger');
