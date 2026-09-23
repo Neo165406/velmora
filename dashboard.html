@@ -47,6 +47,7 @@
     <div class="logo">VEL<span>MORA</span></div>
     <a href="#" data-tab="overview" class="tab-link active">Overview</a>
     <a href="#" data-tab="products" class="tab-link">Products</a>
+    <a href="#" data-tab="categories" class="tab-link">Categories</a>
     <a href="#" data-tab="orders" class="tab-link">Orders</a>
     <a href="#" data-tab="about" class="tab-link">About Cards</a>
     <a href="#" data-tab="theme" class="tab-link">Theme</a>
@@ -99,6 +100,21 @@
         <table>
           <thead><tr><th>Product</th><th>Category</th><th>Gender</th><th>Price</th><th>Stock</th><th>Featured</th><th></th></tr></thead>
           <tbody id="productsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CATEGORIES (extra categories shown on the homepage) -->
+    <section id="tab-categories" class="hidden">
+      <div class="admin-topbar">
+        <h1>Categories</h1>
+        <button class="btn btn-aqua" id="newCatBtn">+ New Category</button>
+      </div>
+      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Add your own categories. Each one appears in the product form and as a tile under <b>For Women</b> or <b>For Man</b> on the homepage (once it has a product with a photo). The built-in categories stay as they are.</p>
+      <div class="table-card">
+        <table>
+          <thead><tr><th>Category</th><th>Shows under</th><th></th></tr></thead>
+          <tbody id="catsTableBody"></tbody>
         </table>
       </div>
     </section>
@@ -269,6 +285,38 @@
   </div>
 </div>
 
+<!-- Category modal -->
+<div class="modal-overlay" id="catModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="catModalTitle">New Category</h3>
+      <button class="modal-close" id="closeCatModal">✕</button>
+    </div>
+    <div class="field">
+      <label>Category Name *</label>
+      <input type="text" id="cName" placeholder="e.g. Anklets">
+      <p id="cNameNote" style="font-size:0.76rem; color:#7a5a5d; margin-top:6px; display:none;">The name can't be changed after creating (products use it). Delete and re-create if needed.</p>
+    </div>
+    <div class="field">
+      <label>Shows under *</label>
+      <select id="cGender">
+        <option value="Women">For Women</option>
+        <option value="Men">For Man</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tile Photo — optional</label>
+      <div class="img-upload" id="cImgUploadZone">
+        <input type="file" id="cImgInput" accept="image/*" style="display:none;">
+        <span id="cUploadLabel">📷 Select photo</span>
+      </div>
+      <div class="img-preview-row" id="cImgPreviewRow"></div>
+      <p style="font-size:0.76rem; color:#7a5a5d; margin-top:6px;">No photo? The tile uses the photo of a product in this category.</p>
+    </div>
+    <button class="btn btn-aqua btn-block" id="saveCatBtn" style="margin-top:8px;">Save Category</button>
+  </div>
+</div>
+
 <!-- Order modal -->
 <div class="modal-overlay" id="orderModal">
   <div class="modal">
@@ -350,7 +398,7 @@
         e.preventDefault();
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         link.classList.add('active');
-        ['overview', 'products', 'orders', 'about', 'theme'].forEach(t =>
+        ['overview', 'products', 'categories', 'orders', 'about', 'theme'].forEach(t =>
           document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== link.dataset.tab));
       });
     });
@@ -363,10 +411,13 @@
     let productCategoryFilter = '';
     const RING_SIZES = ['5', '6', '7', '8', '9', '10', '11'];
     let selectedSizes = [];
+    // Built-in category names, read once before any custom ones are added to the dropdown.
+    const BUILTIN_CATS = [...document.querySelectorAll('#pCategory option')].map(o => o.value);
 
     function init() {
       loadProducts();
       loadOrders();
+      loadCategories();
       loadAbout();
       loadTheme();
     }
@@ -389,6 +440,7 @@
       document.getElementById('statProducts').textContent = allProducts.length;
       document.getElementById('emptyStateCard').style.display = allProducts.length ? 'none' : 'block';
       renderProductsTable();
+      renderCatsTable();
     }
 
     function renderProductsTable() {
@@ -452,7 +504,12 @@
       selectedSizes = selectedSizes.includes(s) ? selectedSizes.filter(x => x !== s) : [...selectedSizes, s];
       chip.classList.toggle('active');
     });
-    document.getElementById('pCategory').addEventListener('change', (e) => toggleSizeField(e.target.value));
+    document.getElementById('pCategory').addEventListener('change', (e) => {
+      toggleSizeField(e.target.value);
+      // A custom category belongs to Women or Men — preselect that gender.
+      const custom = customCats.find(c => c.name === e.target.value);
+      if (custom) document.getElementById('pGender').value = custom.gender;
+    });
 
     function openProductModal(id = null) {
       editingProductId = id;
@@ -594,6 +651,165 @@
       showToast('Product deleted');
       loadProducts();
     }
+
+    /* ---------- Categories (custom, shown on the homepage) ---------- */
+    // Stored in Firestore settings/site -> customCategories: [{ name, gender, image }]
+    let customCats = [];
+    let editingCatIndex = null;
+    let currentCatImage = '';
+
+    // Adds the custom categories to the product form dropdown and the product filter chips.
+    function syncCategoryControls() {
+      const sel = document.getElementById('pCategory');
+      sel.querySelectorAll('[data-custom]').forEach(o => o.remove());
+      customCats.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c.name;
+        o.textContent = c.name;
+        o.setAttribute('data-custom', '');
+        sel.appendChild(o);
+      });
+      const bar = document.querySelector('#tab-products .filter-bar');
+      bar.querySelectorAll('[data-custom]').forEach(b => b.remove());
+      customCats.forEach(c => {
+        const b = document.createElement('button');
+        b.className = 'chip' + (productCategoryFilter === c.name ? ' active' : '');
+        b.dataset.pcat = c.name;
+        b.textContent = c.name;
+        b.setAttribute('data-custom', '');
+        bar.appendChild(b);
+      });
+    }
+
+    function renderCatsTable() {
+      const body = document.getElementById('catsTableBody');
+      if (!customCats.length) {
+        body.innerHTML = `<tr><td colspan="3" class="text-center" style="color:#7a5a5d; padding:30px;">No custom categories yet — tap "+ New Category"</td></tr>`;
+        return;
+      }
+      body.innerHTML = customCats.map((c, i) => {
+        const count = allProducts.filter(p => p.category === c.name).length;
+        return `
+        <tr>
+          <td><div class="row-thumb">${c.image ? `<img src="${esc(c.image)}">` : ''}<span>${esc(c.name)} <small style="color:#7a5a5d;">(${count} product${count === 1 ? '' : 's'})</small></span></div></td>
+          <td>${c.gender === 'Men' ? 'For Man' : 'For Women'}</td>
+          <td>
+            <button class="btn btn-outline btn-sm" data-cedit="${i}">Edit</button>
+            <button class="btn btn-danger btn-sm" data-cdel="${i}">Delete</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function loadCategories() {
+      try {
+        const snap = await getDoc(doc(db, 'settings', 'site'));
+        const saved = snap.exists() ? snap.data().customCategories : null;
+        customCats = Array.isArray(saved) ? saved.filter(c => c && c.name) : [];
+      } catch (e) { /* no settings yet */ }
+      syncCategoryControls();
+      renderCatsTable();
+    }
+
+    async function persistCategories() {
+      await setDoc(doc(db, 'settings', 'site'), { customCategories: customCats }, { merge: true });
+      syncCategoryControls();
+      renderCatsTable();
+    }
+
+    function renderCatImagePreview() {
+      document.getElementById('cImgPreviewRow').innerHTML = currentCatImage
+        ? `<div style="position:relative;"><img src="${esc(currentCatImage)}"><span id="rmCatImg" style="position:absolute;top:-6px;right:-6px;background:var(--maroon-dark);color:#fff;width:18px;height:18px;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</span></div>`
+        : '';
+      const rm = document.getElementById('rmCatImg');
+      if (rm) rm.addEventListener('click', () => { currentCatImage = ''; renderCatImagePreview(); });
+    }
+
+    function openCatModal(index = null) {
+      editingCatIndex = index;
+      const c = index === null ? null : customCats[index];
+      document.getElementById('catModalTitle').textContent = c ? 'Edit Category' : 'New Category';
+      document.getElementById('cName').value = c ? c.name : '';
+      document.getElementById('cName').disabled = !!c;
+      document.getElementById('cNameNote').style.display = c ? 'block' : 'none';
+      document.getElementById('cGender').value = c ? c.gender : 'Women';
+      currentCatImage = c ? (c.image || '') : '';
+      renderCatImagePreview();
+      document.getElementById('catModal').classList.add('open');
+    }
+    document.getElementById('newCatBtn').addEventListener('click', () => openCatModal());
+    document.getElementById('closeCatModal').addEventListener('click', () => document.getElementById('catModal').classList.remove('open'));
+
+    document.getElementById('cImgUploadZone').addEventListener('click', () => document.getElementById('cImgInput').click());
+    document.getElementById('cImgInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const label = document.getElementById('cUploadLabel');
+      label.innerHTML = `<span class="spinner" style="border-top-color:var(--maroon-dark); border-color:rgba(107,15,26,0.2);"></span> Uploading...`;
+      try {
+        currentCatImage = await uploadToImgbb(file);
+        renderCatImagePreview();
+      } catch (err) {
+        console.error(err);
+        showToast('Photo upload failed — check imgbb key');
+      }
+      label.textContent = '📷 Select photo';
+      e.target.value = '';
+    });
+
+    document.getElementById('saveCatBtn').addEventListener('click', async () => {
+      const name = document.getElementById('cName').value.replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+      const gender = document.getElementById('cGender').value;
+      if (!name) { showToast('Category name is required'); return; }
+      if (editingCatIndex === null) {
+        const lower = name.toLowerCase();
+        if (BUILTIN_CATS.some(n => n.toLowerCase() === lower) || customCats.some(c => c.name.toLowerCase() === lower)) {
+          showToast('That category already exists');
+          return;
+        }
+      }
+      const btn = document.getElementById('saveCatBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> Saving...`;
+      const entry = { name, gender, image: currentCatImage || '' };
+      const previous = customCats.slice();
+      if (editingCatIndex === null) customCats.push(entry);
+      else customCats[editingCatIndex] = entry;
+      try {
+        await persistCategories();
+        document.getElementById('catModal').classList.remove('open');
+        showToast('Category saved ✓');
+      } catch (err) {
+        console.error('Category save failed:', err);
+        customCats = previous;
+        showToast('Could not save — try again');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save Category';
+    });
+
+    document.getElementById('catsTableBody').addEventListener('click', async (e) => {
+      const edit = e.target.closest('[data-cedit]');
+      const del = e.target.closest('[data-cdel]');
+      if (edit) openCatModal(Number(edit.dataset.cedit));
+      if (del) {
+        const i = Number(del.dataset.cdel);
+        const c = customCats[i];
+        const count = allProducts.filter(p => p.category === c.name).length;
+        if (count) { showToast(`Move or delete its ${count} product${count === 1 ? '' : 's'} first`); return; }
+        if (!confirm(`Delete the category "${c.name}"?`)) return;
+        const previous = customCats.slice();
+        customCats.splice(i, 1);
+        try {
+          await persistCategories();
+          showToast('Category deleted');
+        } catch (err) {
+          console.error(err);
+          customCats = previous;
+          showToast('Could not delete — try again');
+        }
+      }
+    });
 
     /* ---------- About Cards (homepage "About Velmora") ---------- */
     // Stored in Firestore settings/site -> aboutCards: [{ title, text, image }, x3]
