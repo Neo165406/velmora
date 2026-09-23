@@ -7,6 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/account.css">
 </head>
 <body>
 
@@ -42,7 +43,7 @@
         <input type="email" id="su-email" autocomplete="email" required>
       </div>
       <div class="field">
-        <label for="su-password">Password</label>
+        <label for="su-password">Password (6+ characters)</label>
         <input type="password" id="su-password" autocomplete="new-password" minlength="6" required>
       </div>
       <button type="submit" class="btn btn-solid btn-block">Create Account</button>
@@ -66,21 +67,22 @@
   const signinForm = document.getElementById('signin-form');
   const signupForm = document.getElementById('signup-form');
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      statusEl.textContent = '';
-      const isSignin = tab.dataset.authTab === 'signin';
-      signinForm.classList.toggle('hidden', !isSignin);
-      signupForm.classList.toggle('hidden', isSignin);
-    });
-  });
-
-  function redirectAfterAuth() {
-    const params = new URLSearchParams(window.location.search);
-    window.location.href = params.get('redirect') || 'index.html';
+  function showTab(name) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.authTab === name));
+    statusEl.textContent = '';
+    signinForm.classList.toggle('hidden', name !== 'signin');
+    signupForm.classList.toggle('hidden', name !== 'signup');
   }
+  tabs.forEach(tab => tab.addEventListener('click', () => showTab(tab.dataset.authTab)));
+  if (new URLSearchParams(window.location.search).get('tab') === 'signup') showTab('signup');
+
+  // Only ever send the buyer to a page on this site (e.g. "cart.html"), never to another website.
+  function safeRedirect() {
+    const r = new URLSearchParams(window.location.search).get('redirect') || '';
+    if (!r || r.indexOf('//') !== -1 || r.indexOf(':') !== -1 || r.charAt(0) === '/' || r.charCodeAt(0) === 92) return 'index.html';
+    return r;
+  }
+  function redirectAfterAuth() { window.location.href = safeRedirect(); }
 
   if (!isFirebaseConfigured) {
     statusEl.style.color = '#a15a5a';
@@ -109,7 +111,7 @@
     signupForm.addEventListener('submit', async function (e) {
       e.preventDefault();
       statusEl.textContent = '';
-      const name = document.getElementById('su-name').value;
+      const name = document.getElementById('su-name').value.trim();
       const email = document.getElementById('su-email').value;
       const password = document.getElementById('su-password').value;
       const btn = this.querySelector('button[type="submit"]');

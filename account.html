@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account — Velmora</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://firestore.googleapis.com">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/johrot-layout.css">
+<link rel="stylesheet" href="css/account.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav-bar">
+    <a href="index.html" class="brand">VEL<span>MORA</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li class="has-sub">
+        <a href="shop.html?gender=Men">Man</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Man categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?gender=Men&category=Rings">Rings</a></li>
+          <li><a href="shop.html?gender=Men&category=Necklaces">Necklace</a></li>
+          <li><a href="shop.html?gender=Men&category=Bracelets">Bracelets</a></li>
+          <li><a href="shop.html?gender=Men&category=Glasses">Glasses</a></li>
+        </ul>
+      </li>
+      <li class="has-sub">
+        <a href="shop.html?gender=Women">Woman</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Woman categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?gender=Women&category=Pendant">Pendant</a></li>
+          <li><a href="shop.html?gender=Women&category=Rings">Ring</a></li>
+          <li><a href="shop.html?gender=Women&category=Bracelets">Bracelet</a></li>
+          <li><a href="shop.html?gender=Women&category=Earrings">Earring</a></li>
+          <li><a href="shop.html?gender=Women&category=Jewelry%20Set">Jewelry Set</a></li>
+        </ul>
+      </li>
+      <li><a href="shop.html?category=DIY">Style your own – DIY</a></li>
+      <li class="has-sub">
+        <a href="shop.html?category=Gift%20Box,Flower,Chocolate,Books">Gift Items</a>
+        <button type="button" class="sub-toggle" aria-label="Toggle Gift Items categories">▾</button>
+        <ul class="sub-menu">
+          <li><a href="shop.html?category=Gift%20Box">Gift Box</a></li>
+          <li><a href="shop.html?category=Flower">Flower</a></li>
+          <li><a href="shop.html?category=Chocolate">Chocolate</a></li>
+          <li><a href="shop.html?category=Books">Books</a></li>
+        </ul>
+      </li>
+      <li><a href="shop.html?category=Combo%20Deals">Combo Deals</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="icon-btn search-toggle" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <a href="cart.html" class="cart-icon-wrap" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FAF6EF" stroke-width="1.6"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="10" cy="20" r="1.2" fill="#E4C766"/><circle cx="17" cy="20" r="1.2" fill="#E4C766"/></svg>
+        <span data-cart-count>0</span>
+      </a>
+      <button class="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="nav-overlay"></div>
+  <div class="search-bar" id="search-bar">
+    <div class="container">
+      <input type="text" id="search-input" placeholder="Search products...">
+    </div>
+  </div>
+</header>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>My Account</h1>
+    <p id="acct-welcome">Your details and orders.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <p id="acct-loading" class="acct-empty" style="text-align:center;">Loading your account…</p>
+
+    <div id="acct-main" class="acct-wrap hidden">
+      <div class="acct-card">
+        <h2>My details</h2>
+        <form id="profile-form">
+          <div class="form-field">
+            <label for="a-email">Email</label>
+            <input type="email" id="a-email" readonly>
+          </div>
+          <div class="form-field">
+            <label for="a-name">Full name</label>
+            <input type="text" id="a-name" autocomplete="name">
+          </div>
+          <div class="form-field">
+            <label for="a-phone">Phone</label>
+            <input type="tel" id="a-phone" autocomplete="tel">
+          </div>
+          <div class="form-field">
+            <label for="a-address">Delivery address</label>
+            <textarea id="a-address" rows="3"></textarea>
+          </div>
+          <div class="form-field">
+            <label for="a-city">City</label>
+            <input type="text" id="a-city" autocomplete="address-level2">
+          </div>
+          <button type="submit" class="btn btn-solid" style="width:100%; border:none;">Save details</button>
+          <div class="form-status" id="profile-status"></div>
+        </form>
+        <p style="font-size:0.8rem; color:#6b4a4e; margin-top:10px;">These are filled in for you at checkout.</p>
+        <button type="button" class="btn btn-outline acct-signout" id="acct-signout" style="width:100%;">Sign out</button>
+      </div>
+
+      <div class="acct-card">
+        <h2>My orders</h2>
+        <div id="orders-list"><p class="acct-empty">Loading your orders…</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <p style="text-align:center; font-size:0.85rem; margin-bottom:16px;"><a href="return-exchange.html" style="text-decoration:underline;">Return &amp; Exchange Policy</a></p>
+    <div class="footer-bottom">&copy; 2026 Velmora. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/nav.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/search.js"></script>
+<script type="module">
+  import { auth } from './js/firebase-init.js';
+  import { db, isFirebaseConfigured } from './js/firebase-config.js';
+  import { onAuthStateChanged, updateProfile, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const taka = n => '৳' + Number(n || 0).toLocaleString('en-IN');
+
+  if (!isFirebaseConfigured || !auth) {
+    $('acct-loading').textContent = "Accounts aren't set up yet — please check back soon.";
+  } else {
+    onAuthStateChanged(auth, function (user) {
+      if (!user) { window.location.replace('login.html?redirect=account.html'); return; }
+      $('acct-loading').classList.add('hidden');
+      $('acct-main').classList.remove('hidden');
+      $('a-email').value = user.email || '';
+      $('a-name').value = user.displayName || '';
+      if (user.displayName) $('acct-welcome').textContent = 'Welcome back, ' + user.displayName.split(' ')[0] + '.';
+      loadProfile(user);
+      loadOrders(user);
+    });
+  }
+
+  async function loadProfile(user) {
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (!snap.exists()) return;
+      const p = snap.data();
+      if (p.name) $('a-name').value = p.name;
+      $('a-phone').value = p.phone || '';
+      $('a-address').value = p.address || '';
+      $('a-city').value = p.city || '';
+    } catch (err) {
+      console.error('Could not load profile:', err);
+    }
+  }
+
+  $('profile-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const user = auth && auth.currentUser;
+    if (!user) return;
+    const status = $('profile-status');
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    status.textContent = '';
+    const name = $('a-name').value.trim();
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        name: name,
+        phone: $('a-phone').value.trim(),
+        address: $('a-address').value.trim(),
+        city: $('a-city').value.trim(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      if (name && name !== user.displayName) await updateProfile(user, { displayName: name });
+      status.style.color = '#155724';
+      status.textContent = 'Saved ✓';
+    } catch (err) {
+      console.error('Could not save profile:', err);
+      status.style.color = '#a15a5a';
+      status.textContent = 'Could not save — please try again.';
+    }
+    btn.disabled = false;
+  });
+
+  async function loadOrders(user) {
+    const list = $('orders-list');
+    try {
+      const snap = await getDocs(query(collection(db, 'orders'), where('userId', '==', user.uid)));
+      const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0));
+      if (!orders.length) {
+        list.innerHTML = '<p class="acct-empty">No orders yet. <a href="shop.html" style="text-decoration:underline;">Start shopping</a> — orders you place while signed in will show up here.</p>';
+        return;
+      }
+      list.innerHTML = orders.map(o => {
+        const date = o.createdAt && o.createdAt.seconds ? new Date(o.createdAt.seconds * 1000).toLocaleDateString() : '';
+        const items = (o.items || []).map(i => esc(i.name) + ' × ' + esc(i.qty)).join('<br>');
+        return '<div class="acct-order">' +
+          '<div class="acct-order-head"><span>' + esc(date) + '</span><span class="pill pill-' + esc(o.status) + '">' + esc(o.status) + '</span></div>' +
+          '<div class="acct-order-items">' + items + '</div>' +
+          '<div class="acct-order-total"><span>Total (incl. delivery)</span><span>' + taka(o.total) + '</span></div>' +
+          '</div>';
+      }).join('');
+    } catch (err) {
+      console.error('Could not load orders:', err);
+      list.innerHTML = '<p class="acct-empty">We couldn\'t load your orders right now. Please try again later.</p>';
+    }
+  }
+
+  $('acct-signout').addEventListener('click', async function () {
+    try { await signOut(auth); } catch (err) { console.error(err); }
+    window.location.href = 'index.html';
+  });
+</script>
+</body>
+</html>
