@@ -212,7 +212,7 @@ function updatePriceSliderVisual() {
   const maxPct = (maxVal / PRICE_SLIDER_MAX) * 100;
   if (rangeFill) { rangeFill.style.left = minPct + '%'; rangeFill.style.right = (100 - maxPct) + '%'; }
   if (minLabel) minLabel.textContent = '৳' + minVal.toLocaleString('en-IN');
-  if (maxLabel) maxLabel.textContent = maxVal >= PRICE_SLIDER_MAX ? `৳${PRICE_SLIDER_MAX.toLocaleString('en-IN')}+` : '৳' + maxVal.toLocaleString('en-IN');
+  if (maxLabel) maxLabel.textContent = maxVal >= PRICE_SLIDER_MAX ? '৳' + PRICE_SLIDER_MAX.toLocaleString('en-IN') + '+' : '৳' + maxVal.toLocaleString('en-IN');
 }
 
 function resetPriceSlider() {
@@ -231,8 +231,8 @@ function setupPriceSlider() {
     const minVal = Number(minRange.value);
     const maxRaw = Number(maxRange.value);
     const maxVal = maxRaw >= PRICE_SLIDER_MAX ? 999999 : maxRaw;
-    filterState.price = `${minVal}-${maxVal}`;
-    PRICE_FILTER_LABELS[filterState.price] = `৳${minVal.toLocaleString('en-IN)} – ${maxVal >= 999999 ? `৳${PRICE_SLIDER_MAX.toLocaleString('en-IN')}+` : '৳' + maxVal.toLocaleString('en-IN')}`;
+    filterState.price = minVal + '-' + maxVal;
+    PRICE_FILTER_LABELS[filterState.price] = '৳' + minVal.toLocaleString('en-IN') + ' – ' + (maxVal >= 999999 ? '৳' + PRICE_SLIDER_MAX.toLocaleString('en-IN') + '+' : '৳' + maxVal.toLocaleString('en-IN'));
     document.querySelectorAll('[data-price-filter]').forEach(c => c.classList.remove('active'));
     renderProductGrid();
   }
