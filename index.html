@@ -19,6 +19,7 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/buy-now.css">
+<link rel="stylesheet" href="css/johrot-layout.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -204,128 +205,168 @@
   </div>
 </section>
 
-<!-- Combo Deals — topmost product section, sale-ends note + live discount range badge -->
+<!-- About Velmora — three rounded cards -->
+<section>
+  <div class="container">
+    <h2 class="jr-about-title">About Velmora<span class="gem"></span></h2>
+    <div class="jr-brands">
+      <a class="jr-brand" href="shop.html?gender=Women">
+        <div class="jr-brand-img" data-jr-photo data-gender="Women"></div>
+        <p>Rings, necklaces, bracelets and earrings for her.</p>
+        <h3>For Her</h3>
+      </a>
+      <a class="jr-brand" href="shop.html?gender=Men">
+        <div class="jr-brand-img" data-jr-photo data-gender="Men"></div>
+        <p>Rings, necklaces, bracelets and glasses for him.</p>
+        <h3>For Him</h3>
+      </a>
+      <a class="jr-brand" href="shop.html?category=Gift%20Box,Flower,Chocolate,Books">
+        <div class="jr-brand-img" data-jr-photo data-category="Gift Box,Flower,Chocolate,Books"></div>
+        <p>Curated gifts, ready for every occasion.</p>
+        <h3>Gifts</h3>
+      </a>
+    </div>
+    <p class="jr-about-line">Fine jewellery, made for everyday glamour</p>
+    <p style="max-width:600px; margin:16px auto 0; text-align:center; color:#6b4a4e; font-size:0.9rem;">Velmora is a Dhaka-based jewellery and gift brand bringing affordable, hand-finished pieces to Bangladesh. Every order ships with cash on delivery so you can shop with confidence.</p>
+  </div>
+</section>
+
+<!-- Combo Deals -->
 <section style="padding-top:12px;">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head jr-head">
       <div class="section-eyebrow">Limited Time</div>
       <h2>Combo Deals <span class="discount-pill" data-combo-discount-badge style="display:none;"></span></h2>
       <p data-combo-sale-ends style="display:none; color:#a15a5a; font-weight:500;"></p>
       <p>Save more with our bundled jewellery sets.</p>
     </div>
     <div class="deal-slider-wrap">
-      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
       <div class="deal-slider">
         <div class="deal-track" data-combo-grid></div>
       </div>
-      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
     </div>
-    <div style="text-align:center; margin-top:12px;">
-      <a href="shop.html?category=Combo%20Deals" class="btn">View Others</a>
+    <div class="jr-more">
+      <a href="shop.html?category=Combo%20Deals" class="btn btn-aqua">View all</a>
     </div>
   </div>
 </section>
 
-<!-- New Arrivals — products tagged "New" -->
+<!-- New Arrivals -->
 <section style="background: var(--blush);">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head jr-head">
       <div class="section-eyebrow">Just In</div>
       <h2>New Arrivals</h2>
     </div>
     <div class="deal-slider-wrap">
-      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
       <div class="deal-slider">
         <div class="deal-track" data-newarrivals-grid></div>
       </div>
-      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
     </div>
-    <div style="text-align:center; margin-top:12px;">
-      <a href="shop.html?tag=New" class="btn">View Others</a>
+    <div class="jr-more">
+      <a href="shop.html?tag=New" class="btn btn-aqua">View all</a>
     </div>
   </div>
 </section>
 
-<!-- For Women — — admin-curated horizontal row -->
+<!-- For Women — category tiles -->
 <section>
   <div class="container">
-    <div class="section-head">
-      <div class="section-eyebrow">Shop by Gender</div>
+    <div class="section-head jr-head">
       <h2>For Women</h2>
     </div>
-    <div class="deal-slider-wrap">
-      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
-      <div class="deal-slider">
-        <div class="deal-track" data-forwomen-grid></div>
-      </div>
-      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
-    </div>
-    <div style="text-align:center; margin-top:12px;">
-      <a href="shop.html?gender=Women" class="btn">View Others</a>
+    <div class="jr-tiles">
+      <a class="jr-tile" href="shop.html?gender=Women&category=Pendant"><div class="jr-tile-img" data-jr-photo data-gender="Women" data-category="Pendant"></div><div class="jr-tile-label">Pendants</div></a>
+      <a class="jr-tile" href="shop.html?gender=Women&category=Rings"><div class="jr-tile-img" data-jr-photo data-gender="Women" data-category="Rings"></div><div class="jr-tile-label">Rings</div></a>
+      <a class="jr-tile" href="shop.html?gender=Women&category=Bracelets"><div class="jr-tile-img" data-jr-photo data-gender="Women" data-category="Bracelets"></div><div class="jr-tile-label">Bracelets</div></a>
+      <a class="jr-tile" href="shop.html?gender=Women&category=Earrings"><div class="jr-tile-img" data-jr-photo data-gender="Women" data-category="Earrings"></div><div class="jr-tile-label">Earrings</div></a>
+      <a class="jr-tile" href="shop.html?gender=Women&category=Jewelry%20Set"><div class="jr-tile-img" data-jr-photo data-gender="Women" data-category="Jewelry Set"></div><div class="jr-tile-label">Jewelry Sets</div></a>
     </div>
   </div>
 </section>
 
-<!-- For Man — admin-curated horizontal row -->
+<!-- For Man — category tiles -->
 <section style="background: var(--blush);">
   <div class="container">
-    <div class="section-head">
-      <div class="section-eyebrow">Shop by Gender</div>
+    <div class="section-head jr-head">
       <h2>For Man</h2>
     </div>
-    <div class="deal-slider-wrap">
-      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
-      <div class="deal-slider">
-        <div class="deal-track" data-forman-grid></div>
-      </div>
-      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
-    </div>
-    <div style="text-align:center; margin-top:12px;">
-      <a href="shop.html?gender=Men" class="btn">View Others</a>
+    <div class="jr-tiles">
+      <a class="jr-tile" href="shop.html?gender=Men&category=Rings"><div class="jr-tile-img" data-jr-photo data-gender="Men" data-category="Rings"></div><div class="jr-tile-label">Rings</div></a>
+      <a class="jr-tile" href="shop.html?gender=Men&category=Necklaces"><div class="jr-tile-img" data-jr-photo data-gender="Men" data-category="Necklaces"></div><div class="jr-tile-label">Necklaces</div></a>
+      <a class="jr-tile" href="shop.html?gender=Men&category=Bracelets"><div class="jr-tile-img" data-jr-photo data-gender="Men" data-category="Bracelets"></div><div class="jr-tile-label">Bracelets</div></a>
+      <a class="jr-tile" href="shop.html?gender=Men&category=Glasses"><div class="jr-tile-img" data-jr-photo data-gender="Men" data-category="Glasses"></div><div class="jr-tile-label">Glasses</div></a>
     </div>
   </div>
 </section>
 
-<!-- Gift Box / Gift Items — admin-curated horizontal row -->
+<!-- Gift Items -->
 <section>
   <div class="container">
-    <div class="section-head">
+    <div class="section-head jr-head">
       <div class="section-eyebrow">For Someone Special</div>
       <h2>Gift Items</h2>
       <p>Curated pieces, ready to gift.</p>
     </div>
     <div class="deal-slider-wrap">
-      <button type="button" class="deal-arrow deal-arrow-prev" data-slide-prev aria-label="Previous">‹</button>
       <div class="deal-slider">
         <div class="deal-track" data-giftbox-grid></div>
       </div>
-      <button type="button" class="deal-arrow deal-arrow-next" data-slide-next aria-label="Next">›</button>
     </div>
-    <div style="text-align:center; margin-top:12px;">
-      <a href="shop.html?category=Gift%20Box,Flower,Chocolate,Books" class="btn">View Others</a>
+    <div class="jr-more">
+      <a href="shop.html?category=Gift%20Box,Flower,Chocolate,Books" class="btn btn-aqua">View all</a>
     </div>
   </div>
 </section>
 
 <section style="background: var(--blush);">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head jr-head">
       <div class="section-eyebrow">Handpicked</div>
       <h2>Featured pieces</h2>
     </div>
     <div class="product-grid" data-featured-grid></div>
-    <div style="text-align:center; margin-top:15px;">
-      <a href="shop.html" class="btn">View All Products</a>
+    <div class="jr-more" style="margin-top:15px;">
+      <a href="shop.html" class="btn btn-aqua">View all</a>
     </div>
   </div>
 </section>
 
-<section>
-  <div class="container" style="text-align:center;">
-    <div class="divider" style="margin-bottom:12px;"><span class="gem"></span></div>
-    <div class="section-eyebrow">About Velmora</div>
-    <h2 style="max-width:640px; margin:0 auto 10px;">Fine jewellery, made for everyday glamour</h2>
-    <p style="max-width:600px; margin:0 auto; color:#6b4a4e;">Velmora is a Dhaka-based jewellery and gift brand bringing affordable, hand-finished pieces to Bangladesh — rings, necklaces, bracelets and earrings for her, accessories for him, and curated gifts for every occasion. Every Velmora piece is finished by hand, and every order ships with cash on delivery so you can shop with confidence.</p>
+<!-- FAQ accordion -->
+<section class="jr-faq">
+  <div class="container">
+    <h2>FAQs (Frequently Asked Questions)</h2>
+    <details>
+      <summary><span class="q">?</span>What is your delivery charge?</summary>
+      <div class="a">We deliver across Bangladesh. The delivery charge depends on where you live — you can choose your area at checkout and see the exact charge before you order.</div>
+    </details>
+    <details>
+      <summary><span class="q">?</span>Do you take any advance payment?</summary>
+      <div class="a">No. Every order ships with cash on delivery — you pay when your order arrives.</div>
+    </details>
+    <details>
+      <summary><span class="q">?</span>Exchange &amp; Return Policy</summary>
+      <div class="a">Read our full policy on the <a href="return-exchange.html">Return &amp; Exchange page</a>.</div>
+    </details>
+    <details>
+      <summary><span class="q">?</span>How can I contact Velmora?</summary>
+      <div class="a">Message us on <a href="https://wa.me/8801707082002" target="_blank" rel="noopener">WhatsApp</a>, <a href="https://instagram.com/velmora" target="_blank" rel="noopener">Instagram</a>, or email <a href="mailto:Velmora511@gmail.com">Velmora511@gmail.com</a>.</div>
+    </details>
+  </div>
+</section>
+
+<!-- Contact info -->
+<section class="jr-contact">
+  <div class="container">
+    <h2>Contact Info</h2>
+    <div class="jr-contact-card">
+      <h4>E-mail:</h4>
+      <p><a href="mailto:Velmora511@gmail.com">Velmora511@gmail.com</a></p>
+    </div>
+    <div class="jr-contact-card">
+      <h4>OR</h4>
+      <p>You can contact us through our <a href="https://instagram.com/velmora" target="_blank" rel="noopener">Instagram</a>, <a href="https://www.facebook.com/share/19JQtaQ3fu/" target="_blank" rel="noopener">Facebook</a> or <a href="https://wa.me/8801707082002" target="_blank" rel="noopener">WhatsApp</a>.</p>
+    </div>
   </div>
 </section>
 
@@ -388,16 +429,6 @@
 <script src="js/category-scroll.js" defer></script>
 <script type="module" src="js/products.js"></script>
 <script src="js/motion.js" defer></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.deal-slider-wrap').forEach(function (wrap) {
-    var track = wrap.querySelector('.deal-slider');
-    var prev = wrap.querySelector('[data-slide-prev]');
-    var next = wrap.querySelector('[data-slide-next]');
-    if (prev && track) prev.addEventListener('click', function () { track.scrollBy({ left: -240, behavior: 'smooth' }); });
-    if (next && track) next.addEventListener('click', function () { track.scrollBy({ left: 240, behavior: 'smooth' }); });
-  });
-});
-</script>
+<script src="js/johrot-layout.js" defer></script>
 </body>
 </html>

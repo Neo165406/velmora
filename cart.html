@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Cart — Velmora</title>
+<title>Checkout — Velmora</title>
 <meta name="description" content="Review your cart and check out at Velmora — fine jewellery with cash on delivery across Bangladesh.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://www.gstatic.com">
 <link rel="preconnect" href="https://firestore.googleapis.com">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/johrot-layout.css">
 </head>
 <body>
 
@@ -78,8 +79,8 @@
 
 <div class="page-hero">
   <div class="container">
-    <h1>Your Cart</h1>
-    <p>Review your pieces before checkout.</p>
+    <h1>Checkout</h1>
+    <p>Review your pieces and place your order.</p>
   </div>
 </div>
 
@@ -90,54 +91,99 @@
       <a href="shop.html" class="btn btn-solid">Continue Shopping</a>
     </div>
 
-    <div id="cart-full" class="cart-layout">
+    <div id="cart-full" class="cart-layout jr-checkout">
       <div>
+        <h2 class="jr-h">Your items</h2>
         <div id="cart-items"></div>
       </div>
 
       <div class="cart-summary">
-        <h3>Order Summary</h3>
-        <div class="delivery-options">
-          <label class="delivery-option">
-            <input type="radio" name="delivery" value="dhaka" checked>
-            Inside Dhaka
-            <span class="fee">৳60</span>
-          </label>
-          <label class="delivery-option">
-            <input type="radio" name="delivery" value="outside">
-            Outside Dhaka
-            <span class="fee" id="fee-outside-label">৳110</span>
-          </label>
-        </div>
-
-        <div class="form-field" style="margin-bottom:18px;">
-          <label for="coupon-input">Coupon Code</label>
-          <div style="display:flex; gap:10px;">
-            <input type="text" id="coupon-input" placeholder="Enter code" style="flex:1; text-transform:uppercase;">
-            <button type="button" class="btn btn-outline btn-sm" id="apply-coupon-btn" style="white-space:nowrap;">Apply</button>
-          </div>
-          <div id="coupon-status" style="margin-top:8px; font-size:0.84rem;"></div>
-        </div>
-
-        <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">৳0</span></div>
-        <div class="summary-row" id="sum-discount-row" style="display:none; color:#155724;"><span>Discount</span><span id="sum-discount">−৳0</span></div>
-        <div class="summary-row"><span>Delivery</span><span id="sum-delivery">৳60</span></div>
-        <div class="summary-row total"><span>Total</span><span id="sum-total">৳0</span></div>
-
-        <form id="checkout-form" style="margin-top:24px;">
+        <form id="checkout-form">
+          <h2 class="jr-h">Contact</h2>
           <div class="form-field">
-            <label for="c-name">Full Name</label>
-            <input type="text" id="c-name" required>
+            <label for="c-email">Email (optional)</label>
+            <input type="email" id="c-email" autocomplete="email">
           </div>
           <div class="form-field">
-            <label for="c-phone">Phone Number</label>
-            <input type="tel" id="c-phone" required>
+            <label for="c-phone">Phone</label>
+            <input type="tel" id="c-phone" required autocomplete="tel">
+          </div>
+
+          <h2 class="jr-h">Delivery</h2>
+          <div class="form-field">
+            <label for="c-country">Country/Region</label>
+            <select id="c-country" disabled><option>Bangladesh</option></select>
           </div>
           <div class="form-field">
-            <label for="c-address">Delivery Address</label>
+            <label for="c-name">Full name</label>
+            <input type="text" id="c-name" required autocomplete="name">
+          </div>
+          <div class="form-field">
+            <label for="c-address">Address</label>
             <textarea id="c-address" rows="3" required></textarea>
           </div>
-          <button type="submit" class="btn btn-solid" style="width:100%; border:none;">Place Order — Cash on Delivery</button>
+          <div class="form-field">
+            <label for="c-city">City</label>
+            <input type="text" id="c-city" autocomplete="address-level2">
+          </div>
+
+          <h2 class="jr-h">Shipping method</h2>
+          <div class="jr-radio-group delivery-options">
+            <label class="delivery-option">
+              <input type="radio" name="delivery" value="dhaka" checked>
+              Inside Dhaka
+              <span class="fee" id="fee-dhaka-label">৳60</span>
+            </label>
+            <label class="delivery-option">
+              <input type="radio" name="delivery" value="suburban">
+              <span>Suburban Areas<span class="sub">Gazipur, Narayanganj, Savar, Keraniganj</span></span>
+              <span class="fee" id="fee-suburban-label">৳85</span>
+            </label>
+            <label class="delivery-option">
+              <input type="radio" name="delivery" value="outside">
+              Outside Dhaka
+              <span class="fee" id="fee-outside-label">৳110</span>
+            </label>
+          </div>
+
+          <h2 class="jr-h">Payment</h2>
+          <p style="font-size:0.85rem; color:#6b4a4e; margin-bottom:10px;">All orders are confirmed by phone.</p>
+          <div class="jr-cod">
+            <div class="jr-cod-head">Cash on Delivery (COD)</div>
+            <div class="jr-cod-body">Pay with cash when your order arrives. No advance payment needed.</div>
+          </div>
+
+          <details style="margin-top:18px;">
+            <summary style="cursor:pointer; padding:6px 0;">Order instructions (optional)</summary>
+            <textarea id="c-note" rows="3" style="width:100%; margin-top:8px; border:1px solid rgba(20,20,20,0.25); padding:10px 12px; font-family:'Jost',sans-serif;"></textarea>
+          </details>
+
+          <div style="margin-top:20px;">
+            <button type="button" class="jr-pill" id="add-discount-toggle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12V4h8l10 10-8 8L3 12z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg>
+              Add discount
+            </button>
+            <div id="discount-panel" class="hidden">
+              <div style="display:flex; gap:10px;">
+                <input type="text" id="coupon-input" placeholder="Discount code" style="flex:1; text-transform:uppercase; border:1px solid rgba(20,20,20,0.25); padding:12px 14px; font-family:'Jost',sans-serif;">
+                <button type="button" class="btn btn-outline btn-sm" id="apply-coupon-btn" style="white-space:nowrap;">Apply</button>
+              </div>
+              <div id="coupon-status" style="margin-top:8px; font-size:0.84rem;"></div>
+            </div>
+          </div>
+
+          <div style="margin-top:22px;">
+            <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">৳0</span></div>
+            <div class="summary-row" id="sum-discount-row" style="display:none; color:#155724;"><span>Discount</span><span id="sum-discount">−৳0</span></div>
+            <div class="summary-row"><span>Delivery</span><span id="sum-delivery">৳60</span></div>
+          </div>
+          <div class="jr-total-block">
+            <div class="thumb" id="total-thumb"></div>
+            <div class="label"><strong>Total</strong><span id="total-count">1 item</span></div>
+            <div class="amount"><small>BDT</small><span id="sum-total">৳0</span></div>
+          </div>
+
+          <button type="submit" class="btn btn-solid" style="width:100%; border:none; margin-top:20px;">Complete order</button>
           <div class="form-status" id="checkout-status"></div>
         </form>
       </div>
@@ -172,11 +218,12 @@
 <script src="js/nav.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/search.js"></script>
+<script src="js/johrot-layout.js"></script>
 <script type="module">
   import { db, isFirebaseConfigured } from './js/firebase-config.js';
   import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-  let dynamicFees = null;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   async function loadDeliverySettings() {
     if (!isFirebaseConfigured) return;
@@ -185,10 +232,12 @@
       const snap = await getDoc(docFn(db, 'settings', 'site'));
       if (!snap.exists()) return;
       const t = snap.data();
-      if (t.feeDhaka || t.feeOutside) {
-        dynamicFees = { dhaka: Number(t.feeDhaka) || 60, outside: Number(t.feeOutside) || 110 };
-        DELIVERY_FEES.dhaka = dynamicFees.dhaka;
-        DELIVERY_FEES.outside = dynamicFees.outside;
+      if (t.feeDhaka || t.feeOutside || t.feeSuburban) {
+        DELIVERY_FEES.dhaka = Number(t.feeDhaka) || 60;
+        DELIVERY_FEES.suburban = Number(t.feeSuburban) || 85;
+        DELIVERY_FEES.outside = Number(t.feeOutside) || 110;
+        document.getElementById('fee-dhaka-label').textContent = formatTaka(DELIVERY_FEES.dhaka);
+        document.getElementById('fee-suburban-label').textContent = formatTaka(DELIVERY_FEES.suburban);
         document.getElementById('fee-outside-label').textContent = formatTaka(DELIVERY_FEES.outside);
         updateSummary();
       }
@@ -216,15 +265,19 @@
 
     document.getElementById('cart-items').innerHTML = cart.map(item => `
       <div class="cart-item">
-        <div class="thumb">${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;">` : gemIconSmall()}</div>
+        <div class="thumb">${item.image ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" style="width:100%; height:100%; object-fit:cover;">` : gemIconSmall()}</div>
         <div class="details">
-          <h4>${item.name}</h4>
-          <div class="qty-stepper">
-            <button type="button" data-minus="${item.id}">−</button>
-            <input type="text" value="${item.qty}" readonly>
-            <button type="button" data-plus="${item.id}">+</button>
+          <h4>${esc(item.name)}</h4>
+          <div class="qty-row">
+            <div class="qty-stepper">
+              <button type="button" data-minus="${esc(item.id)}">−</button>
+              <input type="text" value="${item.qty}" readonly>
+              <button type="button" data-plus="${esc(item.id)}">+</button>
+            </div>
+            <button type="button" class="jr-trash" data-remove="${esc(item.id)}" aria-label="Remove">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>
+            </button>
           </div>
-          <a href="#" class="remove-link" data-remove="${item.id}">Remove</a>
         </div>
         <div class="price">${formatTaka(item.price * item.qty)}</div>
       </div>
@@ -238,13 +291,14 @@
       const item = cart.find(i => i.id === btn.dataset.plus);
       btn.addEventListener('click', () => { updateQty(item.id, item.qty + 1); renderCart(); });
     });
-    document.querySelectorAll('[data-remove]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        removeFromCart(link.dataset.remove);
-        renderCart();
-      });
+    document.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.addEventListener('click', () => { removeFromCart(btn.dataset.remove); renderCart(); });
     });
+
+    const first = cart[0];
+    document.getElementById('total-thumb').innerHTML = first.image ? `<img src="${esc(first.image)}" alt="">` : '';
+    const count = cartCount();
+    document.getElementById('total-count').textContent = count + (count === 1 ? ' item' : ' items');
 
     updateSummary();
   }
@@ -277,18 +331,27 @@
       status.textContent = `"${coupon.code}" applied ✓`;
       status.style.color = '#155724';
       input.value = coupon.code;
+      document.getElementById('discount-panel').classList.remove('hidden');
     } else {
       status.textContent = '';
     }
   }
 
-  document.getElementById('apply-coupon-btn').addEventListener('click', () => {
+  document.getElementById('add-discount-toggle').addEventListener('click', () => {
+    document.getElementById('discount-panel').classList.toggle('hidden');
+  });
+
+  function doApplyCoupon() {
     const value = document.getElementById('coupon-input').value;
     const result = applyCoupon(value);
     const status = document.getElementById('coupon-status');
     status.textContent = result.message;
     status.style.color = result.ok ? '#155724' : '#a15a5a';
     updateSummary();
+  }
+  document.getElementById('apply-coupon-btn').addEventListener('click', doApplyCoupon);
+  document.getElementById('coupon-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); doApplyCoupon(); }
   });
 
   document.querySelectorAll('input[name="delivery"]').forEach(radio => {
@@ -319,6 +382,12 @@
       total: Math.max(0, subtotal - discount) + getDeliveryFee(currentZone()),
       status: 'pending'
     };
+    const email = document.getElementById('c-email').value.trim();
+    const city = document.getElementById('c-city').value.trim();
+    const note = document.getElementById('c-note').value.trim();
+    if (email) order.email = email;
+    if (city) order.city = city;
+    if (note) order.note = note;
 
     try {
       if (isFirebaseConfigured) {
@@ -333,6 +402,7 @@
       refreshCouponUI();
       document.getElementById('checkout-status').textContent = 'Order placed! We\'ll call to confirm delivery.';
       this.reset();
+      updateCartBadge();
       setTimeout(renderCart, 1200);
     } catch (err) {
       console.error('Order failed to save:', err);
