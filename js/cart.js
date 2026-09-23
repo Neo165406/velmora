@@ -1,13 +1,14 @@
 // ---------------------------------------------------------------
 // Velmora cart — localStorage-based, no backend required.
-// Delivery: Inside Dhaka ৳60, Outside Dhaka ৳110 (admin can override in dashboard Theme tab).
+// Delivery: Inside Dhaka ৳60, Suburban ৳85 (placeholder — confirm), Outside Dhaka ৳110
+// (admin can override in dashboard Theme tab).
 // Once Firestore is wired (see firebase-init.js), checkout() can be
 // extended to also write the order into an `orders` collection.
 // ---------------------------------------------------------------
 
 const CART_KEY = 'velmora_cart';
 const COUPON_KEY = 'velmora_coupon';
-const DELIVERY_FEES = { dhaka: 60, outside: 110 };
+const DELIVERY_FEES = { dhaka: 60, suburban: 85, outside: 110 };
 
 // Simple built-in coupon codes. Admin can add more from the dashboard
 // Theme tab later — this list is the fallback used when no Firestore
@@ -75,6 +76,8 @@ function addToCart(product, qty = 1) {
     });
   }
   saveCart(cart);
+  // Lets the slide-in cart drawer (js/johrot-layout.js) open after an add.
+  document.dispatchEvent(new CustomEvent('velmora:cart-added'));
 }
 
 function removeFromCart(id) {

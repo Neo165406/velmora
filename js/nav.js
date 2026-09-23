@@ -1,3 +1,18 @@
+// Load shared Johrot-inspired layout assets on any page that doesn't include them explicitly
+(function () {
+  if (!document.querySelector('link[href$="css/johrot-layout.css"]')) {
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = 'css/johrot-layout.css';
+    document.head.appendChild(l);
+  }
+  if (!document.querySelector('script[src$="js/johrot-layout.js"]')) {
+    var s = document.createElement('script');
+    s.src = 'js/johrot-layout.js';
+    document.head.appendChild(s);
+  }
+})();
+
 // Shared hamburger navigation — include on every page
 document.addEventListener('DOMContentLoaded', function () {
   const hamburger = document.querySelector('.hamburger');
