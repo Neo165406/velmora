@@ -122,15 +122,15 @@
   border: 1.5px solid var(--plum);
   border-radius: 26px;
   background: var(--blush);
-  padding: 14px 8px 12px;
+  padding: 26px 8px 24px;
 }
 .jr-brand-img {
-  width: 78%; aspect-ratio: 1/1; border-radius: 50%;
+  width: 84%; aspect-ratio: 1/1; border-radius: 50%;
   background: var(--photo-bg, linear-gradient(200deg, var(--gold) 0%, var(--maroon) 70%)) center/cover;
   border: 2px solid var(--gold-light);
-  margin-bottom: 10px;
+  margin-bottom: 18px;
 }
-.jr-brand p { font-size: 0.68rem; line-height: 1.45; color: var(--plum); margin-bottom: 10px; flex: 1; }
+.jr-brand p { font-size: 0.68rem; line-height: 1.45; color: var(--plum); margin-bottom: 24px; flex: 1; }
 .jr-brand h3 { font-size: 0.95rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; }
 .jr-about-line {
   border-top: 1px solid var(--plum);
@@ -139,6 +139,7 @@
   letter-spacing: 0.22em; text-transform: uppercase; color: #6b4a4e;
 }
 @media (min-width: 700px) {
+  .jr-brand { padding: 34px 16px 30px; }
   .jr-brand p { font-size: 0.9rem; }
   .jr-brand h3 { font-size: 1.15rem; }
   .jr-brands { gap: 22px; }
