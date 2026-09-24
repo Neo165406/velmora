@@ -99,6 +99,9 @@
 
       <div class="cart-summary">
         <form id="checkout-form">
+          <p id="login-hint" style="font-size:0.86rem; color:#6b4a4e; margin-bottom:14px;">
+            Have an account? <a href="login.html?redirect=cart.html" style="text-decoration:underline;">Sign in</a> for faster checkout and to track your orders. You can also check out as a guest.
+          </p>
           <h2 class="jr-h">Contact</h2>
           <div class="form-field">
             <label for="c-email">Email (optional)</label>
@@ -221,15 +224,44 @@
 <script src="js/johrot-layout.js"></script>
 <script type="module">
   import { db, isFirebaseConfigured } from './js/firebase-config.js';
-  import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { auth } from './js/firebase-init.js';
+  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { collection, addDoc, doc, getDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  /* ---------- Signed-in buyers: prefill their saved details ---------- */
+  if (isFirebaseConfigured && auth) {
+    onAuthStateChanged(auth, async function (user) {
+      document.getElementById('login-hint').style.display = user ? 'none' : '';
+      if (!user) return;
+      const setIfEmpty = function (id, value) {
+        const el = document.getElementById(id);
+        if (el && !el.value && value) el.value = value;
+      };
+      setIfEmpty('c-email', user.email);
+      setIfEmpty('c-name', user.displayName);
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists()) {
+          const p = snap.data();
+          setIfEmpty('c-name', p.name);
+          setIfEmpty('c-phone', p.phone);
+          setIfEmpty('c-address', p.address);
+          setIfEmpty('c-city', p.city);
+        }
+      } catch (err) {
+        console.error('Could not load saved details:', err);
+      }
+    });
+  } else {
+    document.getElementById('login-hint').style.display = 'none';
+  }
 
   async function loadDeliverySettings() {
     if (!isFirebaseConfigured) return;
     try {
-      const { doc: docFn, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-      const snap = await getDoc(docFn(db, 'settings', 'site'));
+      const snap = await getDoc(doc(db, 'settings', 'site'));
       if (!snap.exists()) return;
       const t = snap.data();
       if (t.feeDhaka || t.feeOutside || t.feeSuburban) {
@@ -388,6 +420,8 @@
     if (email) order.email = email;
     if (city) order.city = city;
     if (note) order.note = note;
+    // Signed-in buyers: link the order to their account so it shows under My Account.
+    if (auth && auth.currentUser) order.userId = auth.currentUser.uid;
 
     try {
       if (isFirebaseConfigured) {
