@@ -48,6 +48,7 @@
     <a href="#" data-tab="overview" class="tab-link active">Overview</a>
     <a href="#" data-tab="products" class="tab-link">Products</a>
     <a href="#" data-tab="categories" class="tab-link">Categories</a>
+    <a href="#" data-tab="tilegrid" class="tab-link">Tile Grid</a>
     <a href="#" data-tab="orders" class="tab-link">Orders</a>
     <a href="#" data-tab="about" class="tab-link">About Cards</a>
     <a href="#" data-tab="theme" class="tab-link">Theme</a>
@@ -131,6 +132,21 @@
         <table>
           <thead><tr><th>Category</th><th>Shows under</th><th></th></tr></thead>
           <tbody id="catsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TILE GRID (fully manual homepage tiles — any title, any photo, any link) -->
+    <section id="tab-tilegrid" class="hidden">
+      <div class="admin-topbar">
+        <h1>Tile Grid</h1>
+        <button class="btn btn-aqua" id="newTileBtn">+ New Tile</button>
+      </div>
+      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Add your own tiles to the homepage <b>For Women</b> / <b>For Man</b> grids — any title, any photo, linking to any category. Unlike the Categories tab, these always show, whether or not a product exists for them.</p>
+      <div class="table-card">
+        <table>
+          <thead><tr><th>Tile</th><th>Links to</th><th>Shows under</th><th></th></tr></thead>
+          <tbody id="tilesTableBody"></tbody>
         </table>
       </div>
     </section>
@@ -333,6 +349,43 @@
   </div>
 </div>
 
+<!-- Tile Grid modal — fully manual tile: any title, any photo, any category link -->
+<div class="modal-overlay" id="tileModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="tileModalTitle">New Tile</h3>
+      <button class="modal-close" id="closeTileModal">✕</button>
+    </div>
+    <div class="field">
+      <label>Tile Title *</label>
+      <input type="text" id="tTitle" placeholder="e.g. Anklets, Wedding Edit, New Drop...">
+    </div>
+    <div class="field">
+      <label>Links to Category — optional</label>
+      <input type="text" id="tCategory" placeholder="e.g. Anklets (matches a product category)">
+      <p style="font-size:0.76rem; color:#7a5a5d; margin-top:6px;">Any category name — built-in or your own. Leave blank to link to the full shop instead.</p>
+    </div>
+    <div class="field">
+      <label>Shows under *</label>
+      <select id="tSection">
+        <option value="forWomen">For Women</option>
+        <option value="forMan">For Man</option>
+        <option value="both">Both</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tile Photo</label>
+      <div class="img-upload" id="tImgUploadZone">
+        <input type="file" id="tImgInput" accept="image/*" style="display:none;">
+        <span id="tUploadLabel">📷 Select photo</span>
+      </div>
+      <div class="img-preview-row" id="tImgPreviewRow"></div>
+      <p style="font-size:0.76rem; color:#7a5a5d; margin-top:6px;">This tile always shows with this exact photo — it isn't pulled from a product.</p>
+    </div>
+    <button class="btn btn-aqua btn-block" id="saveTileBtn" style="margin-top:8px;">Save Tile</button>
+  </div>
+</div>
+
 <!-- Order modal -->
 <div class="modal-overlay" id="orderModal">
   <div class="modal">
@@ -415,7 +468,7 @@
         e.preventDefault();
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         link.classList.add('active');
-        ['overview', 'products', 'categories', 'orders', 'about', 'theme'].forEach(t =>
+        ['overview', 'products', 'categories', 'tilegrid', 'orders', 'about', 'theme'].forEach(t =>
           document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== link.dataset.tab));
       });
     });
@@ -436,6 +489,7 @@
       loadOrders();
       loadCategories();
       loadDiySection();
+      loadTileGrid();
       loadAbout();
       loadTheme();
     }
@@ -852,6 +906,134 @@
       }
       btn.disabled = false;
       btn.textContent = 'Save';
+    });
+
+    /* ---------- Tile Grid (fully manual homepage tiles) ---------- */
+    // Stored in Firestore settings/site -> tileGrid: [{ title, image, category, section }]
+    // These always show — never tied to whether a matching product exists.
+    let tileGridItems = [];
+    let editingTileIndex = null;
+    let currentTileImage = '';
+
+    function sectionLabel(section) {
+      return section === 'forMan' ? 'For Man' : section === 'both' ? 'Both' : 'For Women';
+    }
+
+    function renderTileGridTable() {
+      const body = document.getElementById('tilesTableBody');
+      if (!tileGridItems.length) {
+        body.innerHTML = `<tr><td colspan="4" class="text-center" style="color:#7a5a5d; padding:30px;">No tiles yet — tap "+ New Tile"</td></tr>`;
+        return;
+      }
+      body.innerHTML = tileGridItems.map((t, i) => `
+        <tr>
+          <td><div class="row-thumb">${t.image ? `<img src="${esc(t.image)}">` : ''}<span>${esc(t.title)}</span></div></td>
+          <td>${t.category ? esc(t.category) : 'All products'}</td>
+          <td>${sectionLabel(t.section)}</td>
+          <td>
+            <button class="btn btn-outline btn-sm" data-tedit="${i}">Edit</button>
+            <button class="btn btn-danger btn-sm" data-tdel="${i}">Delete</button>
+          </td>
+        </tr>`).join('');
+    }
+
+    async function loadTileGrid() {
+      try {
+        const snap = await getDoc(doc(db, 'settings', 'site'));
+        const saved = snap.exists() ? snap.data().tileGrid : null;
+        tileGridItems = Array.isArray(saved) ? saved.filter(t => t && t.title) : [];
+      } catch (e) { /* no settings yet */ }
+      renderTileGridTable();
+    }
+
+    async function persistTileGrid() {
+      await setDoc(doc(db, 'settings', 'site'), { tileGrid: tileGridItems }, { merge: true });
+      renderTileGridTable();
+    }
+
+    function renderTileImagePreview() {
+      document.getElementById('tImgPreviewRow').innerHTML = currentTileImage
+        ? `<div style="position:relative;"><img src="${esc(currentTileImage)}"><span id="rmTileImg" style="position:absolute;top:-6px;right:-6px;background:var(--maroon-dark);color:#fff;width:18px;height:18px;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;">✕</span></div>`
+        : '';
+      const rm = document.getElementById('rmTileImg');
+      if (rm) rm.addEventListener('click', () => { currentTileImage = ''; renderTileImagePreview(); });
+    }
+
+    function openTileModal(index = null) {
+      editingTileIndex = index;
+      const t = index === null ? null : tileGridItems[index];
+      document.getElementById('tileModalTitle').textContent = t ? 'Edit Tile' : 'New Tile';
+      document.getElementById('tTitle').value = t ? t.title : '';
+      document.getElementById('tCategory').value = t ? (t.category || '') : '';
+      document.getElementById('tSection').value = t ? t.section : 'forWomen';
+      currentTileImage = t ? (t.image || '') : '';
+      renderTileImagePreview();
+      document.getElementById('tileModal').classList.add('open');
+    }
+    document.getElementById('newTileBtn').addEventListener('click', () => openTileModal());
+    document.getElementById('closeTileModal').addEventListener('click', () => document.getElementById('tileModal').classList.remove('open'));
+
+    document.getElementById('tImgUploadZone').addEventListener('click', () => document.getElementById('tImgInput').click());
+    document.getElementById('tImgInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const label = document.getElementById('tUploadLabel');
+      label.innerHTML = `<span class="spinner" style="border-top-color:var(--maroon-dark); border-color:rgba(107,15,26,0.2);"></span> Uploading...`;
+      try {
+        currentTileImage = await uploadToImgbb(file);
+        renderTileImagePreview();
+      } catch (err) {
+        console.error(err);
+        showToast('Photo upload failed — check imgbb key');
+      }
+      label.textContent = '📷 Select photo';
+      e.target.value = '';
+    });
+
+    document.getElementById('saveTileBtn').addEventListener('click', async () => {
+      const title = document.getElementById('tTitle').value.trim();
+      const category = document.getElementById('tCategory').value.trim();
+      const section = document.getElementById('tSection').value;
+      if (!title) { showToast('Tile title is required'); return; }
+      const btn = document.getElementById('saveTileBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> Saving...`;
+      const entry = { title, category, section, image: currentTileImage || '' };
+      const previous = tileGridItems.slice();
+      if (editingTileIndex === null) tileGridItems.push(entry);
+      else tileGridItems[editingTileIndex] = entry;
+      try {
+        await persistTileGrid();
+        document.getElementById('tileModal').classList.remove('open');
+        showToast('Tile saved ✓ — refresh the store to see it');
+      } catch (err) {
+        console.error('Tile save failed:', err);
+        tileGridItems = previous;
+        showToast('Could not save — try again');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save Tile';
+    });
+
+    document.getElementById('tilesTableBody').addEventListener('click', async (e) => {
+      const edit = e.target.closest('[data-tedit]');
+      const del = e.target.closest('[data-tdel]');
+      if (edit) openTileModal(Number(edit.dataset.tedit));
+      if (del) {
+        const i = Number(del.dataset.tdel);
+        const t = tileGridItems[i];
+        if (!confirm(`Delete the tile "${t.title}"?`)) return;
+        const previous = tileGridItems.slice();
+        tileGridItems.splice(i, 1);
+        try {
+          await persistTileGrid();
+          showToast('Tile deleted');
+        } catch (err) {
+          console.error(err);
+          tileGridItems = previous;
+          showToast('Could not delete — try again');
+        }
+      }
     });
 
     /* ---------- About Cards (homepage "About Velmora") ---------- */
