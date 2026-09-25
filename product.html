@@ -11,7 +11,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://www.gstatic.com">
 <link rel="preconnect" href="https://firestore.googleapis.com">
-<link rel="stylesheet" href="css/style.css?v=20260924">
+<link rel="stylesheet" href="css/style.css?v=20260925">
 <style>
   .pd-wrap {
     display: grid;
@@ -22,27 +22,6 @@
   @media (max-width: 860px) {
     .pd-wrap { grid-template-columns: minmax(0, 1fr); }
   }
-
-  /* Buy Now (lightning) quick button on "You May Also Like" cards */
-  .quick-buy-btn {
-    position: absolute;
-    top: 54px; right: 12px;
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: var(--gold);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--maroon-dark);
-    box-shadow: 0 4px 10px rgba(10,10,10,0.18);
-    z-index: 3;
-    transition: transform 0.2s ease, background 0.2s ease;
-  }
-  .quick-buy-btn svg { width: 16px; height: 16px; }
-  .quick-buy-btn:hover { background: var(--gold-light); transform: scale(1.08); }
-  .quick-buy-btn:active { transform: scale(0.94); }
-  .quick-buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -154,7 +133,7 @@
 <script src="js/nav.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/search.js"></script>
-<script type="module" src="js/products.js?v=20260924"></script>
+<script type="module" src="js/products.js?v=20260925"></script>
 <script src="js/motion.js" defer></script>
 </body>
 </html>
