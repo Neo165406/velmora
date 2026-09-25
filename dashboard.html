@@ -111,6 +111,22 @@
         <button class="btn btn-aqua" id="newCatBtn">+ New Category</button>
       </div>
       <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Add your own categories. Each one appears in the product form and as a tile under <b>For Women</b> or <b>For Man</b> on the homepage (once it has a product with a photo). The built-in categories stay as they are.</p>
+
+      <div class="table-card" style="padding:20px; margin-bottom:20px; max-width:480px;">
+        <h3 style="margin-bottom:10px;">Style Your Own — DIY tile</h3>
+        <p style="font-size:0.8rem; color:#7a5a5d; margin-bottom:12px;">Choose which homepage section(s) show the built-in "Style Your Own – DIY" tile.</p>
+        <div class="field">
+          <label>Shows under</label>
+          <select id="diySection">
+            <option value="forWomen">For Women</option>
+            <option value="forMan">For Man</option>
+            <option value="both">Both</option>
+            <option value="hidden">Hidden</option>
+          </select>
+        </div>
+        <button class="btn btn-aqua" id="saveDiyBtn">Save</button>
+      </div>
+
       <div class="table-card">
         <table>
           <thead><tr><th>Category</th><th>Shows under</th><th></th></tr></thead>
@@ -419,6 +435,7 @@
       loadProducts();
       loadOrders();
       loadCategories();
+      loadDiySection();
       loadAbout();
       loadTheme();
     }
@@ -810,6 +827,31 @@
           showToast('Could not delete — try again');
         }
       }
+    });
+
+    /* ---------- Style Your Own (DIY) tile placement ---------- */
+    // Stored in Firestore settings/site -> diySection: 'forWomen' | 'forMan' | 'both' | 'hidden'
+    async function loadDiySection() {
+      try {
+        const snap = await getDoc(doc(db, 'settings', 'site'));
+        const value = snap.exists() && typeof snap.data().diySection === 'string' ? snap.data().diySection : 'forWomen';
+        document.getElementById('diySection').value = value;
+      } catch (e) { /* no settings yet — default stays */ }
+    }
+    document.getElementById('saveDiyBtn').addEventListener('click', async () => {
+      const value = document.getElementById('diySection').value;
+      const btn = document.getElementById('saveDiyBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      try {
+        await setDoc(doc(db, 'settings', 'site'), { diySection: value }, { merge: true });
+        showToast('Saved ✓ — refresh the store to see it');
+      } catch (err) {
+        console.error('DIY section save failed:', err);
+        showToast('Could not save — try again');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save';
     });
 
     /* ---------- About Cards (homepage "About Velmora") ---------- */
