@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://www.gstatic.com">
 <link rel="preconnect" href="https://firestore.googleapis.com">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=20260925">
 <link rel="stylesheet" href="css/johrot-layout.css">
 </head>
 <body>
@@ -191,6 +191,16 @@
         </form>
       </div>
     </div>
+
+    <!-- Shown in place of cart-full once an order has been placed -->
+    <div id="order-confirmation" class="hidden" style="max-width:560px; margin:0 auto;">
+      <p style="text-align:center; color:#155724; font-weight:500; margin-bottom:18px;">✓ Order placed! We'll call to confirm delivery.</p>
+      <div id="invoice-mount"></div>
+      <div class="invoice-actions">
+        <button type="button" class="btn btn-outline" id="invoice-print-btn">Print / Save Invoice</button>
+        <a href="shop.html" class="btn btn-solid">Continue Shopping</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -227,6 +237,7 @@
   import { auth } from './js/firebase-init.js';
   import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import { collection, addDoc, doc, getDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { buildInvoiceHtml } from './js/invoice.js';
 
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -393,6 +404,17 @@
   refreshCouponUI();
   loadDeliverySettings();
 
+  // Swaps the checkout form out for a printable invoice summary once
+  // an order has been placed, so the customer sees exactly what will
+  // arrive with them — and the admin can send the same summary on later.
+  function showOrderConfirmation(order, orderId) {
+    document.getElementById('cart-full').style.display = 'none';
+    document.getElementById('invoice-mount').innerHTML = buildInvoiceHtml(order, orderId);
+    document.getElementById('order-confirmation').classList.remove('hidden');
+    document.getElementById('order-confirmation').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  document.getElementById('invoice-print-btn').addEventListener('click', () => window.print());
+
   document.getElementById('checkout-form').addEventListener('submit', async function (e) {
     e.preventDefault();
     const submitBtn = this.querySelector('button[type="submit"]');
@@ -424,20 +446,24 @@
     if (auth && auth.currentUser) order.userId = auth.currentUser.uid;
 
     try {
+      let orderId;
+      let placedOrder;
       if (isFirebaseConfigured) {
-        await addDoc(collection(db, 'orders'), { ...order, createdAt: serverTimestamp() });
+        const docRef = await addDoc(collection(db, 'orders'), { ...order, createdAt: serverTimestamp() });
+        orderId = docRef.id;
+        placedOrder = { ...order, createdAt: new Date().toISOString() };
       } else {
+        orderId = 'V' + Date.now().toString().slice(-8);
         const orders = JSON.parse(localStorage.getItem('velmora_orders') || '[]');
-        orders.push({ ...order, createdAt: new Date().toISOString() });
+        placedOrder = { ...order, id: orderId, createdAt: new Date().toISOString() };
+        orders.push(placedOrder);
         localStorage.setItem('velmora_orders', JSON.stringify(orders));
       }
       localStorage.removeItem('velmora_cart');
       removeCoupon();
       refreshCouponUI();
-      document.getElementById('checkout-status').textContent = 'Order placed! We\'ll call to confirm delivery.';
-      this.reset();
       updateCartBadge();
-      setTimeout(renderCart, 1200);
+      showOrderConfirmation(placedOrder, orderId);
     } catch (err) {
       console.error('Order failed to save:', err);
       document.getElementById('checkout-status').textContent = 'Something went wrong placing the order — please try again.';
