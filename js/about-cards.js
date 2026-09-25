@@ -2,12 +2,15 @@
 //  - aboutCards: the three "About Velmora" cards  { title, text, image } x3
 //  - customCategories: extra categories added in Dashboard -> Categories
 //    { name, gender: 'Women' | 'Men', image }  -> shown as tiles under For Women / For Man
+//  - diySection: where the built-in "Style Your Own – DIY" tile shows:
+//    'forWomen' (default) | 'forMan' | 'both' | 'hidden'
 // Anything left empty keeps the default already written in index.html.
 import { db, isFirebaseConfigured } from './firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const ABOUT_KEY = 'velmora_about_cache';
 const CATS_KEY = 'velmora_categories_cache';
+const DIY_KEY = 'velmora_diysection_cache';
 
 /* ---------- About cards ---------- */
 function applyAboutCards(cards) {
@@ -38,12 +41,13 @@ function photoOf(p) {
 
 // A tile shows only when a product with a photo is in that category (same rule as the
 // built-in tiles). Also keeps each For Women / For Man section's visibility correct.
+// A tile with no data-gender (e.g. the Unisex DIY tile) matches any product gender.
 function refreshCustomTiles(products) {
   if (!Array.isArray(products)) return;
   document.querySelectorAll('[data-custom-tile]').forEach(function (tile) {
     const img = tile.querySelector('.jr-tile-img');
     const match = products.find(function (p) {
-      return photoOf(p) && p.category === img.dataset.category && p.gender === img.dataset.gender;
+      return photoOf(p) && p.category === img.dataset.category && (!img.dataset.gender || p.gender === img.dataset.gender);
     });
     if (match && !img.style.backgroundImage) {
       img.style.setProperty('--photo-bg', "url('" + photoOf(match).replace(/'/g, '%27') + "')");
@@ -62,7 +66,7 @@ function refreshCustomTiles(products) {
 
 function applyCustomCategories(cats) {
   if (!Array.isArray(cats)) return;
-  document.querySelectorAll('[data-custom-tile]').forEach(function (t) { t.remove(); });
+  document.querySelectorAll('[data-custom-tile]:not([data-diy-tile])').forEach(function (t) { t.remove(); });
   const grids = {};
   document.querySelectorAll('.jr-tiles').forEach(function (g) {
     const first = g.querySelector('[data-gender]');
@@ -92,9 +96,46 @@ function applyCustomCategories(cats) {
   if (window.velmoraProductsReady) window.velmoraProductsReady.then(refreshCustomTiles).catch(function () {});
 }
 
+/* ---------- "Style Your Own – DIY" tile ---------- */
+// Built entirely in JS (no static HTML tile) so admin can move it between sections
+// without a leftover element fighting the photo-match script for display state.
+function applyDiySection(section) {
+  const value = ['forWomen', 'forMan', 'both', 'hidden'].indexOf(section) > -1 ? section : 'forWomen';
+  document.querySelectorAll('[data-diy-tile]').forEach(function (t) { t.remove(); });
+  if (value === 'hidden') return;
+  const grids = {};
+  document.querySelectorAll('.jr-tiles').forEach(function (g) {
+    const first = g.querySelector('[data-gender]');
+    if (first) grids[first.dataset.gender] = g;
+  });
+  const targets = value === 'both' ? ['Women', 'Men'] : [value === 'forMan' ? 'Men' : 'Women'];
+  targets.forEach(function (genderKey) {
+    const grid = grids[genderKey];
+    if (!grid) return;
+    const tile = document.createElement('a');
+    tile.className = 'jr-tile';
+    tile.setAttribute('data-diy-tile', '');
+    tile.setAttribute('data-custom-tile', '');
+    tile.href = 'shop.html?category=DIY';
+    const img = document.createElement('div');
+    img.className = 'jr-tile-img';
+    img.setAttribute('data-jr-photo', '');
+    img.dataset.category = 'DIY';
+    const label = document.createElement('div');
+    label.className = 'jr-tile-label';
+    label.textContent = 'Style Your Own – DIY';
+    tile.appendChild(img);
+    tile.appendChild(label);
+    grid.appendChild(tile);
+  });
+  try { refreshCustomTiles(JSON.parse(localStorage.getItem('velmora_products_cache'))); } catch (e) { /* no cache */ }
+  if (window.velmoraProductsReady) window.velmoraProductsReady.then(refreshCustomTiles).catch(function () {});
+}
+
 /* ---------- Load: cached copy first, then fresh from Firestore ---------- */
 try { applyAboutCards(JSON.parse(localStorage.getItem(ABOUT_KEY))); } catch (e) { /* no cache yet */ }
 try { applyCustomCategories(JSON.parse(localStorage.getItem(CATS_KEY))); } catch (e) { /* no cache yet */ }
+try { applyDiySection(localStorage.getItem(DIY_KEY) || 'forWomen'); } catch (e) { applyDiySection('forWomen'); }
 
 (async function () {
   if (!isFirebaseConfigured) return;
@@ -109,6 +150,10 @@ try { applyCustomCategories(JSON.parse(localStorage.getItem(CATS_KEY))); } catch
     if (Array.isArray(data.customCategories)) {
       applyCustomCategories(data.customCategories);
       try { localStorage.setItem(CATS_KEY, JSON.stringify(data.customCategories)); } catch (e) { /* storage unavailable */ }
+    }
+    if (typeof data.diySection === 'string') {
+      applyDiySection(data.diySection);
+      try { localStorage.setItem(DIY_KEY, data.diySection); } catch (e) { /* storage unavailable */ }
     }
   } catch (err) {
     console.error('Could not load homepage settings:', err);
