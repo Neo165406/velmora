@@ -1368,31 +1368,38 @@ a.pd-action-btn, button.pd-action-btn {
   .btn .btn-ripple { display: none; }
 }
 
-
-/* ---------- Buy Now (lightning) quick button on product cards ----------
-   Used on home, shop and related-product cards. Sits directly under the
-   round Add-to-Cart button in the card's top-right corner. */
-.quick-buy-btn {
-  position: absolute;
-  top: 54px; right: 12px;
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  background: var(--gold);
-  border: none;
+/* ---------- Order invoice (post-checkout summary + admin order modal) ---------- */
+.invoice-card {
+  background: var(--white);
+  border: 1px solid rgba(20,20,20,0.12);
+  padding: 26px;
+}
+.invoice-head {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--maroon-dark);
-  box-shadow: 0 4px 10px rgba(10,10,10,0.18);
-  z-index: 3;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid var(--maroon);
+  padding-bottom: 16px;
+  margin-bottom: 18px;
 }
-.quick-buy-btn svg { width: 16px; height: 16px; }
-.quick-buy-btn:hover { background: var(--gold-light); transform: scale(1.08); }
-.quick-buy-btn:active {
-  transform: scale(0.92);
-  background: var(--gold-light);
-  box-shadow: 0 0 14px 4px rgba(228, 199, 102, 0.85);
+.invoice-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--maroon);
 }
-.quick-buy-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+.invoice-brand span { color: var(--gold); }
+.invoice-sub { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: #7a5a5d; margin-top: 2px; }
+.invoice-meta { text-align: right; font-size: 0.84rem; color: #6b4a4e; }
+.invoice-block { font-size: 0.9rem; color: var(--plum); line-height: 1.7; margin-bottom: 6px; }
+.invoice-totals { border-top: 1px solid rgba(20,20,20,0.12); padding-top: 4px; }
+.invoice-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.invoice-actions .btn { flex: 1; min-width: 140px; text-align: center; }
+@media print {
+  .site-header, .site-footer, .invoice-actions, .search-bar, .whatsapp-float { display: none !important; }
+}
