@@ -296,9 +296,6 @@ function renderProductCard(p) {
       <button class="quick-add-btn" data-add-to-cart="${p.id}" aria-label="Add to cart" ${outOfStock ? 'disabled' : ''}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
       </button>
-      <button class="quick-buy-btn" data-buy-now="${p.id}" aria-label="Buy now" ${outOfStock ? 'disabled' : ''}>
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 11-14h-7l1-6z"/></svg>
-      </button>
     </div>`;
 }
 
@@ -316,15 +313,6 @@ function wireAddToCartButtons(scope) {
         if (btn.classList.contains('add-cart-btn')) btn.textContent = 'Add to Cart';
         btn.classList.remove('is-added');
       }, 1200);
-    });
-  });
-  scope.querySelectorAll('.quick-buy-btn[data-buy-now]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const p = VELMORA_PRODUCTS.find(item => item.id === btn.dataset.buyNow);
-      if (!p) return;
-      addToCart(p, 1);
-      window.location.href = 'cart.html';
     });
   });
 }
