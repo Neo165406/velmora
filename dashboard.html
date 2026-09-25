@@ -341,6 +341,7 @@
   import {
     getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { buildInvoiceHtml, whatsappInvoiceLink, emailInvoiceLink } from './js/invoice.js';
 
   const isConfigured = Boolean(firebaseConfig.apiKey);
   const configGate = document.getElementById('config-gate');
@@ -992,24 +993,15 @@
               `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
           </select>
         </div>
-        <div style="margin-bottom:16px;">
-          ${(o.items || []).map(item => `
-            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(107,15,26,0.1); font-size:0.9rem;">
-              <span>${item.name} × ${item.qty}</span>
-              <span>${formatTaka(item.qty * item.price)}</span>
-            </div>`).join('')}
-          ${o.couponCode ? `
-            <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:0.9rem; color:#155724;">
-              <span>Coupon (${o.couponCode})</span><span>−${formatTaka(o.discount || 0)}</span>
-            </div>` : ''}
-          <div style="display:flex; justify-content:space-between; padding:12px 0 0; font-weight:600; color:var(--maroon);">
-            <span>Total</span><span>${formatTaka(o.total)}</span>
-          </div>
+        <button class="btn btn-aqua btn-block" style="margin-bottom:18px;" id="updateStatusBtn">Update Status</button>
+        ${buildInvoiceHtml(o, o.id)}
+        <div class="invoice-actions">
+          <button type="button" class="btn btn-outline" id="sendWaBtn">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="vertical-align:-2px; margin-right:5px;"><path d="M3 21l1.6-4.8A8 8 0 1 1 8.8 19.4L3 21z"/></svg>
+            Send via WhatsApp
+          </button>
+          <button type="button" class="btn btn-outline" id="sendEmailBtn">Send via Email</button>
         </div>
-        <div style="font-size:0.88rem; color:#6b4a4e; padding:14px; background:var(--blush);">
-          📍 ${o.name} · ${o.phone}<br>${o.address}
-        </div>
-        <button class="btn btn-aqua btn-block" style="margin-top:16px;" id="updateStatusBtn">Update Status</button>
       `;
       document.getElementById('orderModal').classList.add('open');
       document.getElementById('updateStatusBtn').addEventListener('click', async () => {
@@ -1018,6 +1010,15 @@
         document.getElementById('orderModal').classList.remove('open');
         showToast('Order status updated');
         loadOrders();
+      });
+      document.getElementById('sendWaBtn').addEventListener('click', () => {
+        window.open(whatsappInvoiceLink(o, o.id), '_blank');
+      });
+      document.getElementById('sendEmailBtn').addEventListener('click', () => {
+        let email = o.email;
+        if (!email) email = prompt('No email on file for this order — enter one to send the invoice to:');
+        if (!email) return;
+        window.location.href = emailInvoiceLink({ ...o, email }, o.id);
       });
     }
     document.getElementById('closeOrderModal').addEventListener('click', () => document.getElementById('orderModal').classList.remove('open'));
