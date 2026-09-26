@@ -5,7 +5,7 @@
 // Firestore's `orders` collection.
 // ---------------------------------------------------------------
 
-const ZONE_LABELS = { dhaka: 'Inside Dhaka', suburban: 'Suburban Areas', outside: 'Outside Dhaka' };
+const ZONE_LABELS = { dhaka: 'Inside Dhaka', outside: 'Outside Dhaka' };
 
 export function formatTakaInvoice(n) {
   return '৳' + Number(n || 0).toLocaleString('en-IN');
