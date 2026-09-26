@@ -138,11 +138,6 @@
               <span class="fee" id="fee-dhaka-label">৳60</span>
             </label>
             <label class="delivery-option">
-              <input type="radio" name="delivery" value="suburban">
-              <span>Suburban Areas<span class="sub">Gazipur, Narayanganj, Savar, Keraniganj</span></span>
-              <span class="fee" id="fee-suburban-label">৳85</span>
-            </label>
-            <label class="delivery-option">
               <input type="radio" name="delivery" value="outside">
               Outside Dhaka
               <span class="fee" id="fee-outside-label">৳110</span>
@@ -275,12 +270,10 @@
       const snap = await getDoc(doc(db, 'settings', 'site'));
       if (!snap.exists()) return;
       const t = snap.data();
-      if (t.feeDhaka || t.feeOutside || t.feeSuburban) {
+      if (t.feeDhaka || t.feeOutside) {
         DELIVERY_FEES.dhaka = Number(t.feeDhaka) || 60;
-        DELIVERY_FEES.suburban = Number(t.feeSuburban) || 85;
         DELIVERY_FEES.outside = Number(t.feeOutside) || 110;
         document.getElementById('fee-dhaka-label').textContent = formatTaka(DELIVERY_FEES.dhaka);
-        document.getElementById('fee-suburban-label').textContent = formatTaka(DELIVERY_FEES.suburban);
         document.getElementById('fee-outside-label').textContent = formatTaka(DELIVERY_FEES.outside);
         updateSummary();
       }
