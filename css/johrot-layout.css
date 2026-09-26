@@ -29,7 +29,7 @@
     left: 0; right: auto;
     width: min(88vw, 400px);
     transform: translateX(-100%);
-    padding: 84px 0 40px;
+    padding: 56px 0 40px;
   }
   .nav-links.is-open { transform: translateX(0); }
   .nav-links li { border-bottom: none; }
