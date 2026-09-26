@@ -236,6 +236,12 @@
 
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+  // Customer-facing order number: VM + 6 random digits (e.g. VM503219).
+  // Separate from Firestore's own internal document ID.
+  function generateOrderNumber() {
+    return 'VM' + Math.floor(100000 + Math.random() * 900000);
+  }
+
   /* ---------- Signed-in buyers: prefill their saved details ---------- */
   if (isFirebaseConfigured && auth) {
     onAuthStateChanged(auth, async function (user) {
@@ -400,9 +406,9 @@
   // Swaps the checkout form out for a printable invoice summary once
   // an order has been placed, so the customer sees exactly what will
   // arrive with them — and the admin can send the same summary on later.
-  function showOrderConfirmation(order, orderId) {
+  function showOrderConfirmation(order, orderNumber) {
     document.getElementById('cart-full').style.display = 'none';
-    document.getElementById('invoice-mount').innerHTML = buildInvoiceHtml(order, orderId);
+    document.getElementById('invoice-mount').innerHTML = buildInvoiceHtml(order, orderNumber);
     document.getElementById('order-confirmation').classList.remove('hidden');
     document.getElementById('order-confirmation').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -417,6 +423,7 @@
     const discount = couponDiscount(subtotal);
     const coupon = getAppliedCoupon();
     const order = {
+      orderNumber: generateOrderNumber(),
       name: document.getElementById('c-name').value,
       phone: document.getElementById('c-phone').value,
       address: document.getElementById('c-address').value,
@@ -439,16 +446,13 @@
     if (auth && auth.currentUser) order.userId = auth.currentUser.uid;
 
     try {
-      let orderId;
       let placedOrder;
       if (isFirebaseConfigured) {
-        const docRef = await addDoc(collection(db, 'orders'), { ...order, createdAt: serverTimestamp() });
-        orderId = docRef.id;
+        await addDoc(collection(db, 'orders'), { ...order, createdAt: serverTimestamp() });
         placedOrder = { ...order, createdAt: new Date().toISOString() };
       } else {
-        orderId = 'V' + Date.now().toString().slice(-8);
         const orders = JSON.parse(localStorage.getItem('velmora_orders') || '[]');
-        placedOrder = { ...order, id: orderId, createdAt: new Date().toISOString() };
+        placedOrder = { ...order, id: order.orderNumber, createdAt: new Date().toISOString() };
         orders.push(placedOrder);
         localStorage.setItem('velmora_orders', JSON.stringify(orders));
       }
@@ -456,7 +460,7 @@
       removeCoupon();
       refreshCouponUI();
       updateCartBadge();
-      showOrderConfirmation(placedOrder, orderId);
+      showOrderConfirmation(placedOrder, order.orderNumber);
     } catch (err) {
       console.error('Order failed to save:', err);
       document.getElementById('checkout-status').textContent = 'Something went wrong placing the order — please try again.';
