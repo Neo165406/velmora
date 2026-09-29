@@ -1,10 +1,17 @@
-// Velmora — zoomable product images.
-// Tap/click the main product photo to open a fullscreen viewer:
-// pinch or mouse-wheel to zoom, drag to pan, double-tap/click to toggle,
+// Velmora — zoomable product images (product page + every product card).
+// Product page: tap/click the main photo to open a fullscreen viewer.
+// Product cards (home, shop, related, etc.): tap the small magnifier button on the photo.
+// Viewer: pinch or mouse-wheel to zoom, drag to pan, double-tap/click to toggle,
 // swipe (when not zoomed) or arrows to switch photos, Esc or × to close.
 (function () {
+  if (window.__velmoraZoom) return; // loaded once, even if included twice
+  window.__velmoraZoom = true;
+
   var css = '\
 [data-pd-img]{cursor:zoom-in;}\
+.vz-card-btn{position:absolute;left:10px;bottom:10px;z-index:3;width:34px;height:34px;border-radius:50%;border:1px solid rgba(228,199,102,.75);background:rgba(22,22,22,.68);color:#E4C766;display:flex;align-items:center;justify-content:center;padding:0;cursor:zoom-in;-webkit-tap-highlight-color:transparent;}\
+.vz-card-btn:active{background:rgba(228,199,102,.3);}\
+.vz-card-btn svg{width:17px;height:17px;}\
 .vz-box{position:fixed;inset:0;z-index:9999;background:rgba(22,22,22,.96);display:none;user-select:none;-webkit-user-select:none;}\
 .vz-box.is-open{display:block;}\
 .vz-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;}\
@@ -23,7 +30,7 @@
   document.head.appendChild(st);
 
   var box, stage, img, countEl, prevBtn, nextBtn;
-  var srcs = [], idx = 0;
+  var srcs = [], idx = 0, syncMain = false;
   var scale = 1, tx = 0, ty = 0;
   var MAX = 5;
   var pointers = {};
@@ -114,15 +121,18 @@
     img.src = srcs[idx];
     countEl.textContent = (idx + 1) + ' / ' + srcs.length;
     reset();
-    // keep the product page's own gallery in sync
-    var b = document.querySelector('[data-thumb="' + idx + '"]');
-    if (b) b.click();
+    if (syncMain) {
+      // keep the product page's own gallery in sync
+      var b = document.querySelector('[data-thumb="' + idx + '"]');
+      if (b) b.click();
+    }
   }
 
-  function open(list, start) {
+  function open(list, start, sync) {
     build();
     srcs = list;
     idx = start;
+    syncMain = !!sync;
     img.src = srcs[idx];
     countEl.textContent = srcs.length > 1 ? (idx + 1) + ' / ' + srcs.length : '';
     prevBtn.style.display = nextBtn.style.display = srcs.length > 1 ? '' : 'none';
@@ -196,7 +206,7 @@
     }
   }
 
-  // Open from the product page's main image (rendered dynamically, so delegate).
+  // ---- Product page: open from the main image (rendered dynamically, so delegate) ----
   var downX = 0, downY = 0;
   document.addEventListener('pointerdown', function (e) { downX = e.clientX; downY = e.clientY; }, true);
   document.addEventListener('click', function (e) {
@@ -206,6 +216,61 @@
     var thumbs = Array.prototype.map.call(document.querySelectorAll('[data-thumb] img'), function (i) { return i.getAttribute('src'); });
     var list = thumbs.length ? thumbs : [t.getAttribute('src')];
     var start = list.indexOf(t.getAttribute('src'));
-    open(list, start < 0 ? 0 : start);
+    open(list, start < 0 ? 0 : start, true);
   });
+
+  // ---- Product cards: add a magnifier button to every card photo ----
+  var ZOOM_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><line x1="20" y1="20" x2="15.8" y2="15.8"/><line x1="11" y1="8.5" x2="11" y2="13.5"/><line x1="8.5" y1="11" x2="13.5" y2="11"/></svg>';
+
+  function cardImages(card, fallbackSrc) {
+    var a = card.querySelector('a[href*="id="]');
+    var id = null;
+    try { id = a ? new URL(a.getAttribute('href'), location.href).searchParams.get('id') : null; } catch (err) { /* ignore */ }
+    var ready = window.velmoraProductsReady;
+    if (!id || !ready || !ready.then) return Promise.resolve([fallbackSrc]);
+    return ready.then(function (list) {
+      var p = (list || []).filter(function (x) { return x.id === id; })[0];
+      var imgs = p && Array.isArray(p.images) && p.images.length ? p.images : (p && p.image ? [p.image] : []);
+      return imgs.length ? imgs : [fallbackSrc];
+    }).catch(function () { return [fallbackSrc]; });
+  }
+
+  function decorate() {
+    var media = document.querySelectorAll('.product-card .product-media');
+    Array.prototype.forEach.call(media, function (m) {
+      if (m.querySelector('.vz-card-btn')) return;
+      var im = m.querySelector('img');
+      if (!im) return; // placeholder gem icon — nothing to zoom
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'vz-card-btn';
+      btn.setAttribute('aria-label', 'Zoom image');
+      btn.innerHTML = ZOOM_SVG;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();   // don't follow the card's product link
+        e.stopPropagation();
+        var card = btn.closest('.product-card');
+        var fallback = im.getAttribute('src');
+        cardImages(card, fallback).then(function (list) {
+          var start = list.indexOf(fallback);
+          open(list, start < 0 ? 0 : start, false);
+        });
+      });
+      m.appendChild(btn);
+    });
+  }
+
+  var scheduled = false;
+  function schedule() {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(function () { scheduled = false; decorate(); });
+  }
+
+  function initCards() {
+    decorate();
+    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCards);
+  else initCards();
 })();

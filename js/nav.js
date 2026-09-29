@@ -29,6 +29,15 @@
   }
 })();
 
+// Zoomable product images on every page (js/zoom.js guards against loading twice)
+(function () {
+  if (!document.querySelector('script[src*="js/zoom.js"]')) {
+    var z = document.createElement('script');
+    z.src = 'js/zoom.js';
+    document.head.appendChild(z);
+  }
+})();
+
 // Shared hamburger navigation — include on every page
 document.addEventListener('DOMContentLoaded', function () {
   const hamburger = document.querySelector('.hamburger');
