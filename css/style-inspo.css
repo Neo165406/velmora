@@ -1,9 +1,12 @@
 /* ==========================================================
-   Style Inspo section — Velmora maroon / gold / ivory theme.
-   Loaded after johrot-layout.css. Uses the same CSS variables.
+   Style Inspo — customer photos, approved from the dashboard.
+   Velmora maroon / gold / ivory theme. Loaded after johrot-layout.css.
+   The section carries the `hidden` attribute until js/style-inspo.js
+   finds at least one approved photo.
    ========================================================== */
 
 .si-section { background: var(--maroon-dark); color: var(--ivory); }
+.si-section[hidden] { display: none !important; }
 .si-section .jr-head h2 { color: var(--ivory); }
 .si-section .jr-head p { color: rgba(250,246,239,0.78); }
 
@@ -17,78 +20,104 @@
 .si-scroller::-webkit-scrollbar { display: none; }
 
 .si-card {
-  flex: 0 0 min(72vw, 290px);
+  flex: 0 0 min(66vw, 270px);
   scroll-snap-align: start;
-  background: var(--ivory);
   border: 1.5px solid var(--gold);
   border-radius: 26px;
   overflow: hidden;
-  display: flex; flex-direction: column;
+  background: var(--ivory);
 }
-
-.si-main { display: block; position: relative; }
-.si-img {
-  aspect-ratio: 4/5;
-  background: var(--photo-bg, linear-gradient(200deg, var(--gold) 0%, var(--maroon) 70%)) center/cover;
+.si-main { position: relative; overflow: hidden; }
+.si-main img {
+  display: block; width: 100%; aspect-ratio: 4/5; object-fit: cover;
+  background: linear-gradient(200deg, var(--gold) 0%, var(--maroon) 70%);
   transition: transform 0.35s ease;
 }
-.si-main { overflow: hidden; }
-.si-main:hover .si-img { transform: scale(1.03); }
+.si-card:hover .si-main img { transform: scale(1.03); }
 .si-main::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(to top, rgba(20,6,10,0.78) 0%, rgba(20,6,10,0) 58%);
+  background: linear-gradient(to top, rgba(20,6,10,0.78) 0%, rgba(20,6,10,0) 55%);
 }
-
-.si-tag {
-  position: absolute; top: 12px; left: 12px; z-index: 1;
-  background: var(--ivory); color: var(--maroon);
-  border: 1px solid var(--gold); border-radius: 999px;
-  padding: 5px 11px;
-  font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 500;
-}
-
 .si-cap {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
-  padding: 16px 16px 18px; color: var(--ivory);
+  padding: 14px 16px 16px; color: var(--ivory);
 }
 .si-cap h3 {
   font-family: 'Playfair Display', serif;
-  font-size: 1.3rem; font-weight: 500; color: var(--ivory);
-  margin: 0 0 4px;
+  font-size: 1.15rem; font-weight: 500; color: var(--ivory); margin: 0;
 }
-.si-cap p { margin: 0; font-size: 0.78rem; line-height: 1.4; color: rgba(250,246,239,0.88); }
+.si-cap p { margin: 4px 0 0; font-size: 0.78rem; line-height: 1.4; color: rgba(250,246,239,0.9); }
 
-/* "Pair with" chips under each look */
-.si-pair {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-  padding: 14px 14px 16px;
-  background: var(--blush);
+/* Buttons */
+.si-share { text-align: center; margin-top: 8px; }
+.si-btn {
+  background: transparent; color: var(--gold-light);
+  border: 1.5px solid var(--gold);
+  padding: 13px 26px; cursor: pointer;
+  font-family: 'Jost', sans-serif; font-size: 0.78rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
-.si-pair span {
-  font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: #6b4a4e;
-  margin-right: 2px;
+.si-btn:hover { background: var(--gold); color: var(--maroon-dark); }
+.si-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 0 0 4px rgba(228,199,102,0.35), 0 0 20px rgba(228,199,102,0.65);
 }
-.si-pair a {
-  border: 1px solid var(--maroon); color: var(--maroon);
-  padding: 6px 12px; border-radius: 999px;
-  font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-.si-pair a:hover, .si-pair a:active { background: var(--maroon); color: var(--ivory); }
 
-.si-share {
-  text-align: center; margin: 6px 0 0;
-  font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--gold-light);
+/* Share modal */
+.si-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(12,12,12,0.55);
+  display: none; align-items: center; justify-content: center;
+  padding: 16px;
 }
-.si-share a { color: var(--gold-light); text-decoration: underline; text-underline-offset: 4px; }
+.si-overlay.is-open { display: flex; }
+.si-modal {
+  width: 100%; max-width: 440px; max-height: 92vh; overflow-y: auto;
+  background: var(--ivory); color: var(--plum);
+  border: 1.5px solid var(--gold); border-radius: 26px;
+  padding: 24px 22px 22px; position: relative;
+}
+.si-modal h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 500; margin: 0 0 6px; color: var(--maroon); }
+.si-modal .si-sub { font-size: 0.86rem; color: #6b4a4e; margin: 0 0 16px; }
+.si-x {
+  position: absolute; top: 12px; right: 14px;
+  background: none; border: none; font-size: 1.2rem; color: var(--plum); cursor: pointer;
+  width: 34px; height: 34px;
+}
+.si-drop {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border: 1.5px dashed var(--gold); background: var(--blush);
+  min-height: 130px; margin-bottom: 14px; cursor: pointer; overflow: hidden;
+  font-size: 0.86rem; color: var(--maroon); text-align: center;
+}
+.si-drop img { width: 100%; max-height: 260px; object-fit: cover; display: block; }
+.si-modal label { display: block; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: #6b4a4e; margin-bottom: 6px; }
+.si-modal input[type="text"], .si-modal textarea {
+  width: 100%; border: 1px solid rgba(22,22,22,0.25); background: var(--white);
+  padding: 12px 14px; font-family: 'Jost', sans-serif; font-size: 0.95rem;
+  margin-bottom: 14px; border-radius: 0; color: var(--plum);
+}
+.si-note { font-size: 0.74rem; color: #6b4a4e; margin: 0 0 14px; }
+.si-submit {
+  display: block; width: 100%; text-align: center; padding: 15px; cursor: pointer;
+  background: var(--maroon-dark); color: var(--gold-light); border: none;
+  letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.85rem;
+  font-family: 'Jost', sans-serif;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+.si-submit:disabled { opacity: 0.6; }
+.si-submit:active { transform: scale(0.98); box-shadow: 0 0 0 4px rgba(228,199,102,0.35), 0 0 18px rgba(228,199,102,0.6); }
+.si-status { min-height: 1.2em; font-size: 0.85rem; margin: 0 0 10px; color: var(--maroon); }
+.si-status.is-error { color: #a12b2b; }
+.si-thanks { text-align: center; padding: 18px 4px 6px; }
+.si-thanks p { color: #6b4a4e; margin: 0 0 18px; }
 
-/* Desktop: all looks in a grid, no scrolling */
+/* Desktop: grid instead of a swipe row */
 @media (min-width: 900px) {
   .si-scroller {
-    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 18px; overflow: visible; padding-bottom: 6px;
   }
   .si-card { flex: none; }
-  .si-cap h3 { font-size: 1.15rem; }
 }
