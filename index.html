@@ -167,58 +167,17 @@
   </div>
 </section>
 
-<!-- Style Inspo — ready-made looks. Photos come from product images (data-jr-photo);
-     each look links to the shop and suggests pieces to pair. -->
-<section class="si-section" id="style-inspo">
+<!-- Style Inspo — photos shared by customers. Approved in Dashboard → Style Inspo
+     (js/style-inspo.js). Stays hidden until at least one photo is approved. -->
+<section class="si-section" id="style-inspo" hidden>
   <div class="container">
     <div class="section-head jr-head">
       <div class="section-eyebrow">Style Inspo</div>
       <h2>Styled to Shine</h2>
-      <p>Looks to borrow — tap one to shop it.</p>
+      <p>Real looks from the Velmora family.</p>
     </div>
-    <div class="si-scroller">
-      <article class="si-card">
-        <a class="si-main" href="shop.html?gender=Women&category=Pendant">
-          <div class="si-img" data-jr-photo data-gender="Women" data-category="Pendant"></div>
-          <span class="si-tag">Daily</span>
-          <div class="si-cap"><h3>Everyday Minimal</h3><p>A slim pendant with a dainty ring.</p></div>
-        </a>
-        <div class="si-pair"><span>Pair with</span><a href="shop.html?gender=Women&category=Pendant">Pendant</a><a href="shop.html?gender=Women&category=Rings">Ring</a></div>
-      </article>
-      <article class="si-card">
-        <a class="si-main" href="shop.html?gender=Women&category=Bracelets">
-          <div class="si-img" data-jr-photo data-gender="Women" data-category="Bracelets"></div>
-          <span class="si-tag">Layered</span>
-          <div class="si-cap"><h3>Layered Glow</h3><p>Stack bracelets, add a soft pendant.</p></div>
-        </a>
-        <div class="si-pair"><span>Pair with</span><a href="shop.html?gender=Women&category=Bracelets">Bracelet</a><a href="shop.html?gender=Women&category=Pendant">Pendant</a></div>
-      </article>
-      <article class="si-card">
-        <a class="si-main" href="shop.html?gender=Women&category=Earrings">
-          <div class="si-img" data-jr-photo data-gender="Women" data-category="Earrings"></div>
-          <span class="si-tag">Evening</span>
-          <div class="si-cap"><h3>Night Out</h3><p>Statement earrings, nothing else needed.</p></div>
-        </a>
-        <div class="si-pair"><span>Pair with</span><a href="shop.html?gender=Women&category=Earrings">Earring</a><a href="shop.html?gender=Women&category=Jewelry%20Set">Set</a></div>
-      </article>
-      <article class="si-card">
-        <a class="si-main" href="shop.html?gender=Women&category=Jewelry%20Set">
-          <div class="si-img" data-jr-photo data-gender="Women" data-category="Jewelry Set"></div>
-          <span class="si-tag">Occasion</span>
-          <div class="si-cap"><h3>Matched Set</h3><p>Made for weddings, parties and gifting.</p></div>
-        </a>
-        <div class="si-pair"><span>Pair with</span><a href="shop.html?gender=Women&category=Jewelry%20Set">Set</a><a href="shop.html?category=Gift%20Box">Gift Box</a></div>
-      </article>
-      <article class="si-card">
-        <a class="si-main" href="shop.html?gender=Men&category=Bracelets">
-          <div class="si-img" data-jr-photo data-gender="Men" data-category="Bracelets"></div>
-          <span class="si-tag">For Him</span>
-          <div class="si-cap"><h3>Clean &amp; Bold</h3><p>A sharp bracelet with a statement ring.</p></div>
-        </a>
-        <div class="si-pair"><span>Pair with</span><a href="shop.html?gender=Men&category=Bracelets">Bracelet</a><a href="shop.html?gender=Men&category=Rings">Ring</a></div>
-      </article>
-    </div>
-    <p class="si-share">Wearing Velmora? Tag <a href="https://instagram.com/velmora" target="_blank" rel="noopener">@velmora</a></p>
+    <div class="si-scroller" data-si-list></div>
+    <div class="si-share"><button type="button" class="si-btn" data-si-open>Share your look</button></div>
   </div>
 </section>
 
@@ -362,6 +321,7 @@
           <li><a href="contact.html">Contact</a></li>
           <li><a href="index.html">Home</a></li>
           <li><a href="return-exchange.html">Return & Exchange Policy</a></li>
+          <li><a href="#" data-si-open>Share Your Style</a></li>
         </ul>
       </div>
       <div>
@@ -381,6 +341,7 @@
 <script src="js/search.js" defer></script>
 <script type="module" src="js/products.js"></script>
 <script type="module" src="js/about-cards.js"></script>
+<script type="module" src="js/style-inspo.js"></script>
 <script src="js/motion.js" defer></script>
 <script src="js/johrot-layout.js" defer></script>
 </body>

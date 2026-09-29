@@ -51,6 +51,7 @@
     <a href="#" data-tab="tilegrid" class="tab-link">Tile Grid</a>
     <a href="#" data-tab="orders" class="tab-link">Orders</a>
     <a href="#" data-tab="about" class="tab-link">About Cards</a>
+    <a href="#" data-tab="styleinspo" class="tab-link">Style Inspo</a>
     <a href="#" data-tab="theme" class="tab-link">Theme</a>
     <a href="index.html" target="_blank">View Store ↗</a>
     <a href="#" id="logoutBtn">Log Out</a>
@@ -168,6 +169,18 @@
       <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Controls the three cards under "About Velmora" on the homepage. Change the photo, title and text of each card, then save. With no photo, the store shows an automatic product photo.</p>
       <div id="aboutCardsWrap" style="display:grid; gap:16px; max-width:520px;"></div>
       <button class="btn btn-aqua" id="saveAboutBtn" style="margin-top:16px; max-width:520px; width:100%;">Save About Cards</button>
+    </section>
+
+    <!-- STYLE INSPO (customer photos — approve to show on the homepage) -->
+    <section id="tab-styleinspo" class="hidden">
+      <div class="admin-topbar"><h1>Style Inspo</h1></div>
+      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Photos customers send from the store. Tap <b>Approve</b> to show a photo in the homepage <b>Style Inspo</b> section. The section stays hidden while no photo is approved. <b>Hide</b> takes an approved photo off the homepage; <b>Delete</b> removes it for good.</p>
+      <div class="table-card">
+        <table>
+          <thead><tr><th>Photo</th><th>From</th><th>Status</th><th></th></tr></thead>
+          <tbody id="siTableBody"></tbody>
+        </table>
+      </div>
     </section>
 
     <!-- THEME -->
@@ -468,7 +481,7 @@
         e.preventDefault();
         document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
         link.classList.add('active');
-        ['overview', 'products', 'categories', 'tilegrid', 'orders', 'about', 'theme'].forEach(t =>
+        ['overview', 'products', 'categories', 'tilegrid', 'orders', 'about', 'styleinspo', 'theme'].forEach(t =>
           document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== link.dataset.tab));
       });
     });
@@ -491,6 +504,7 @@
       loadDiySection();
       loadTileGrid();
       loadAbout();
+      loadStyleInspo();
       loadTheme();
     }
 
@@ -1134,6 +1148,73 @@
       btn.textContent = 'Save About Cards';
     }
     document.getElementById('saveAboutBtn').addEventListener('click', saveAbout);
+
+    /* ---------- Style Inspo (customer photos — admin approves) ---------- */
+    // Firestore collection styleInspo: { image, name, caption, status: 'pending' | 'approved', createdAt }
+    // The homepage section only shows while at least one photo is approved.
+    let siItems = [];
+
+    function renderStyleInspo() {
+      const body = document.getElementById('siTableBody');
+      const pending = siItems.filter(i => i.status !== 'approved').length;
+      document.querySelector('[data-tab="styleinspo"]').textContent = pending ? `Style Inspo (${pending})` : 'Style Inspo';
+      if (!siItems.length) {
+        body.innerHTML = `<tr><td colspan="4" class="text-center" style="color:#7a5a5d; padding:30px;">No photos submitted yet</td></tr>`;
+        return;
+      }
+      body.innerHTML = siItems.map(i => {
+        const approved = i.status === 'approved';
+        return `
+        <tr>
+          <td><a href="${esc(i.image)}" target="_blank" rel="noopener"><div class="row-thumb"><img src="${esc(i.image)}"></div></a></td>
+          <td>${esc(i.name || 'Anonymous')}<br><small style="color:#7a5a5d;">${esc(i.caption || '')}</small></td>
+          <td><span class="pill ${approved ? 'pill-delivered' : 'pill-pending'}">${approved ? 'approved' : 'pending'}</span></td>
+          <td>
+            <button class="btn ${approved ? 'btn-outline' : 'btn-aqua'} btn-sm" data-siset="${i.id}" data-to="${approved ? 'pending' : 'approved'}">${approved ? 'Hide' : 'Approve'}</button>
+            <button class="btn btn-danger btn-sm" data-sidel="${i.id}">Delete</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function loadStyleInspo() {
+      try {
+        const snap = await getDocs(collection(db, 'styleInspo'));
+        siItems = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => {
+            // Pending first, then newest.
+            const ap = a.status === 'approved' ? 1 : 0;
+            const bp = b.status === 'approved' ? 1 : 0;
+            if (ap !== bp) return ap - bp;
+            return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+          });
+      } catch (e) {
+        console.error('Could not load Style Inspo:', e);
+        siItems = [];
+      }
+      renderStyleInspo();
+    }
+
+    document.getElementById('siTableBody').addEventListener('click', async (e) => {
+      const set = e.target.closest('[data-siset]');
+      const del = e.target.closest('[data-sidel]');
+      try {
+        if (set) {
+          await updateDoc(doc(db, 'styleInspo', set.dataset.siset), { status: set.dataset.to });
+          showToast(set.dataset.to === 'approved' ? 'Approved ✓ — now on the homepage' : 'Hidden from the homepage');
+          loadStyleInspo();
+        }
+        if (del) {
+          if (!confirm('Delete this photo for good?')) return;
+          await deleteDoc(doc(db, 'styleInspo', del.dataset.sidel));
+          showToast('Photo deleted');
+          loadStyleInspo();
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Could not update — try again');
+      }
+    });
 
     /* ---------- Theme ---------- */
     async function loadTheme() {
