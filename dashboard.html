@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — Velmora</title>
+<title>Admin Dashboard — Bengalcharms</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
   <div class="login-box" style="width:420px;">
     <h2>Connect Firebase</h2>
     <p style="font-size:0.9rem; color:#6b4a4e; margin-bottom:16px;">
-      This dashboard needs your Velmora Firebase web config before it can log in or manage products/orders.
+      This dashboard needs your Bengalcharms Firebase web config before it can log in or manage products/orders.
     </p>
     <div class="config-warning">
       Open <code>js/firebase-config.js</code> and paste in your project's web config from
@@ -44,7 +44,7 @@
 <!-- Main dashboard -->
 <div class="admin-shell hidden" id="adminShell">
   <aside class="admin-side">
-    <div class="logo">VEL<span>MORA</span></div>
+    <div class="logo">BENGAL<span>CHARMS</span></div>
     <a href="#" data-tab="overview" class="tab-link active">Overview</a>
     <a href="#" data-tab="products" class="tab-link">Products</a>
     <a href="#" data-tab="categories" class="tab-link">Categories</a>
@@ -163,10 +163,10 @@
       </div>
     </section>
 
-    <!-- ABOUT CARDS (homepage "About Velmora" section) -->
+    <!-- ABOUT CARDS (homepage "About Bengalcharms" section) -->
     <section id="tab-about" class="hidden">
       <div class="admin-topbar"><h1>About Cards</h1></div>
-      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Controls the three cards under "About Velmora" on the homepage. Change the photo, title and text of each card, then save. With no photo, the store shows an automatic product photo.</p>
+      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Controls the three cards under "About Bengalcharms" on the homepage. Change the photo, title and text of each card, then save. With no photo, the store shows an automatic product photo.</p>
       <div id="aboutCardsWrap" style="display:grid; gap:16px; max-width:520px;"></div>
       <button class="btn btn-aqua" id="saveAboutBtn" style="margin-top:16px; max-width:520px; width:100%;">Save About Cards</button>
     </section>
@@ -209,7 +209,7 @@
         <div class="field-row">
           <div class="field">
             <label>Coupon Code</label>
-            <input type="text" id="tCouponCode" placeholder="VELMORA10">
+            <input type="text" id="tCouponCode" placeholder="BENGALCHARMS10">
           </div>
           <div class="field">
             <label>Discount (%)</label>
@@ -1050,7 +1050,7 @@
       }
     });
 
-    /* ---------- About Cards (homepage "About Velmora") ---------- */
+    /* ---------- About Cards (homepage "About Bengalcharms") ---------- */
     // Stored in Firestore settings/site -> aboutCards: [{ title, text, image }, x3]
     const ABOUT_DEFAULTS = [
       { title: 'For Her', text: 'Rings, necklaces, bracelets and earrings for her.', image: '' },
