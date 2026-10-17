@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------
 // Builds an order invoice (as plain text for WhatsApp/email, and as
 // an HTML card for the on-page checkout summary / admin order view)
-// from a Velmora order object — same shape cart.html saves to
+// from a Bengalcharms order object — same shape cart.html saves to
 // Firestore's `orders` collection.
 // ---------------------------------------------------------------
 
@@ -25,7 +25,7 @@ function escInvoice(s) {
 export function buildInvoiceText(order, orderId) {
   const d = invoiceDate(order);
   const lines = [];
-  lines.push('VELMORA — Order Invoice');
+  lines.push('BENGALCHARMS — Order Invoice');
   lines.push(`Order #${orderId || '—'}`);
   lines.push(`Date: ${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
   lines.push('');
@@ -49,7 +49,7 @@ export function buildInvoiceText(order, orderId) {
   if (order.status) lines.push(`Status: ${order.status}`);
   if (order.note) { lines.push(''); lines.push(`Note: ${order.note}`); }
   lines.push('');
-  lines.push('Thank you for shopping with Velmora!');
+  lines.push('Thank you for shopping with Bengalcharms!');
   return lines.join('\n');
 }
 
@@ -67,7 +67,7 @@ export function buildInvoiceHtml(order, orderId) {
     <div class="invoice-card">
       <div class="invoice-head">
         <div>
-          <div class="invoice-brand">VEL<span>MORA</span></div>
+          <div class="invoice-brand">BENGAL<span>CHARMS</span></div>
           <div class="invoice-sub">Order Invoice</div>
         </div>
         <div class="invoice-meta">
@@ -111,6 +111,6 @@ export function whatsappInvoiceLink(order, orderId) {
 }
 
 export function emailInvoiceLink(order, orderId) {
-  const subject = `Your Velmora Order Invoice #${orderId || ''}`;
+  const subject = `Your Bengalcharms Order Invoice #${orderId || ''}`;
   return `mailto:${encodeURIComponent(order.email || '')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(buildInvoiceText(order, orderId))}`;
 }
