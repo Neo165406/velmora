@@ -3,4 +3,4 @@ Allow: /
 Disallow: /dashboard.html
 Disallow: /cart.html
 
-Sitemap: https://velmora-alpha.vercel.app/sitemap.xml
+Sitemap: https://bengalcharms.vercel.app/sitemap.xml
