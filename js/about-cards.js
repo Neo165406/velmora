@@ -1,8 +1,8 @@
 // Homepage content that the admin edits in the dashboard (Firestore settings/site):
-//  - aboutCards: the three "About Velmora" cards  { title, text, image } x3
+//  - aboutCards: the three "About Velmora" cards { title, text, image } x3
 //  - customCategories: extra categories added in Dashboard -> Categories
-//    { name, gender: 'Women' | 'Men', image }  -> shown as tiles under For Women / For Man,
-//    auto-hidden until a matching product with a photo exists.
+//    { name, gender: 'Women' | 'Men', image } -> shown as tiles under For Women / For Man.
+//    Category tiles stay visible even before products have been added.
 //  - diySection: where the built-in "Style Your Own – DIY" tile shows:
 //    'forWomen' (default) | 'forMan' | 'both' | 'hidden'
 //  - tileGrid: fully manual tiles added in Dashboard -> Tile Grid
@@ -29,7 +29,6 @@ function applyAboutCards(cards) {
     if (title && c.title) title.textContent = c.title;
     if (text && c.text) text.textContent = c.text;
     if (img && c.image) {
-      // Stop the automatic product-photo / category logic from touching this photo.
       img.removeAttribute('data-jr-photo');
       img.removeAttribute('data-category');
       img.style.display = '';
@@ -52,7 +51,6 @@ function tileGrids() {
   return grids;
 }
 function refreshSectionVisibility() {
-  // Hide a whole "For Women" / "For Man" section only when it has no visible tile at all.
   document.querySelectorAll('.jr-tiles').forEach(function (grid) {
     const section = grid.closest('section');
     if (!section) return;
@@ -63,19 +61,29 @@ function refreshSectionVisibility() {
   });
 }
 
-/* ---------- Custom category tiles (auto-hide until a matching product exists) ---------- */
-// A tile with no data-gender (e.g. the Unisex DIY tile) matches any product gender.
+/* ---------- Custom category tiles ---------- */
+// Admin-created categories remain visible even when there are no products yet.
+// If a matching product photo exists, use it only when the admin did not set an image.
+// DIY remains product-dependent, as before.
 function refreshCustomTiles(products) {
-  if (!Array.isArray(products)) return;
   document.querySelectorAll('[data-custom-tile]').forEach(function (tile) {
     const img = tile.querySelector('.jr-tile-img');
-    const match = products.find(function (p) {
-      return photoOf(p) && p.category === img.dataset.category && (!img.dataset.gender || p.gender === img.dataset.gender);
-    });
-    if (match && !img.style.backgroundImage) {
-      img.style.setProperty('--photo-bg', "url('" + photoOf(match).replace(/'/g, '%27') + "')");
+    if (!img) return;
+    const match = Array.isArray(products) ? products.find(function (p) {
+      return photoOf(p) && p.category === img.dataset.category &&
+        (!img.dataset.gender || p.gender === img.dataset.gender);
+    }) : null;
+
+    if (match && !img.style.backgroundImage && !img.style.getPropertyValue('--photo-bg')) {
+      const photo = photoOf(match);
+      img.style.setProperty('--photo-bg', "url('" + String(photo).replace(/'/g, '%27') + "')");
     }
-    tile.style.display = match ? '' : 'none';
+
+    if (tile.hasAttribute('data-diy-tile')) {
+      tile.style.display = match ? '' : 'none';
+    } else {
+      tile.style.display = '';
+    }
   });
   refreshSectionVisibility();
 }
@@ -83,20 +91,24 @@ function refreshCustomTiles(products) {
 function applyCustomCategories(cats) {
   if (!Array.isArray(cats)) return;
   document.querySelectorAll('[data-custom-tile]:not([data-diy-tile])').forEach(function (t) { t.remove(); });
+  document.querySelectorAll('[data-all-categories-tile]').forEach(function (t) { t.remove(); });
   const grids = tileGrids();
+
   cats.forEach(function (c) {
+    if (!c || !c.name) return;
     const grid = grids[c.gender];
-    if (!grid || !c.name) return;
+    if (!grid) return;
     const tile = document.createElement('a');
     tile.className = 'jr-tile';
     tile.setAttribute('data-custom-tile', '');
     tile.href = 'shop.html?gender=' + encodeURIComponent(c.gender) + '&category=' + encodeURIComponent(c.name);
+
     const img = document.createElement('div');
     img.className = 'jr-tile-img';
-    img.setAttribute('data-jr-photo', '');
     img.dataset.gender = c.gender;
     img.dataset.category = c.name;
     if (c.image) img.style.backgroundImage = 'url("' + String(c.image).replace(/"/g, '%22') + '")';
+
     const label = document.createElement('div');
     label.className = 'jr-tile-label';
     label.textContent = c.name;
@@ -104,13 +116,29 @@ function applyCustomCategories(cats) {
     tile.appendChild(label);
     grid.appendChild(tile);
   });
-  try { refreshCustomTiles(JSON.parse(localStorage.getItem('velmora_products_cache'))); } catch (e) { /* no cache */ }
+
+  // Explicit entry point to browse every women's category from the homepage.
+  if (grids.Women) {
+    const allTile = document.createElement('a');
+    allTile.className = 'jr-tile';
+    allTile.setAttribute('data-all-categories-tile', '');
+    allTile.href = 'shop.html?gender=Women';
+    const allImg = document.createElement('div');
+    allImg.className = 'jr-tile-img';
+    allImg.setAttribute('aria-hidden', 'true');
+    const allLabel = document.createElement('div');
+    allLabel.className = 'jr-tile-label';
+    allLabel.textContent = 'All Categories';
+    allTile.appendChild(allImg);
+    allTile.appendChild(allLabel);
+    grids.Women.appendChild(allTile);
+  }
+
+  try { refreshCustomTiles(JSON.parse(localStorage.getItem('velmora_products_cache'))); } catch (e) { refreshCustomTiles(null); }
   if (window.velmoraProductsReady) window.velmoraProductsReady.then(refreshCustomTiles).catch(function () {});
 }
 
 /* ---------- "Style Your Own – DIY" tile ---------- */
-// Built entirely in JS (no static HTML tile) so admin can move it between sections
-// without a leftover element fighting the photo-match script for display state.
 function applyDiySection(section) {
   const value = ['forWomen', 'forMan', 'both', 'hidden'].indexOf(section) > -1 ? section : 'forWomen';
   document.querySelectorAll('[data-diy-tile]').forEach(function (t) { t.remove(); });
@@ -127,7 +155,6 @@ function applyDiySection(section) {
     tile.href = 'shop.html?category=DIY';
     const img = document.createElement('div');
     img.className = 'jr-tile-img';
-    img.setAttribute('data-jr-photo', '');
     img.dataset.category = 'DIY';
     const label = document.createElement('div');
     label.className = 'jr-tile-label';
@@ -136,14 +163,11 @@ function applyDiySection(section) {
     tile.appendChild(label);
     grid.appendChild(tile);
   });
-  try { refreshCustomTiles(JSON.parse(localStorage.getItem('velmora_products_cache'))); } catch (e) { /* no cache */ }
+  try { refreshCustomTiles(JSON.parse(localStorage.getItem('velmora_products_cache'))); } catch (e) { refreshCustomTiles(null); }
   if (window.velmoraProductsReady) window.velmoraProductsReady.then(refreshCustomTiles).catch(function () {});
 }
 
 /* ---------- Fully manual tile grid (Dashboard -> Tile Grid) ---------- */
-// Unlike custom categories, these are always visible with the admin's own title/photo —
-// they are never hidden for lack of a matching product, so they carry no data-jr-photo
-// attribute (the product-photo script never touches them).
 function applyTileGrid(tiles) {
   if (!Array.isArray(tiles)) return;
   document.querySelectorAll('[data-manual-tile]').forEach(function (t) { t.remove(); });
@@ -173,10 +197,10 @@ function applyTileGrid(tiles) {
 }
 
 /* ---------- Load: cached copy first, then fresh from Firestore ---------- */
-try { applyAboutCards(JSON.parse(localStorage.getItem(ABOUT_KEY))); } catch (e) { /* no cache yet */ }
-try { applyCustomCategories(JSON.parse(localStorage.getItem(CATS_KEY))); } catch (e) { /* no cache yet */ }
+try { applyAboutCards(JSON.parse(localStorage.getItem(ABOUT_KEY))); } catch (e) {}
+try { applyCustomCategories(JSON.parse(localStorage.getItem(CATS_KEY))); } catch (e) {}
 try { applyDiySection(localStorage.getItem(DIY_KEY) || 'forWomen'); } catch (e) { applyDiySection('forWomen'); }
-try { applyTileGrid(JSON.parse(localStorage.getItem(TILEGRID_KEY))); } catch (e) { /* no cache yet */ }
+try { applyTileGrid(JSON.parse(localStorage.getItem(TILEGRID_KEY))); } catch (e) {}
 
 (async function () {
   if (!isFirebaseConfigured) return;
@@ -186,19 +210,19 @@ try { applyTileGrid(JSON.parse(localStorage.getItem(TILEGRID_KEY))); } catch (e)
     const data = snap.data();
     if (Array.isArray(data.aboutCards)) {
       applyAboutCards(data.aboutCards);
-      try { localStorage.setItem(ABOUT_KEY, JSON.stringify(data.aboutCards)); } catch (e) { /* storage unavailable */ }
+      try { localStorage.setItem(ABOUT_KEY, JSON.stringify(data.aboutCards)); } catch (e) {}
     }
     if (Array.isArray(data.customCategories)) {
       applyCustomCategories(data.customCategories);
-      try { localStorage.setItem(CATS_KEY, JSON.stringify(data.customCategories)); } catch (e) { /* storage unavailable */ }
+      try { localStorage.setItem(CATS_KEY, JSON.stringify(data.customCategories)); } catch (e) {}
     }
     if (typeof data.diySection === 'string') {
       applyDiySection(data.diySection);
-      try { localStorage.setItem(DIY_KEY, data.diySection); } catch (e) { /* storage unavailable */ }
+      try { localStorage.setItem(DIY_KEY, data.diySection); } catch (e) {}
     }
     if (Array.isArray(data.tileGrid)) {
       applyTileGrid(data.tileGrid);
-      try { localStorage.setItem(TILEGRID_KEY, JSON.stringify(data.tileGrid)); } catch (e) { /* storage unavailable */ }
+      try { localStorage.setItem(TILEGRID_KEY, JSON.stringify(data.tileGrid)); } catch (e) {}
     }
   } catch (err) {
     console.error('Could not load homepage settings:', err);
