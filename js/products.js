@@ -328,10 +328,34 @@ const PRICE_FILTER_LABELS = {
   '3000-999999': '৳3,000+'
 };
 
+// Tolerant category comparison: ignores case, extra spaces and a trailing
+// plural "s", so a tile named "Necklace" / "Jewelry Sets" still finds
+// products assigned to "Necklaces" / "Jewelry Set" (and vice versa).
+function normCategory(value) {
+  let s = String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  if (s.length > 3 && s.endsWith('s')) s = s.slice(0, -1);
+  return s;
+}
+
+function categoryMatches(filterValue, productCategory) {
+  if (filterValue === 'All') return true;
+  const target = normCategory(productCategory);
+  return String(filterValue).split(',').some(function (c) { return normCategory(c) === target; });
+}
+
+// Gender filter: Women / Men also include Unisex products (and products
+// with no gender set), so nothing assigned to a category gets hidden.
+function genderMatches(filterValue, productGender) {
+  if (filterValue === 'All') return true;
+  const g = String(productGender || '').trim().toLowerCase();
+  if (!g || g === 'unisex') return true;
+  return g === String(filterValue).trim().toLowerCase();
+}
+
 function applyFilters() {
   return VELMORA_PRODUCTS.filter(p => {
-    const matchCategory = filterState.category === 'All' || filterState.category.split(',').includes(p.category);
-    const matchGender = filterState.gender === 'All' || p.gender === filterState.gender;
+    const matchCategory = categoryMatches(filterState.category, p.category);
+    const matchGender = genderMatches(filterState.gender, p.gender);
     const matchSearch = !filterState.search || p.name.toLowerCase().includes(filterState.search.toLowerCase());
     const matchTag = filterState.tag === 'All' || (p.tag || '').toLowerCase() === filterState.tag.toLowerCase();
     let matchPrice = true;
