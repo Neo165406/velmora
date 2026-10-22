@@ -117,23 +117,6 @@ function applyCustomCategories(cats) {
     grid.appendChild(tile);
   });
 
-  // Explicit entry point to browse every women's category from the homepage.
-  if (grids.Women) {
-    const allTile = document.createElement('a');
-    allTile.className = 'jr-tile';
-    allTile.setAttribute('data-all-categories-tile', '');
-    allTile.href = 'shop.html?gender=Women';
-    const allImg = document.createElement('div');
-    allImg.className = 'jr-tile-img';
-    allImg.setAttribute('aria-hidden', 'true');
-    const allLabel = document.createElement('div');
-    allLabel.className = 'jr-tile-label';
-    allLabel.textContent = 'All Categories';
-    allTile.appendChild(allImg);
-    allTile.appendChild(allLabel);
-    grids.Women.appendChild(allTile);
-  }
-
   try { refreshCustomTiles(JSON.parse(localStorage.getItem('velmora_products_cache'))); } catch (e) { refreshCustomTiles(null); }
   if (window.velmoraProductsReady) window.velmoraProductsReady.then(refreshCustomTiles).catch(function () {});
 }
