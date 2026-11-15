@@ -143,10 +143,27 @@
         <h1>Tile Grid</h1>
         <button class="btn btn-aqua" id="newTileBtn">+ New Tile</button>
       </div>
-      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Add your own tiles to the homepage <b>For Women</b> / <b>For Man</b> grids — any title, any photo, linking to any category. Unlike the Categories tab, these always show, whether or not a product exists for them.</p>
+      <p style="color:#7a5a5d; font-size:0.85rem; margin-bottom:16px;">Controls the homepage <b>For Women</b> / <b>For Man</b> grids — any title, any photo, linking to any category. These tiles always show, whether or not a product exists for them. Use <b>Manual</b> mode below to make these the <b>only</b> tiles, so nothing is added automatically.</p>
+
+      <div class="table-card" style="padding:20px; margin-bottom:20px; max-width:480px;">
+        <h3 style="margin-bottom:10px;">Homepage tile mode</h3>
+        <p style="font-size:0.8rem; color:#7a5a5d; margin-bottom:12px;"><b>Auto</b> — built-in tiles (photos picked from products) plus the tiles below.<br><b>Manual</b> — only the tiles below show, in the order listed. Tap <b>Import current tiles</b> first to copy today's tiles into the list, then edit them freely.</p>
+        <div class="field">
+          <label>Mode</label>
+          <select id="tileMode">
+            <option value="auto">Auto — built-in tiles + tiles below</option>
+            <option value="manual">Manual — only the tiles below</option>
+          </select>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+          <button class="btn btn-aqua" id="saveTileModeBtn">Save Mode</button>
+          <button class="btn btn-outline" id="importTilesBtn">Import current tiles</button>
+        </div>
+      </div>
+
       <div class="table-card">
         <table>
-          <thead><tr><th>Tile</th><th>Links to</th><th>Shows under</th><th></th></tr></thead>
+          <thead><tr><th>Tile</th><th>Links to</th><th>Shows under</th><th>Order</th><th></th></tr></thead>
           <tbody id="tilesTableBody"></tbody>
         </table>
       </div>
@@ -373,11 +390,21 @@
       <label>Tile Title *</label>
       <input type="text" id="tTitle" placeholder="e.g. Anklets, Wedding Edit, New Drop...">
     </div>
-    <div class="field">
-      <label>Links to Category — optional</label>
-      <input type="text" id="tCategory" placeholder="e.g. Anklets (matches a product category)">
-      <p style="font-size:0.76rem; color:#7a5a5d; margin-top:6px;">Any category name — built-in or your own. Leave blank to link to the full shop instead.</p>
+    <div class="field-row">
+      <div class="field">
+        <label>Links to Category — optional</label>
+        <input type="text" id="tCategory" placeholder="e.g. Anklets (matches a product category)">
+      </div>
+      <div class="field">
+        <label>Gender filter — optional</label>
+        <select id="tGender">
+          <option value="">Any</option>
+          <option value="Women">Women only</option>
+          <option value="Men">Men only</option>
+        </select>
+      </div>
     </div>
+    <p style="font-size:0.76rem; color:#7a5a5d; margin:-6px 0 14px;">Any category name — built-in or your own. Leave blank to link to the full shop instead.</p>
     <div class="field">
       <label>Shows under *</label>
       <select id="tSection">
@@ -393,7 +420,7 @@
         <span id="tUploadLabel">📷 Select photo</span>
       </div>
       <div class="img-preview-row" id="tImgPreviewRow"></div>
-      <p style="font-size:0.76rem; color:#7a5a5d; margin-top:6px;">This tile always shows with this exact photo — it isn't pulled from a product.</p>
+      <p style="font-size:0.76rem; color:#7a5a5d; margin-top:6px;">This tile always shows with this exact photo. No photo? It falls back to a product photo from the linked category, if one exists.</p>
     </div>
     <button class="btn btn-aqua btn-block" id="saveTileBtn" style="margin-top:8px;">Save Tile</button>
   </div>
@@ -450,6 +477,12 @@
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2400);
     }
+    // Exact error text (code + message) instead of a generic failure line.
+    function errText(err) {
+      const code = err && err.code ? err.code : 'error';
+      const msg = err && err.message ? err.message : String(err);
+      return code + (msg && msg !== code ? ': ' + msg : '');
+    }
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -469,7 +502,8 @@
       try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (err) {
-        document.getElementById('login-status').textContent = 'Login failed — check email/password.';
+        console.error('Login failed:', err);
+        document.getElementById('login-status').textContent = 'Login failed — ' + errText(err);
       }
     });
     document.getElementById('logoutBtn').addEventListener('click', (e) => { e.preventDefault(); signOut(auth); });
@@ -923,7 +957,9 @@
     });
 
     /* ---------- Tile Grid (fully manual homepage tiles) ---------- */
-    // Stored in Firestore settings/site -> tileGrid: [{ title, image, category, section }]
+    // Stored in Firestore settings/site ->
+    //   tileGrid: [{ title, image, category, gender, section }]   (array order = display order)
+    //   tileMode: 'auto' | 'manual'   (manual = ONLY these tiles show on the homepage)
     // These always show — never tied to whether a matching product exists.
     let tileGridItems = [];
     let editingTileIndex = null;
@@ -936,14 +972,18 @@
     function renderTileGridTable() {
       const body = document.getElementById('tilesTableBody');
       if (!tileGridItems.length) {
-        body.innerHTML = `<tr><td colspan="4" class="text-center" style="color:#7a5a5d; padding:30px;">No tiles yet — tap "+ New Tile"</td></tr>`;
+        body.innerHTML = `<tr><td colspan="5" class="text-center" style="color:#7a5a5d; padding:30px;">No tiles yet — tap "+ New Tile" or "Import current tiles"</td></tr>`;
         return;
       }
       body.innerHTML = tileGridItems.map((t, i) => `
         <tr>
           <td><div class="row-thumb">${t.image ? `<img src="${esc(t.image)}">` : ''}<span>${esc(t.title)}</span></div></td>
-          <td>${t.category ? esc(t.category) : 'All products'}</td>
+          <td>${t.category ? esc(t.category) : 'All products'}${t.gender ? ' · ' + (t.gender === 'Men' ? 'Men' : 'Women') : ''}</td>
           <td>${sectionLabel(t.section)}</td>
+          <td>
+            <button class="btn btn-outline btn-sm" data-tup="${i}" ${i === 0 ? 'disabled' : ''}>▲</button>
+            <button class="btn btn-outline btn-sm" data-tdown="${i}" ${i === tileGridItems.length - 1 ? 'disabled' : ''}>▼</button>
+          </td>
           <td>
             <button class="btn btn-outline btn-sm" data-tedit="${i}">Edit</button>
             <button class="btn btn-danger btn-sm" data-tdel="${i}">Delete</button>
@@ -954,8 +994,9 @@
     async function loadTileGrid() {
       try {
         const snap = await getDoc(doc(db, 'settings', 'site'));
-        const saved = snap.exists() ? snap.data().tileGrid : null;
-        tileGridItems = Array.isArray(saved) ? saved.filter(t => t && t.title) : [];
+        const data = snap.exists() ? snap.data() : {};
+        tileGridItems = Array.isArray(data.tileGrid) ? data.tileGrid.filter(t => t && t.title) : [];
+        document.getElementById('tileMode').value = data.tileMode === 'manual' ? 'manual' : 'auto';
       } catch (e) { /* no settings yet */ }
       renderTileGridTable();
     }
@@ -964,6 +1005,69 @@
       await setDoc(doc(db, 'settings', 'site'), { tileGrid: tileGridItems }, { merge: true });
       renderTileGridTable();
     }
+
+    // Auto / Manual mode
+    document.getElementById('saveTileModeBtn').addEventListener('click', async () => {
+      const mode = document.getElementById('tileMode').value;
+      if (mode === 'manual' && !tileGridItems.length) {
+        showToast('Add or import some tiles first — Manual mode needs at least one');
+        return;
+      }
+      const btn = document.getElementById('saveTileModeBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      try {
+        await setDoc(doc(db, 'settings', 'site'), { tileMode: mode }, { merge: true });
+        showToast('Mode saved ✓ — refresh the store to see it');
+      } catch (err) {
+        console.error('Tile mode save failed:', err);
+        showToast('Could not save mode — ' + errText(err));
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save Mode';
+    });
+
+    // Copies today's homepage tiles (built-in + custom categories + DIY) into the editable list.
+    document.getElementById('importTilesBtn').addEventListener('click', async () => {
+      const photoFor = (category, gender) => {
+        const p = allProducts.find(x => x.category === category && (!gender || x.gender === gender) &&
+          ((Array.isArray(x.images) && x.images[0]) || x.image));
+        return p ? ((Array.isArray(p.images) && p.images[0]) || p.image) : '';
+      };
+      // [title, category, gender, section, image]
+      const wanted = [
+        ['Pendants', 'Pendant', 'Women', 'forWomen'],
+        ['Rings', 'Rings', 'Women', 'forWomen'],
+        ['Bracelets', 'Bracelets', 'Women', 'forWomen'],
+        ['Earrings', 'Earrings', 'Women', 'forWomen'],
+        ['Jewelry Sets', 'Jewelry Set', 'Women', 'forWomen'],
+        ['Rings', 'Rings', 'Men', 'forMan'],
+        ['Necklaces', 'Necklaces', 'Men', 'forMan'],
+        ['Bracelets', 'Bracelets', 'Men', 'forMan'],
+        ['Glasses', 'Glasses', 'Men', 'forMan']
+      ];
+      customCats.forEach(c => wanted.push([c.name, c.name, c.gender, c.gender === 'Men' ? 'forMan' : 'forWomen', c.image]));
+      const diy = document.getElementById('diySection').value;
+      if (diy !== 'hidden') wanted.push(['Style Your Own – DIY', 'DIY', '', diy]);
+
+      const previous = tileGridItems.slice();
+      let added = 0;
+      wanted.forEach(([title, category, gender, section, image]) => {
+        if (tileGridItems.some(t => t.title === title && t.section === section)) return;
+        tileGridItems.push({ title, category, gender, section, image: image || photoFor(category, gender) });
+        added++;
+      });
+      if (!added) { showToast('Nothing to import — those tiles are already in the list'); return; }
+      try {
+        await persistTileGrid();
+        showToast(`Imported ${added} tile${added === 1 ? '' : 's'} ✓ — now set mode to Manual and save`);
+      } catch (err) {
+        console.error('Tile import failed:', err);
+        tileGridItems = previous;
+        renderTileGridTable();
+        showToast('Import failed — ' + errText(err));
+      }
+    });
 
     function renderTileImagePreview() {
       document.getElementById('tImgPreviewRow').innerHTML = currentTileImage
@@ -979,6 +1083,7 @@
       document.getElementById('tileModalTitle').textContent = t ? 'Edit Tile' : 'New Tile';
       document.getElementById('tTitle').value = t ? t.title : '';
       document.getElementById('tCategory').value = t ? (t.category || '') : '';
+      document.getElementById('tGender').value = t ? (t.gender || '') : '';
       document.getElementById('tSection').value = t ? t.section : 'forWomen';
       currentTileImage = t ? (t.image || '') : '';
       renderTileImagePreview();
@@ -998,7 +1103,7 @@
         renderTileImagePreview();
       } catch (err) {
         console.error(err);
-        showToast('Photo upload failed — check imgbb key');
+        showToast('Photo upload failed — ' + errText(err));
       }
       label.textContent = '📷 Select photo';
       e.target.value = '';
@@ -1007,12 +1112,13 @@
     document.getElementById('saveTileBtn').addEventListener('click', async () => {
       const title = document.getElementById('tTitle').value.trim();
       const category = document.getElementById('tCategory').value.trim();
+      const gender = document.getElementById('tGender').value;
       const section = document.getElementById('tSection').value;
       if (!title) { showToast('Tile title is required'); return; }
       const btn = document.getElementById('saveTileBtn');
       btn.disabled = true;
       btn.innerHTML = `<span class="spinner"></span> Saving...`;
-      const entry = { title, category, section, image: currentTileImage || '' };
+      const entry = { title, category, gender, section, image: currentTileImage || '' };
       const previous = tileGridItems.slice();
       if (editingTileIndex === null) tileGridItems.push(entry);
       else tileGridItems[editingTileIndex] = entry;
@@ -1023,15 +1129,41 @@
       } catch (err) {
         console.error('Tile save failed:', err);
         tileGridItems = previous;
-        showToast('Could not save — try again');
+        showToast('Could not save — ' + errText(err));
       }
       btn.disabled = false;
       btn.textContent = 'Save Tile';
     });
 
+    // Move a tile up/down among the tiles that share a homepage grid with it.
+    async function moveTile(i, dir) {
+      const a = tileGridItems[i];
+      let j = i + dir;
+      while (j >= 0 && j < tileGridItems.length) {
+        const b = tileGridItems[j];
+        if (a.section === b.section || a.section === 'both' || b.section === 'both') break;
+        j += dir;
+      }
+      if (j < 0 || j >= tileGridItems.length) return;
+      const previous = tileGridItems.slice();
+      [tileGridItems[i], tileGridItems[j]] = [tileGridItems[j], tileGridItems[i]];
+      try {
+        await persistTileGrid();
+      } catch (err) {
+        console.error('Tile reorder failed:', err);
+        tileGridItems = previous;
+        renderTileGridTable();
+        showToast('Could not reorder — ' + errText(err));
+      }
+    }
+
     document.getElementById('tilesTableBody').addEventListener('click', async (e) => {
+      const up = e.target.closest('[data-tup]');
+      const down = e.target.closest('[data-tdown]');
       const edit = e.target.closest('[data-tedit]');
       const del = e.target.closest('[data-tdel]');
+      if (up) { moveTile(Number(up.dataset.tup), -1); return; }
+      if (down) { moveTile(Number(down.dataset.tdown), 1); return; }
       if (edit) openTileModal(Number(edit.dataset.tedit));
       if (del) {
         const i = Number(del.dataset.tdel);
@@ -1045,7 +1177,8 @@
         } catch (err) {
           console.error(err);
           tileGridItems = previous;
-          showToast('Could not delete — try again');
+          renderTileGridTable();
+          showToast('Could not delete — ' + errText(err));
         }
       }
     });

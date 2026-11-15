@@ -6,8 +6,13 @@
 //  - diySection: where the built-in "Style Your Own – DIY" tile shows:
 //    'forWomen' (default) | 'forMan' | 'both' | 'hidden'
 //  - tileGrid: fully manual tiles added in Dashboard -> Tile Grid
-//    { title, image, category, section: 'forWomen' | 'forMan' | 'both' }
+//    { title, image, category, gender, section: 'forWomen' | 'forMan' | 'both' }
 //    Always visible with the admin's own title/photo — not tied to product data.
+//    Array order = display order.
+//  - tileMode: 'auto' (default) = built-in tiles + manual tiles;
+//    'manual' = ONLY the Tile Grid tiles show (built-in and category tiles are hidden),
+//    so the admin controls every title, photo, link and order.
+//    Manual mode is ignored while the Tile Grid is empty, so the section can never go blank.
 // Anything left empty keeps the default already written in index.html.
 import { db, isFirebaseConfigured } from './firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -16,6 +21,10 @@ const ABOUT_KEY = 'velmora_about_cache';
 const CATS_KEY = 'velmora_categories_cache';
 const DIY_KEY = 'velmora_diysection_cache';
 const TILEGRID_KEY = 'velmora_tilegrid_cache';
+const TILEMODE_KEY = 'velmora_tilemode_cache';
+
+let tileModeSetting = 'auto';
+let tileGridData = [];
 
 /* ---------- About cards ---------- */
 function applyAboutCards(cards) {
@@ -55,10 +64,26 @@ function refreshSectionVisibility() {
     const section = grid.closest('section');
     if (!section) return;
     const anyVisible = Array.prototype.some.call(grid.querySelectorAll('.jr-tile'), function (t) {
-      return t.style.display !== 'none';
+      return t.style.display !== 'none' && window.getComputedStyle(t).display !== 'none';
     });
     section.style.display = anyVisible ? '' : 'none';
   });
+}
+
+/* ---------- Tile mode (auto / manual) ---------- */
+// Manual mode hides every tile that is not a Tile Grid tile (pure CSS, fully reversible).
+function updateTileModeStyle() {
+  let st = document.getElementById('tile-mode-style');
+  const on = tileModeSetting === 'manual' && tileGridData.some(function (t) { return t && t.title; });
+  if (on && !st) {
+    st = document.createElement('style');
+    st.id = 'tile-mode-style';
+    st.textContent = '.jr-tiles .jr-tile:not([data-manual-tile]){display:none !important;}';
+    document.head.appendChild(st);
+  } else if (!on && st) {
+    st.remove();
+  }
+  refreshSectionVisibility();
 }
 
 /* ---------- Custom category tiles ---------- */
@@ -151,8 +176,23 @@ function applyDiySection(section) {
 }
 
 /* ---------- Fully manual tile grid (Dashboard -> Tile Grid) ---------- */
+// A manual tile with no photo falls back to a matching product photo (never blank if one exists).
+function fillManualPhotos(products) {
+  if (!Array.isArray(products)) return;
+  document.querySelectorAll('[data-manual-tile] .jr-tile-img[data-auto-photo]').forEach(function (img) {
+    if (img.style.getPropertyValue('--photo-bg')) return;
+    const match = products.find(function (p) {
+      return photoOf(p) &&
+        (!img.dataset.autoCategory || p.category === img.dataset.autoCategory) &&
+        (!img.dataset.autoGender || p.gender === img.dataset.autoGender);
+    });
+    if (match) img.style.setProperty('--photo-bg', "url('" + String(photoOf(match)).replace(/'/g, '%27') + "')");
+  });
+}
+
 function applyTileGrid(tiles) {
   if (!Array.isArray(tiles)) return;
+  tileGridData = tiles;
   document.querySelectorAll('[data-manual-tile]').forEach(function (t) { t.remove(); });
   const grids = tileGrids();
   tiles.forEach(function (t) {
@@ -164,10 +204,19 @@ function applyTileGrid(tiles) {
       const tile = document.createElement('a');
       tile.className = 'jr-tile';
       tile.setAttribute('data-manual-tile', '');
-      tile.href = t.category ? ('shop.html?category=' + encodeURIComponent(t.category)) : 'shop.html';
+      const params = [];
+      if (t.gender === 'Women' || t.gender === 'Men') params.push('gender=' + t.gender);
+      if (t.category) params.push('category=' + encodeURIComponent(t.category));
+      tile.href = 'shop.html' + (params.length ? '?' + params.join('&') : '');
       const img = document.createElement('div');
       img.className = 'jr-tile-img';
-      if (t.image) img.style.setProperty('--photo-bg', "url('" + String(t.image).replace(/'/g, '%27') + "')");
+      if (t.image) {
+        img.style.setProperty('--photo-bg', "url('" + String(t.image).replace(/'/g, '%27') + "')");
+      } else if (t.category) {
+        img.setAttribute('data-auto-photo', '');
+        img.dataset.autoCategory = t.category;
+        if (t.gender === 'Women' || t.gender === 'Men') img.dataset.autoGender = t.gender;
+      }
       const label = document.createElement('div');
       label.className = 'jr-tile-label';
       label.textContent = t.title;
@@ -176,10 +225,13 @@ function applyTileGrid(tiles) {
       grid.appendChild(tile);
     });
   });
-  refreshSectionVisibility();
+  try { fillManualPhotos(JSON.parse(localStorage.getItem('velmora_products_cache'))); } catch (e) {}
+  if (window.velmoraProductsReady) window.velmoraProductsReady.then(fillManualPhotos).catch(function () {});
+  updateTileModeStyle();
 }
 
 /* ---------- Load: cached copy first, then fresh from Firestore ---------- */
+try { tileModeSetting = localStorage.getItem(TILEMODE_KEY) || 'auto'; } catch (e) {}
 try { applyAboutCards(JSON.parse(localStorage.getItem(ABOUT_KEY))); } catch (e) {}
 try { applyCustomCategories(JSON.parse(localStorage.getItem(CATS_KEY))); } catch (e) {}
 try { applyDiySection(localStorage.getItem(DIY_KEY) || 'forWomen'); } catch (e) { applyDiySection('forWomen'); }
@@ -203,9 +255,15 @@ try { applyTileGrid(JSON.parse(localStorage.getItem(TILEGRID_KEY))); } catch (e)
       applyDiySection(data.diySection);
       try { localStorage.setItem(DIY_KEY, data.diySection); } catch (e) {}
     }
+    if (typeof data.tileMode === 'string') {
+      tileModeSetting = data.tileMode;
+      try { localStorage.setItem(TILEMODE_KEY, data.tileMode); } catch (e) {}
+    }
     if (Array.isArray(data.tileGrid)) {
       applyTileGrid(data.tileGrid);
       try { localStorage.setItem(TILEGRID_KEY, JSON.stringify(data.tileGrid)); } catch (e) {}
+    } else {
+      updateTileModeStyle();
     }
   } catch (err) {
     console.error('Could not load homepage settings:', err);
