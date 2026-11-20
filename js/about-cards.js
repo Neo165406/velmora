@@ -14,6 +14,11 @@
 //    so the admin controls every title, photo, link and order.
 //    Manual mode is ignored while the Tile Grid is empty, so the section can never go blank.
 // Anything left empty keeps the default already written in index.html.
+//
+// Dead image links: every admin-set photo (tile, category, about card) is checked first.
+// Hosts like imgbb answer a deleted photo with an "image not found" placeholder, so a plain
+// background-image would show that placeholder. A dead link is skipped and the tile falls
+// back to a working product photo from the same category (or is hidden if there is none).
 import { db, isFirebaseConfigured } from './firebase-config.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
@@ -25,6 +30,35 @@ const TILEMODE_KEY = 'velmora_tilemode_cache';
 
 let tileModeSetting = 'auto';
 let tileGridData = [];
+
+/* ---------- Dead-image check ---------- */
+const imageChecks = {};
+function imageWorks(url) {
+  if (imageChecks[url]) return imageChecks[url];
+  imageChecks[url] = new Promise(function (resolve) {
+    function viaImage() {
+      const im = new Image();
+      im.onload = function () { resolve(im.naturalWidth > 0); };
+      im.onerror = function () { resolve(false); };
+      im.src = url;
+    }
+    if (!window.fetch) return viaImage();
+    fetch(url, { mode: 'cors', cache: 'force-cache' }).then(function (r) {
+      const type = r.headers.get('content-type') || '';
+      resolve(r.ok && (!type || type.indexOf('image') === 0 || type.indexOf('octet') > -1));
+    }).catch(viaImage); // CORS blocked or offline: fall back to a normal image load
+  });
+  return imageChecks[url];
+}
+// Resolves to the first URL in the list that works, or null.
+function firstWorking(urls) {
+  return urls.reduce(function (chain, url) {
+    return chain.then(function (found) {
+      if (found) return found;
+      return imageWorks(url).then(function (ok) { return ok ? url : null; });
+    });
+  }, Promise.resolve(null));
+}
 
 /* ---------- About cards ---------- */
 function applyAboutCards(cards) {
@@ -38,10 +72,14 @@ function applyAboutCards(cards) {
     if (title && c.title) title.textContent = c.title;
     if (text && c.text) text.textContent = c.text;
     if (img && c.image) {
-      img.removeAttribute('data-jr-photo');
-      img.removeAttribute('data-category');
-      img.style.display = '';
-      img.style.setProperty('--photo-bg', 'url("' + String(c.image).replace(/"/g, '%22') + '")');
+      // Only replace the default product photo when the admin's photo really loads.
+      imageWorks(String(c.image)).then(function (ok) {
+        if (!ok) return;
+        img.removeAttribute('data-jr-photo');
+        img.removeAttribute('data-category');
+        img.style.display = '';
+        img.style.setProperty('--photo-bg', 'url("' + String(c.image).replace(/"/g, '%22') + '")');
+      });
     }
   });
 }
@@ -50,6 +88,13 @@ function applyAboutCards(cards) {
 function photoOf(p) {
   if (Array.isArray(p.images) && p.images.length) return p.images[0];
   return p.image || null;
+}
+// All image URLs a product has, in order (gallery first, then the single image).
+function photosOf(p) {
+  let list = [];
+  if (Array.isArray(p.images)) list = list.concat(p.images);
+  if (p.image) list.push(p.image);
+  return list.filter(function (u) { return typeof u === 'string' && u; });
 }
 function tileGrids() {
   const grids = {};
@@ -132,7 +177,13 @@ function applyCustomCategories(cats) {
     img.className = 'jr-tile-img';
     img.dataset.gender = c.gender;
     img.dataset.category = c.name;
-    if (c.image) img.style.backgroundImage = 'url("' + String(c.image).replace(/"/g, '%22') + '")';
+    if (c.image) {
+      // Set the admin's photo only if it really loads; otherwise the product-photo fallback applies.
+      const url = String(c.image);
+      imageWorks(url).then(function (ok) {
+        if (ok) img.style.backgroundImage = 'url("' + url.replace(/"/g, '%22') + '")';
+      });
+    }
 
     const label = document.createElement('div');
     label.className = 'jr-tile-label';
@@ -176,18 +227,37 @@ function applyDiySection(section) {
 }
 
 /* ---------- Fully manual tile grid (Dashboard -> Tile Grid) ---------- */
-// A manual tile with no photo falls back to a matching product photo (never blank if one exists).
+// A manual tile with no photo (or a dead photo link) falls back to a working product photo
+// from the tile's category. A tile whose photo link is dead and that has no product photo
+// to fall back on is hidden, so the "image not found" placeholder is never shown.
 function fillManualPhotos(products) {
   if (!Array.isArray(products)) return;
   document.querySelectorAll('[data-manual-tile] .jr-tile-img[data-auto-photo]').forEach(function (img) {
     if (img.style.getPropertyValue('--photo-bg')) return;
-    const match = products.find(function (p) {
-      return photoOf(p) &&
-        (!img.dataset.autoCategory || p.category === img.dataset.autoCategory) &&
-        (!img.dataset.autoGender || p.gender === img.dataset.autoGender);
+    const tile = img.closest('.jr-tile');
+    const urls = [];
+    products.forEach(function (p) {
+      if ((!img.dataset.autoCategory || p.category === img.dataset.autoCategory) &&
+          (!img.dataset.autoGender || p.gender === img.dataset.autoGender)) {
+        photosOf(p).forEach(function (u) { if (urls.indexOf(u) < 0) urls.push(u); });
+      }
     });
-    if (match) img.style.setProperty('--photo-bg', "url('" + String(photoOf(match)).replace(/'/g, '%27') + "')");
+    firstWorking(urls.slice(0, 10)).then(function (url) {
+      if (img.style.getPropertyValue('--photo-bg')) return;
+      if (url) {
+        img.style.setProperty('--photo-bg', "url('" + String(url).replace(/'/g, '%27') + "')");
+        if (tile) tile.style.display = '';
+      } else if (img.hasAttribute('data-dead') && tile) {
+        tile.style.display = 'none';
+      }
+      refreshSectionVisibility();
+    });
   });
+}
+
+function runManualFill() {
+  try { fillManualPhotos(JSON.parse(localStorage.getItem('velmora_products_cache'))); } catch (e) {}
+  if (window.velmoraProductsReady) window.velmoraProductsReady.then(fillManualPhotos).catch(function () {});
 }
 
 function applyTileGrid(tiles) {
@@ -211,7 +281,27 @@ function applyTileGrid(tiles) {
       const img = document.createElement('div');
       img.className = 'jr-tile-img';
       if (t.image) {
-        img.style.setProperty('--photo-bg', "url('" + String(t.image).replace(/'/g, '%27') + "')");
+        // Show the admin's photo only if the link really serves an image.
+        const url = String(t.image);
+        imageWorks(url).then(function (ok) {
+          if (ok) {
+            img.style.setProperty('--photo-bg', "url('" + url.replace(/'/g, '%27') + "')");
+            tile.style.display = '';
+            refreshSectionVisibility();
+            return;
+          }
+          // Dead link (e.g. a deleted imgbb photo): use a product photo from the tile's category.
+          img.setAttribute('data-dead', '');
+          if (t.category) {
+            img.setAttribute('data-auto-photo', '');
+            img.dataset.autoCategory = t.category;
+            if (t.gender === 'Women' || t.gender === 'Men') img.dataset.autoGender = t.gender;
+            runManualFill();
+          } else {
+            tile.style.display = 'none';
+            refreshSectionVisibility();
+          }
+        });
       } else if (t.category) {
         img.setAttribute('data-auto-photo', '');
         img.dataset.autoCategory = t.category;
@@ -225,8 +315,7 @@ function applyTileGrid(tiles) {
       grid.appendChild(tile);
     });
   });
-  try { fillManualPhotos(JSON.parse(localStorage.getItem('velmora_products_cache'))); } catch (e) {}
-  if (window.velmoraProductsReady) window.velmoraProductsReady.then(fillManualPhotos).catch(function () {});
+  runManualFill();
   updateTileModeStyle();
 }
 
