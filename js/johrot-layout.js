@@ -150,24 +150,48 @@
   }
 
   /* ---------- Photos for tiles / brand cards (from product images) ---------- */
-  function photoOf(p) {
-    if (Array.isArray(p.images) && p.images.length) return p.images[0];
-    return p.image || null;
+  // All image URLs a product has, in order (gallery first, then the single image).
+  function photosOf(p) {
+    var list = [];
+    if (Array.isArray(p.images)) list = list.concat(p.images);
+    if (p.image) list.push(p.image);
+    return list.filter(function (u) { return typeof u === 'string' && u; });
   }
-  function applyPhotos(products) {
-    if (!Array.isArray(products)) return;
-    document.querySelectorAll('[data-jr-photo]').forEach(function (el) {
-      var cats = (el.dataset.category || '').split(',').filter(Boolean);
-      var gender = el.dataset.gender || '';
-      var match = products.find(function (p) {
-        return photoOf(p) && (!cats.length || cats.indexOf(p.category) > -1) && (!gender || p.gender === gender);
-      });
-      if (match) el.style.setProperty('--photo-bg', "url('" + photoOf(match).replace(/'/g, '%27') + "')");
-      // Category tiles (For Women / For Man): hide a tile when no product is assigned to it.
-      var tile = el.closest('.jr-tile');
-      if (tile) tile.style.display = match ? '' : 'none';
+
+  // Checks that an image URL really serves an image. Hosts like imgbb answer a deleted
+  // photo with a placeholder ("image not found"), so a plain <img> would show that
+  // placeholder instead of failing. Results are cached per URL.
+  var imageChecks = {};
+  function imageWorks(url) {
+    if (imageChecks[url]) return imageChecks[url];
+    imageChecks[url] = new Promise(function (resolve) {
+      function viaImage() {
+        var im = new Image();
+        im.onload = function () { resolve(im.naturalWidth > 0); };
+        im.onerror = function () { resolve(false); };
+        im.src = url;
+      }
+      if (!window.fetch) return viaImage();
+      fetch(url, { mode: 'cors', cache: 'force-cache' }).then(function (r) {
+        var type = r.headers.get('content-type') || '';
+        resolve(r.ok && (!type || type.indexOf('image') === 0 || type.indexOf('octet') > -1));
+      }).catch(viaImage); // CORS blocked or offline: fall back to a normal image load
     });
-    // Hide a whole "For Women" / "For Man" section when none of its tiles has a product.
+    return imageChecks[url];
+  }
+
+  // Resolves to the first URL in the list that works, or null.
+  function firstWorking(urls) {
+    return urls.reduce(function (chain, url) {
+      return chain.then(function (found) {
+        if (found) return found;
+        return imageWorks(url).then(function (ok) { return ok ? url : null; });
+      });
+    }, Promise.resolve(null));
+  }
+
+  // Hide a whole "For Women" / "For Man" section when none of its tiles has a product.
+  function hideEmptySections() {
     document.querySelectorAll('.jr-tiles').forEach(function (grid) {
       var section = grid.closest('section');
       if (!section) return;
@@ -176,6 +200,36 @@
       });
       section.style.display = anyVisible ? '' : 'none';
     });
+  }
+
+  function applyPhotos(products) {
+    if (!Array.isArray(products)) return;
+    var jobs = [];
+    document.querySelectorAll('[data-jr-photo]').forEach(function (el) {
+      var cats = (el.dataset.category || '').split(',').filter(Boolean);
+      var gender = el.dataset.gender || '';
+      var urls = [];
+      products.forEach(function (p) {
+        if ((!cats.length || cats.indexOf(p.category) > -1) && (!gender || p.gender === gender)) {
+          photosOf(p).forEach(function (u) { if (urls.indexOf(u) < 0) urls.push(u); });
+        }
+      });
+      urls = urls.slice(0, 10);
+      var tile = el.closest('.jr-tile');
+      // Category tiles (For Women / For Man): hide a tile when no product is assigned to it.
+      if (!urls.length) {
+        if (tile) tile.style.display = 'none';
+        return;
+      }
+      if (tile) tile.style.display = '';
+      // Use the first photo that actually loads; skip dead links.
+      jobs.push(firstWorking(urls).then(function (url) {
+        if (url) el.style.setProperty('--photo-bg', "url('" + url.replace(/'/g, '%27') + "')");
+        else if (tile) tile.style.display = 'none';
+      }));
+    });
+    hideEmptySections();
+    Promise.all(jobs).then(hideEmptySections);
   }
   function initPhotos() {
     if (!document.querySelector('[data-jr-photo]')) return;
